@@ -39,27 +39,4 @@ export class Balances extends RuntimeModule<BalancesConfig> {
 
     this.balances.set(address, newBalance);
   }
-
-  @runtimeMethod()
-  public transfer(from: PublicKey, to: PublicKey, amount: UInt64) {
-    const fromBalance = this.balances.get(from);
-    const toBalance = this.balances.get(to);
-
-    assert(
-      fromBalance.value.greaterThanOrEqual(amount),
-      "From balance is not sufficient"
-    );
-
-    const safeFromBalance = Provable.if(
-      fromBalance.value.greaterThanOrEqual(amount),
-      fromBalance.value,
-      amount
-    );
-
-    const newFromBalance = safeFromBalance.sub(amount);
-    const newToBalance = toBalance.value.add(amount);
-
-    this.balances.set(from, newFromBalance);
-    this.balances.set(to, newToBalance);
-  }
 }

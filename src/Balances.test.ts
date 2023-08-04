@@ -39,25 +39,5 @@ describe("Balances", () => {
 
     expect(block1?.txs[0].status, block1?.txs[0].statusMessage).toBe(true);
     expect(aliceBalance1?.toBigInt()).toBe(1000n);
-
-    const bobPrivateKey = PrivateKey.random();
-    const bob = bobPrivateKey.toPublicKey();
-
-    const tx2 = appChain.transaction(alice, () => {
-      balances.transfer(alice, bob, UInt64.from(100));
-    });
-
-    await tx2.sign();
-    await tx2.send();
-
-    const block2 = await appChain.produceBlock();
-
-    expect(block2?.txs[0].status, block2?.txs[0].statusMessage).toBe(true);
-
-    const aliceBalance2 = await appChain.query.Balances.balances.get(alice);
-    const bobBalance1 = await appChain.query.Balances.balances.get(bob);
-
-    expect(aliceBalance2?.toBigInt()).toBe(900n);
-    expect(bobBalance1?.toBigInt()).toBe(100n);
   });
 });
