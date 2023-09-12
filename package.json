@@ -13,7 +13,8 @@
     "@proto-kit/common": "*",
     "@proto-kit/module": "*",
     "@proto-kit/sdk": "*",
-    "snarkyjs": "0.11.0",
+    "@proto-kit/protocol": "*",
+    "snarkyjs": "0.12.0",
     "tsyringe": "^4.8.0"
   },
   "devDependencies": {

@@ -1,6 +1,9 @@
 import { TestingAppChain } from "@proto-kit/sdk";
 import { PrivateKey, UInt64 } from "snarkyjs";
 import { Balances } from "./Balances";
+import { log } from "@proto-kit/common";
+
+log.disableAll();
 
 describe("Balances", () => {
   it("should demonstrate how balances work", async () => {
@@ -35,9 +38,11 @@ describe("Balances", () => {
 
     const block1 = await appChain.produceBlock();
 
-    const aliceBalance1 = await appChain.query.Balances.balances.get(alice);
+    const aliceBalance = await appChain.query.runtime.Balances.balances.get(
+      alice
+    );
 
     expect(block1?.txs[0].status, block1?.txs[0].statusMessage).toBe(true);
-    expect(aliceBalance1?.toBigInt()).toBe(1000n);
+    expect(aliceBalance?.toBigInt()).toBe(1000n);
   });
 });
