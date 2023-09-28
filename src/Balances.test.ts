@@ -3,7 +3,7 @@ import { PrivateKey, UInt64 } from "snarkyjs";
 import { Balances } from "./Balances";
 import { log } from "@proto-kit/common";
 
-log.disableAll();
+log.setLevel("ERROR");
 
 describe("Balances", () => {
   it("should demonstrate how balances work", async () => {
