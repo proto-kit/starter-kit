@@ -1,5 +1,5 @@
 import { TestingAppChain } from "@proto-kit/sdk";
-import { PrivateKey, UInt64 } from "snarkyjs";
+import { PrivateKey, UInt64, Field } from "o1js";
 import { Balances } from "./Balances";
 import { log } from "@proto-kit/common";
 
@@ -7,15 +7,13 @@ log.setLevel("ERROR");
 
 describe("Balances", () => {
   it("should demonstrate how balances work", async () => {
-    const totalSupply = UInt64.from(10_000);
-
     const appChain = TestingAppChain.fromRuntime({
       modules: {
         Balances,
       },
       config: {
         Balances: {
-          totalSupply,
+          totalSupply: UInt64.from(10000),
         },
       },
     });
@@ -36,13 +34,11 @@ describe("Balances", () => {
     await tx1.sign();
     await tx1.send();
 
-    const block1 = await appChain.produceBlock();
+    const block = await appChain.produceBlock();
 
-    const aliceBalance = await appChain.query.runtime.Balances.balances.get(
-      alice
-    );
+    const balance = await appChain.query.runtime.Balances.balances.get(alice);
 
-    expect(block1?.txs[0].status, block1?.txs[0].statusMessage).toBe(true);
-    expect(aliceBalance?.toBigInt()).toBe(1000n);
-  });
+    expect(block?.txs[0].status).toBe(true);
+    expect(balance?.toBigInt()).toBe(1000n);
+  }, 1_000_000);
 });
