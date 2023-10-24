@@ -14,7 +14,8 @@
     "@proto-kit/module": "*",
     "@proto-kit/sdk": "*",
     "@proto-kit/protocol": "*",
-    "snarkyjs": "0.12.0",
+    "@proto-kit/sequencer": "*",
+    "o1js": "0.13.1",
     "tsyringe": "^4.8.0"
   },
   "devDependencies": {
