@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Inter as FontSans } from "next/font/google";
 import { cn } from "@/lib/utils";
+import Header from "@/components/header";
+import { Toaster } from "@/components/ui/toaster";
 
 export const fontSans = FontSans({
   subsets: ["latin"],
@@ -19,14 +21,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-full">
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased",
-          fontSans.variable
+          "h-full bg-background font-sans antialiased",
+          fontSans.variable,
         )}
       >
+        <Header
+          loading={false}
+          balance="1000"
+          balanceLoading={true}
+          wallet={"B62qmeMDp3AafAcYHGhBtx9UhTuqKCgyqLAWjcEED6Q1mGwJ6W14Zr6"}
+        />
         {children}
+        <Toaster />
       </body>
     </html>
   );
