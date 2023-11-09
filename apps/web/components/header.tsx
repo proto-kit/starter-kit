@@ -4,23 +4,25 @@ import Image from "next/image";
 // @ts-ignore
 import truncateMiddle from "truncate-middle";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LogOut } from "lucide-react";
-import clsx from "clsx";
 import { Chain } from "./chain";
 import { Separator } from "./ui/separator";
 
 export interface HeaderProps {
   loading: boolean;
   wallet?: string;
+  onConnectWallet: () => void;
   balance?: string;
   balanceLoading: boolean;
+  blockHeight?: string;
 }
 
 export default function Header({
   loading,
   wallet,
+  onConnectWallet,
   balance,
   balanceLoading,
+  blockHeight,
 }: HeaderProps) {
   return (
     <div className="flex items-center justify-between border-b p-2 shadow-sm">
@@ -29,7 +31,7 @@ export default function Header({
           <Image className="h-8 w-8" src={protokit} alt={"Protokit logo"} />
           <Separator className="mx-4 h-8" orientation={"vertical"} />
           <div className="flex grow">
-            <Chain error={false} />
+            <Chain height={blockHeight} />
           </div>
         </div>
         <div className="flex basis-6/12 flex-row items-center justify-end">
@@ -49,30 +51,11 @@ export default function Header({
             </div>
           )}
           {/* connect wallet */}
-          <div
-            className={clsx("mr-2", {
-              group: wallet,
-            })}
-          >
-            <Button loading={loading} className="w-44">
-              <div className="inline-block group-hover:hidden">
-                {wallet
-                  ? truncateMiddle(wallet, 7, 7, "...")
-                  : "Connect wallet"}
-              </div>
-              <div className="hidden group-hover:inline-block">
-                Reconnect wallet
-              </div>
-            </Button>
-          </div>
-          {/* additional actions */}
-          {/* {wallet && (
+          <Button loading={loading} className="w-44" onClick={onConnectWallet}>
             <div>
-              <Button variant={"outline"} size="icon">
-                <LogOut className="h-4 w-4" />
-              </Button>
+              {wallet ? truncateMiddle(wallet, 7, 7, "...") : "Connect wallet"}
             </div>
-          )} */}
+          </Button>
         </div>
       </div>
     </div>

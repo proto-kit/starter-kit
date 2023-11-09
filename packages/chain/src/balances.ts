@@ -21,7 +21,7 @@ export class Balances extends RuntimeModule<BalancesConfig> {
   @state() public circulatingSupply = State.from<UInt64>(UInt64);
 
   @runtimeMethod()
-  public setBalance(address: PublicKey, amount: UInt64): void {
+  public addBalance(address: PublicKey, amount: UInt64): void {
     const circulatingSupply = this.circulatingSupply.get();
     const newCirculatingSupply = circulatingSupply.value.add(amount);
     assert(
@@ -31,7 +31,6 @@ export class Balances extends RuntimeModule<BalancesConfig> {
     this.circulatingSupply.set(newCirculatingSupply);
     const currentBalance = this.balances.get(address);
     const newBalance = currentBalance.value.add(amount);
-    Provable.log("set balance", { address, newBalance });
     this.balances.set(address, newBalance);
   }
 }

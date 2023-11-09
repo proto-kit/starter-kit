@@ -8,15 +8,15 @@ import { Button } from "./ui/button";
 export interface FaucetProps {
   wallet?: string;
   loading: boolean;
-  balance?: string;
-  balanceLoading: boolean;
+  onConnectWallet: () => void;
+  onDrip: () => void;
 }
 
 export function Faucet({
   wallet,
+  onConnectWallet,
+  onDrip,
   loading,
-  balance,
-  balanceLoading,
 }: FaucetProps) {
   const form = useForm();
   return (
@@ -53,6 +53,10 @@ export function Faucet({
           type="submit"
           className="mt-6 w-full"
           loading={loading}
+          onClick={() => {
+            wallet ?? onConnectWallet();
+            wallet && onDrip();
+          }}
         >
           {wallet ? "Drip 💦" : "Connect wallet"}
         </Button>

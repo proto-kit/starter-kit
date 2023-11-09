@@ -17,9 +17,11 @@
     "@radix-ui/react-toast": "^1.1.5",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@tailwindcss/typography": "^0.5.10",
+    "@uidotdev/usehooks": "^2.4.1",
     "chain": "workspace:*",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
+    "immer": "^10.0.3",
     "lucide-react": "^0.292.0",
     "next": "14.0.1",
     "react": "^18",
@@ -28,7 +30,8 @@
     "tailwind-merge": "^2.0.0",
     "tailwindcss-animate": "^1.0.7",
     "truncate-middle": "^1.0.6",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "zustand": "^4.4.6"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -43,5 +46,11 @@
     "prettier-plugin-tailwindcss": "^0.5.6",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
+  },
+  "peerDependencies": {
+    "@proto-kit/sdk": "../../../framework/packages/sdk",
+    "@proto-kit/sequencer": "../../../framework/packages/sequencer",
+    "@proto-kit/module": "../../../framework/packages/module",
+    "o1js": "../../../framework/node_modules/o1js"
   }
 }
