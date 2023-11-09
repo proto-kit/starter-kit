@@ -22,7 +22,7 @@
     "build-and-start": "pnpm run build && pnpm run start",
     "dev": "npm-watch build-and-start"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@proto-kit/api": "../../../framework/packages/api",
     "@proto-kit/cli": "../../../framework/packages/cli",
     "@proto-kit/common": "../../../framework/packages/common",
@@ -30,11 +30,11 @@
     "@proto-kit/protocol": "../../../framework/packages/protocol",
     "@proto-kit/sdk": "../../../framework/packages/sdk",
     "@proto-kit/sequencer": "../../../framework/packages/sequencer",
-    "npm-watch": "^0.11.0",
     "o1js": "../../../framework/node_modules/o1js",
     "tsyringe": "../../../framework/node_modules/tsyringe"
   },
   "devDependencies": {
+    "npm-watch": "^0.11.0",
     "@jest/globals": "^29.6.1",
     "@types/jest": "^29.5.7",
     "@types/node": "^20.8.10",
