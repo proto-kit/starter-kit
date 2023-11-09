@@ -131,12 +131,14 @@ export const useNotifyTransactions = () => {
     [client.client],
   );
 
+  // notify about new pending transactions
   useEffect(() => {
     newPendingTransactions.forEach((pendingTransaction) => {
       notifyTransaction("PENDING", pendingTransaction);
     });
   }, [newPendingTransactions, notifyTransaction]);
 
+  // notify about transaction success or failure
   useEffect(() => {
     const confirmedTransactions = chain.block?.txs?.map(
       ({ tx, status, statusMessage }) => {

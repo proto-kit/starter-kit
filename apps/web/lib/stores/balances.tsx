@@ -72,7 +72,7 @@ export const useObserveBalance = () => {
     if (!client.client || !wallet.wallet) return;
 
     balances.loadBalance(client.client, wallet.wallet);
-  }, [client.client, chain.height, wallet.wallet]);
+  }, [client.client, chain.block?.height, wallet.wallet]);
 };
 
 export const useFaucet = () => {
