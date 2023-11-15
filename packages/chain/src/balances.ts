@@ -1,15 +1,9 @@
 import {
-  AreProofsEnabled,
-  provableMethod,
-  ZkProgrammable,
-} from "@proto-kit/common";
-import {
   RuntimeModule,
   runtimeModule,
   state,
   runtimeMethod,
 } from "@proto-kit/module";
-
 import { State, StateMap, assert } from "@proto-kit/protocol";
 import { PublicKey, UInt64 } from "o1js";
 
@@ -27,7 +21,7 @@ export class Balances extends RuntimeModule<BalancesConfig> {
   @state() public circulatingSupply = State.from<UInt64>(UInt64);
 
   @runtimeMethod()
-  public setBalance(address: PublicKey, amount: UInt64) {
+  public addBalance(address: PublicKey, amount: UInt64): void {
     const circulatingSupply = this.circulatingSupply.get();
     const newCirculatingSupply = circulatingSupply.value.add(amount);
     assert(
