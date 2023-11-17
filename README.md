@@ -44,4 +44,10 @@ pnpm dev -- --filter web
 pnpm dev -- --filter chain
 ```
 
+### Running tests
+```zsh
+# run and watch tests for the `chain` package
+pnpm run test --filter=chain -- --watchAll
+```
+
 Navigate to `localhost:3000` to see the example UI, or to `localhost:8080/graphql` to see the GQL interface of the locally running sequencer.
