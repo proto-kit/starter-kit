@@ -48,9 +48,10 @@
     "typescript": "^5"
   },
   "peerDependencies": {
+    "@proto-kit/module": "*",
     "@proto-kit/sdk": "*",
     "@proto-kit/sequencer": "*",
-    "@proto-kit/module": "*",
-    "o1js": "0.13.1"
+    "o1js": "0.13.1",
+    "tsyringe": "^4.7.0"
   }
 }

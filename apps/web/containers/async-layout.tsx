@@ -38,7 +38,7 @@ export default function AsyncLayout({ children }: { children: ReactNode }) {
         balanceLoading={loading}
         wallet={wallet.wallet}
         onConnectWallet={wallet.connectWallet}
-        blockHeight={chain.block?.height ?? "0"}
+        blockHeight={chain.block?.height ?? "-"}
       />
       {children}
       <Toaster />

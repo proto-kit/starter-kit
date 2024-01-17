@@ -33,8 +33,10 @@ export interface ChainState {
 export interface BlockQueryResponse {
   data: {
     network: {
-      block: {
-        height: string;
+      unproven?: {
+        block: {
+          height: string;
+        };
       };
     };
     block: ComputedBlockJSON;
@@ -75,8 +77,10 @@ export const useChainStore = create<ChainState, [["zustand/immer", never]]>(
                 }
               }
               network {
-                block {
-                  height
+                unproven {
+                  block {
+                    height
+                  }
                 }
               }
             }
@@ -88,10 +92,12 @@ export const useChainStore = create<ChainState, [["zustand/immer", never]]>(
 
       set((state) => {
         state.loading = false;
-        state.block = {
-          height: data.network.block.height,
-          ...data.block,
-        };
+        state.block = data.network.unproven
+          ? {
+              height: data.network.unproven.block.height,
+              ...data.block,
+            }
+          : undefined;
       });
     },
   })),
