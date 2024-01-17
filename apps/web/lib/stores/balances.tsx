@@ -53,8 +53,6 @@ export const useBalancesStore = create<
         balances.addBalance(sender, UInt64.from(1000));
       });
 
-      console.log('nonce', tx.transaction?.nonce.toBigInt());
-
       await tx.sign();
       await tx.send();
 
