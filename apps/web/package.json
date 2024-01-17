@@ -48,9 +48,9 @@
     "typescript": "^5"
   },
   "peerDependencies": {
-    "@proto-kit/sdk": "*",
-    "@proto-kit/sequencer": "*",
-    "@proto-kit/module": "*",
-    "o1js": "0.13.1"
+    "@proto-kit/sdk": "../../../framework/packages/sdk",
+    "@proto-kit/sequencer": "../../../framework/packages/sequencer",
+    "@proto-kit/module": "../../../framework/packages/module",
+    "o1js": "../../../framework/node_modules/o1js"
   }
 }
