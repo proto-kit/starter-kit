@@ -11,7 +11,10 @@ describe("balances", () => {
       modules: {
         Balances,
       },
-      config: {
+    });
+
+    appChain.configurePartial({
+      Runtime: {
         Balances: {
           totalSupply: UInt64.from(10000),
         },
@@ -38,7 +41,7 @@ describe("balances", () => {
 
     const balance = await appChain.query.runtime.Balances.balances.get(alice);
 
-    expect(block?.txs[0].status).toBe(true);
+    expect(block?.transactions[0].status.toBoolean()).toBe(true);
     expect(balance?.toBigInt()).toBe(1000n);
   }, 1_000_000);
 });
