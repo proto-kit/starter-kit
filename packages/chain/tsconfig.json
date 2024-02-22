@@ -19,6 +19,6 @@
     "strictFunctionTypes": true
   },
   "files": ["node_modules/jest-expect-message/types/index.d.ts"],
-  "include": ["./src/**/*", "./bin/**/*"],
+  "include": ["./src/**/*", "./bin/**/*", "./on_startup_scripts/**/*"],
   "exclude": ["jest.config.cjs"]
 }
