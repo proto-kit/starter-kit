@@ -25,7 +25,7 @@ export interface WalletState {
 export const useWalletStore = create<WalletState, [["zustand/immer", never]]>(
   immer((set) => ({
     async initializeWallet() {
-      if (typeof mina === 'undefined') {
+      if (typeof mina === "undefined") {
         throw new Error("Auro wallet not installed");
       }
 
@@ -36,7 +36,7 @@ export const useWalletStore = create<WalletState, [["zustand/immer", never]]>(
       });
     },
     async connectWallet() {
-      if (typeof mina === 'undefined') {
+      if (typeof mina === "undefined") {
         throw new Error("Auro wallet not installed");
       }
 
@@ -47,7 +47,7 @@ export const useWalletStore = create<WalletState, [["zustand/immer", never]]>(
       });
     },
     observeWalletChange() {
-      if (typeof mina === 'undefined') {
+      if (typeof mina === "undefined") {
         throw new Error("Auro wallet not installed");
       }
 
@@ -61,7 +61,7 @@ export const useWalletStore = create<WalletState, [["zustand/immer", never]]>(
     pendingTransactions: [] as PendingTransaction[],
     addPendingTransaction(pendingTransaction) {
       set((state) => {
-        // @ts-expect-error
+        // @ts-ignore
         state.pendingTransactions.push(pendingTransaction);
       });
     },
@@ -144,6 +144,7 @@ export const useNotifyTransactions = () => {
       ({ tx, status, statusMessage }) => {
         return {
           tx: new PendingTransaction({
+            isMessage: false,
             methodId: Field(tx.methodId),
             nonce: UInt64.from(tx.nonce),
             sender: PublicKey.fromBase58(tx.sender),
