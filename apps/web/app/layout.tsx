@@ -1,14 +1,8 @@
 "use client";
+
 import "./globals.css";
-import { Inter as FontSans } from "next/font/google";
-import { cn } from "@/lib/utils";
-
 import AsyncLayoutDynamic from "@/containers/async-layout-dynamic";
-
-export const fontSans = FontSans({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
+import "reflect-metadata";
 
 export default function RootLayout({
   children,
@@ -16,13 +10,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="h-full">
-      <body
-        className={cn(
-          "h-full bg-background font-sans antialiased",
-          fontSans.variable,
-        )}
-      >
+    <html lang="en">
+      <head>
+        <title>Starter Kit</title>
+        <meta property="og:title" content="Starter Kit" key="title" />
+        <link rel="shortcut icon" type="image/x-icon" href={"/favicon.ico"} />
+      </head>
+      <body className="font-mono">
         <AsyncLayoutDynamic>{children}</AsyncLayoutDynamic>
       </body>
     </html>
