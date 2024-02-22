@@ -11,6 +11,10 @@
       "cache": false,
       "persistent": true
     },
+    "start-chain-custom-run": {
+      "cache": false,
+      "persistent": true
+    },
     "test": {},
     "start": {
       "cache": false

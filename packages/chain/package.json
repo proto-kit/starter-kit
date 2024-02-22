@@ -2,7 +2,7 @@
   "name": "chain",
   "version": "1.0.0",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
   "watch": {
     "build-and-start": {
       "patterns": [
@@ -18,9 +18,11 @@
     "test": "node --experimental-vm-modules --experimental-wasm-modules --experimental-wasm-threads ./node_modules/jest/bin/jest.js",
     "test:watch": "npm run test --watchAll",
     "build": "tsc -p tsconfig.json",
-    "start": "FORCE_COLOR=3 protokit start ./dist/chain.config.js",
+    "start": "FORCE_COLOR=3 protokit start ./dist/src/chain.config.js",
     "build-and-start": "pnpm run build && pnpm run start",
-    "dev": "npm-watch build-and-start"
+    "dev": "npm-watch build-and-start",
+    "start-chain-custom-run": "pnpm run build && pnpm custom-run",
+    "custom-run": "node --experimental-specifier-resolution=node --experimental-vm-modules --experimental-wasm-modules --experimental-wasm-threads dist/bin/run.js"
   },
   "peerDependencies": {
     "@proto-kit/api": "*",
