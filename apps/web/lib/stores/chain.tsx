@@ -51,13 +51,15 @@ export const useChainStore = create<ChainState, [["zustand/immer", never]]>(
         state.loading = true;
       });
 
-      const response = await fetch("http://localhost:8080/graphql", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          query: `
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_PROTOKIT_URL || "http://localhost:8080/graphql",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            query: `
             query GetBlock {
               block {
                 txs {
@@ -85,8 +87,9 @@ export const useChainStore = create<ChainState, [["zustand/immer", never]]>(
               }
             }
           `,
-        }),
-      });
+          }),
+        },
+      );
 
       const { data } = (await response.json()) as BlockQueryResponse;
 
