@@ -14,7 +14,13 @@ const nextConfig = {
   },
   webpack(config) {
     config.experiments = { ...config.experiments, topLevelAwait: true };
-    return config;
+    return {
+      ...config,
+      optimization: {
+        // workaround client-side runtime bug
+        minimize: false,
+      },
+    };
   },
   compress: false,
 };
