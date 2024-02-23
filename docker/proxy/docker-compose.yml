@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    restart: unless-stopped
+    ports:
+      - 443:443
+      - 127.0.0.1:8080:8080
+    volumes:
+      - ./traefik_conf.yml:/etc/traefik_dynamic_conf.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+      - traefik-letsencrypt:/letsencrypt
+    networks:
+      - proxy-network
+    command:
+      - --api.insecure=true
+      - --certificatesresolvers.letsencrypt.acme.email=${LETSENCRYPT_EMAIL}
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.letsencrypt.acme.tlschallenge=true
+      - --certificatesresolvers.letsencrypt.acme.keyType=EC256
+      - --entrypoints.websecure.address=:443
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker=true
+      - --providers.file.filename=/etc/traefik_dynamic_conf.yml
+
+      - --log.level=DEBUG
+
+      # # for testing SSL
+      # - --certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+      # - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/test-acme.json
+
+  backup:
+    image: offen/docker-volume-backup:v2
+    environment:
+      BACKUP_FILENAME: backup-traefik-%Y%m%d%H%M%S.tar.gz
+      BACKUP_PRUNING_PREFIX: backup-traefik-
+      BACKUP_LATEST_SYMLINK: backup-traefik-latest.tar.gz
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS}
+      BACKUP_CRON_EXPRESSION: "${BACKUP_CRON_EXPRESSION}"
+      # GPG_PASSPHRASE: XXXXXXXXXXXXX
+    volumes:
+      - ${BACKUP_DIR}:/archive
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik-letsencrypt:/backup/traefik-letsencrypt:ro
+
+volumes:
+  traefik-letsencrypt:
+
+networks:
+  proxy-network:
+    name: proxy-network
+    driver: bridge
