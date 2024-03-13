@@ -1,11 +1,12 @@
 import { LocalhostAppChain } from "@proto-kit/cli";
-import runtime from "./runtime";
 import { Runtime } from "@proto-kit/module";
 import { VanillaProtocol } from "@proto-kit/protocol";
+import { PrismaRedisDatabase } from "@proto-kit/persistance";
+import runtime from "./runtime";
 
 import {
   BlockProducerModule,
-  InMemoryDatabase,
+  // 1: InMemoryDatabase,
   LocalTaskQueue,
   LocalTaskWorkerModule,
   ManualBlockTrigger,
@@ -47,7 +48,8 @@ const appChain = LocalhostAppChain.from({
 
   sequencer: Sequencer.from({
     modules: {
-      Database: InMemoryDatabase,
+      // 1: Database: InMemoryDatabase,
+      Database: PrismaRedisDatabase,
       Mempool: PrivateMempool,
       GraphqlServer,
       LocalTaskWorkerModule,
@@ -88,7 +90,26 @@ appChain.configure({
   },
 
   Sequencer: {
-    Database: {},
+    // 1: Database: {},
+
+    Database: {
+      redis: {
+        url: "redis://localhost:6379",
+        password: "password",
+      },
+      prisma: {
+        connection: {
+          host: "localhost",
+          password: "password",
+          username: "admin",
+          port: 5432,
+          db: {
+            name: "protokit",
+          },
+        },
+      },
+    },
+
     UnprovenProducerModule: {},
     StartupScripts: {},
 
