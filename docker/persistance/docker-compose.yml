@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:14-alpine
+    container_name: protokit-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=protokit
+
+  redis:
+    image: redis:6.2-alpine
+    container_name: protokit-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server /redis.conf --requirepass password
+    volumes:
+      - ./redis:/data
+      - ./redis.conf:/redis.conf
