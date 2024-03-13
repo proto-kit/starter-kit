@@ -30,6 +30,7 @@
     "@proto-kit/cli": "*",
     "@proto-kit/common": "*",
     "@proto-kit/module": "*",
+    "@proto-kit/persistance": "*",
     "@proto-kit/protocol": "*",
     "@proto-kit/sdk": "*",
     "@proto-kit/sequencer": "*",
