@@ -1,21 +1,18 @@
-import { UInt64 } from "o1js";
+import { Balance } from "@proto-kit/library";
 import { Balances } from "./balances";
-import { runtimeModule } from "@proto-kit/module";
+import { ModulesConfig } from "@proto-kit/common";
 
-@runtimeModule()
-export class CustomBalances extends Balances {}
+export const modules = {
+  Balances,
+};
+
+export const config: ModulesConfig<typeof modules> = {
+  Balances: {
+    totalSupply: Balance.from(10_000),
+  },
+};
 
 export default {
-  modules: {
-    Balances,
-    CustomBalances,
-  },
-  config: {
-    Balances: {
-      totalSupply: UInt64.from(10_000),
-    },
-    CustomBalances: {
-      totalSupply: UInt64.from(10_000),
-    },
-  },
+  modules,
+  config,
 };
