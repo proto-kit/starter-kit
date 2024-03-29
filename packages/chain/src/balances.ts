@@ -1,16 +1,6 @@
-import {
-  RuntimeModule,
-  runtimeModule,
-  state,
-  runtimeMethod,
-} from "@proto-kit/module";
+import { runtimeModule, state, runtimeMethod } from "@proto-kit/module";
 import { State, assert } from "@proto-kit/protocol";
-import {
-  Balance,
-  BalancesKey,
-  Balances as BaseBalances,
-  TokenId,
-} from "@proto-kit/library";
+import { Balance, Balances as BaseBalances, TokenId } from "@proto-kit/library";
 import { PublicKey } from "o1js";
 
 interface BalancesConfig {
@@ -36,8 +26,6 @@ export class Balances extends BaseBalances<BalancesConfig> {
       "Circulating supply would be higher than total supply"
     );
     this.circulatingSupply.set(newCirculatingSupply);
-    const currentBalance = this.getBalance(tokenId, address);
-    const newBalance = currentBalance.add(amount);
-    this.setBalance(tokenId, address, newBalance);
+    this.mint(tokenId, address, amount);
   }
 }
