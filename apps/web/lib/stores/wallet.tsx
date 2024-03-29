@@ -9,7 +9,7 @@ import truncateMiddle from "truncate-middle";
 import { usePrevious } from "@uidotdev/usehooks";
 import { useClientStore } from "./client";
 import { useChainStore } from "./chain";
-import { Field, PublicKey, Signature, UInt64 } from "o1js";
+import { Bool, Field, PublicKey, Signature, UInt64 } from "o1js";
 
 export interface WalletState {
   wallet?: string;
@@ -25,7 +25,7 @@ export interface WalletState {
 export const useWalletStore = create<WalletState, [["zustand/immer", never]]>(
   immer((set) => ({
     async initializeWallet() {
-      if (typeof mina === 'undefined') {
+      if (typeof mina === "undefined") {
         throw new Error("Auro wallet not installed");
       }
 
@@ -36,7 +36,7 @@ export const useWalletStore = create<WalletState, [["zustand/immer", never]]>(
       });
     },
     async connectWallet() {
-      if (typeof mina === 'undefined') {
+      if (typeof mina === "undefined") {
         throw new Error("Auro wallet not installed");
       }
 
@@ -47,7 +47,7 @@ export const useWalletStore = create<WalletState, [["zustand/immer", never]]>(
       });
     },
     observeWalletChange() {
-      if (typeof mina === 'undefined') {
+      if (typeof mina === "undefined") {
         throw new Error("Auro wallet not installed");
       }
 
@@ -146,6 +146,7 @@ export const useNotifyTransactions = () => {
           tx: new PendingTransaction({
             methodId: Field(tx.methodId),
             nonce: UInt64.from(tx.nonce),
+            isMessage: false,
             sender: PublicKey.fromBase58(tx.sender),
             argsFields: tx.argsFields.map((arg) => Field(arg)),
             argsJSON: tx.argsJSON,

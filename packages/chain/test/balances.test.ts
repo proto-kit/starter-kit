@@ -1,16 +1,15 @@
 import { TestingAppChain } from "@proto-kit/sdk";
-import { PrivateKey, UInt64 } from "o1js";
+import { PrivateKey } from "o1js";
 import { Balances } from "../src/balances";
 import { log } from "@proto-kit/common";
+import { BalancesKey, TokenId, UInt64 } from "@proto-kit/library";
 
 log.setLevel("ERROR");
 
 describe("balances", () => {
   it("should demonstrate how balances work", async () => {
     const appChain = TestingAppChain.fromRuntime({
-      modules: {
-        Balances,
-      },
+      Balances,
     });
 
     appChain.configurePartial({
@@ -25,13 +24,14 @@ describe("balances", () => {
 
     const alicePrivateKey = PrivateKey.random();
     const alice = alicePrivateKey.toPublicKey();
+    const tokenId = TokenId.from(0);
 
     appChain.setSigner(alicePrivateKey);
 
     const balances = appChain.runtime.resolve("Balances");
 
     const tx1 = await appChain.transaction(alice, () => {
-      balances.addBalance(alice, UInt64.from(1000));
+      balances.addBalance(tokenId, alice, UInt64.from(1000));
     });
 
     await tx1.sign();
@@ -39,7 +39,8 @@ describe("balances", () => {
 
     const block = await appChain.produceBlock();
 
-    const balance = await appChain.query.runtime.Balances.balances.get(alice);
+    const key = new BalancesKey({ tokenId, address: alice });
+    const balance = await appChain.query.runtime.Balances.balances.get(key);
 
     expect(block?.transactions[0].status.toBoolean()).toBe(true);
     expect(balance?.toBigInt()).toBe(1000n);
