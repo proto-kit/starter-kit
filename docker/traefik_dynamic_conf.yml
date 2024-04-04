@@ -1,0 +1,44 @@
+global:
+  sendAnonymousUsage: false
+http:
+  middlewares:
+    SSLHeader:
+      headers:
+        AccessControlAllowHeaders:
+          - "Accept"
+          - "Content-Type"
+          - "Origin"
+          - "Authorization" # Include other headers as needed
+        AccessControlAllowMethods:
+          - "GET"
+          - "OPTIONS"
+          - "POST"
+          - "PUT"
+        AccessControlAllowOriginList:
+          - "*" # Allow all origins
+          # Or restrict access to specific origin(s):
+          # - "https://example.xyz"
+        AccessControlMaxAge: 100
+        AddVaryHeader: true
+        BrowserXssFilter: true
+        ContentTypeNosniff: true
+        CustomFrameOptionsValue: SAMEORIGIN
+        ForceSTSHeader: true
+        FrameDeny: true
+        ReferrerPolicy: same-origin
+        STSIncludeSubdomains: true
+        STSPreload: true
+        STSSeconds: 315360000
+        # ContentSecurityPolicy: default-src 'self' 'unsafe-inline'
+tls:
+  options:
+    default:
+      minVersion: VersionTLS12
+      sniStrict: true
+      curvePreferences:
+        - CurveP521
+        - CurveP384
+      cipherSuites:
+        - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+        - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+        - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256

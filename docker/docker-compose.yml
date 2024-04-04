@@ -1,0 +1,78 @@
+version: "3.8"
+
+services:
+  traefik:
+    image: traefik:v2.11
+    container_name: traefik
+    restart: unless-stopped
+    ports:
+      - 443:443
+    volumes:
+      - ./traefik_dynamic_conf.yml:/etc/traefik_dynamic_conf.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+      - traefik-letsencrypt:/letsencrypt
+    networks:
+      - proxy-network
+    command:
+      - --certificatesresolvers.letsencrypt.acme.email=${LETSENCRYPT_EMAIL}
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.letsencrypt.acme.tlschallenge=true
+      - --certificatesresolvers.letsencrypt.acme.keyType=EC256
+      - --entrypoints.websecure.address=:443
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker=true
+      - --providers.file.filename=/etc/traefik_dynamic_conf.yml
+
+      - --log.level=DEBUG
+
+      # for testing SSL
+      # - --certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+      # - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/test-acme.json
+
+  chain:
+    image: ${DOCKER_IMG}:${DOCKER_TAG}
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    command: sh -c "pnpm start-chain-custom-run"
+    restart: unless-stopped
+    expose:
+      - "8080"
+    networks:
+      - proxy-network
+    environment:
+      - BLOCK_INTERVAL
+      - PRODUCE_EMPTY_BLOCKS
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy-network"
+      - "traefik.http.routers.chain.rule=Host(`${DOMAIN_CHAIN}`)"
+      - "traefik.http.routers.chain.entrypoints=websecure"
+      - "traefik.http.routers.chain.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.chain.middlewares=SSLHeader@file"
+
+  app:
+    image: ${DOCKER_IMG}:${DOCKER_TAG}
+    command: sh -c "cd apps/web && pnpm run start"
+    restart: unless-stopped
+    expose:
+      - "3000"
+    networks:
+      - proxy-network
+    depends_on:
+      - chain
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy-network"
+      - "traefik.http.routers.app.rule=Host(`${DOMAIN_APP}`)"
+      - "traefik.http.routers.app.entrypoints=websecure"
+      - "traefik.http.routers.app.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.app.middlewares=SSLHeader@file"
+
+volumes:
+  traefik-letsencrypt:
+
+networks:
+  proxy-network:
+    name: proxy-network
+    driver: bridge
