@@ -3,9 +3,14 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
+    "dev:local": "turbo run dev:local",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "test": "turbo run test"
+    "test": "turbo run test",
+    "migrate": "turbo run migrate",
+    "start": "turbo run start",
+    "docker:up": "docker-compose -f docker/docker-compose.yml up",
+    "prisma:generate": "turbo run prisma:generate"
   },
   "devDependencies": {
     "eslint": "^8.53.0",

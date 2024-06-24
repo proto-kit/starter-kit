@@ -14,6 +14,9 @@
     "test": {},
     "start": {
       "cache": false
-    }
+    },
+    "migrate": {},
+    "dev:local": {},
+    "prisma:generate": {}
   }
 }
