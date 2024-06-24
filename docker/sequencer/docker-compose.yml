@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  sequencer:
+    #    extends:
+    #      file: ../packages/chain/node_modules/@proto-kit/deployment/docker/docker-compose.yml
+    #      service: sequencer
+    image: starterkit-sequencer
+    build:
+      dockerfile: ./docker/base/Dockerfile
+      context: ../..
+    container_name: starterkit-sequencer
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - LOGGING-LEVEL=${LOGGING_LEVEL:-INFO}
+    profiles:
+      - mono-sequencer
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - db-net
+    ports:
+      - "8080:8080"
+    command: [ "${INDEX_JS}", "${PROTOKIT_ENV}", "${PROTOKIT_CONFIG}" ]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy-network"
+      - "traefik.http.routers.api_server.rule=Host(`${GRAPHQL_URL}`)"
+      - "traefik.http.routers.api_server.entrypoints=websecure"
+      - "traefik.http.routers.api_server.tls.certresolver=letsencrypt"
+      # - "traefik.http.routers.api_server.middlewares=SslHeader@file"
+
+networks:
+  proxy-network:
+    external: true
