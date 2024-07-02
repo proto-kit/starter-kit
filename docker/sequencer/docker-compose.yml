@@ -12,7 +12,7 @@ services:
     container_name: starterkit-sequencer
     environment:
       - DATABASE_URL=${DATABASE_URL}
-      - LOGGING-LEVEL=${LOGGING_LEVEL:-INFO}
+      - LOGGING_LEVEL=${LOGGING_LEVEL:-INFO}
     profiles:
       - mono-sequencer
     depends_on:
@@ -22,7 +22,7 @@ services:
       - db-net
     ports:
       - "8080:8080"
-    command: [ "${INDEX_JS}", "${PROTOKIT_ENV}", "${PROTOKIT_CONFIG}" ]
+    command: ["${INDEX_JS}", "${PROTOKIT_ENV}", "${PROTOKIT_CONFIG}"]
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy-network"

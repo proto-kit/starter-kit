@@ -22,6 +22,12 @@ import {
   VanillaTaskWorkerModules,
 } from "@proto-kit/sequencer";
 import { log } from "@proto-kit/common";
+import { PrismaRedisDatabase } from "@proto-kit/persistance";
+import {
+  DefaultGraphqlModules,
+  GraphqlSequencerModule,
+  GraphqlServer,
+} from "@proto-kit/api";
 
 const appChain = AppChain.from({
   Runtime: Runtime.from({
@@ -37,8 +43,8 @@ const appChain = AppChain.from({
       // BullQueue,
 
       // Database
-      InMemoryDatabase,
-      // PrismaRedisDatabase,
+      // InMemoryDatabase,
+      PrismaRedisDatabase,
 
       // Settlement Layer
       MinaBaseLayer,
@@ -48,9 +54,14 @@ const appChain = AppChain.from({
 
       {
         LocalTaskWorkerModules: LocalTaskWorkerModule.from(
-          VanillaTaskWorkerModules.allTasks(),
+          VanillaTaskWorkerModules.allTasks()
         ),
-      },
+        GraphqlServer: GraphqlServer,
+
+        Graphql: GraphqlSequencerModule.from({
+          modules: DefaultGraphqlModules.with({}),
+        }),
+      }
     ),
   }),
   modules: {
@@ -62,6 +73,20 @@ const appChain = AppChain.from({
 appChain.configurePartial({
   Sequencer: {
     ...SimpleSequencerModules.defaultConfig(),
+    GraphqlServer: {
+      port: 8080,
+      host: "0.0.0.0",
+      graphiql: true,
+    },
+
+    Graphql: {
+      QueryGraphqlModule: {},
+      MempoolResolver: {},
+      BlockStorageResolver: {},
+      NodeStatusResolver: {},
+      MerkleWitnessResolver: {},
+      UnprovenBlockResolver: {},
+    },
     TaskQueue: {},
     Database: {
       redis: {
@@ -108,4 +133,4 @@ appChain.configurePartial({
 log.setLevel("INFO");
 
 // TODO: remove temporary `as any` once `error TS2742` is resolved
-export default appChain as any;
+export default appChain;

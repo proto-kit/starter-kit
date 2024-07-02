@@ -49,11 +49,11 @@
     "typescript": "^5"
   },
   "peerDependencies": {
-    "@proto-kit/module": "*",
-    "@proto-kit/sdk": "*",
-    "@proto-kit/sequencer": "*",
-    "@proto-kit/library": "*",
-    "o1js": "0.13.1",
-    "tsyringe": "^4.7.0"
+    "@proto-kit/module": "../../../framework/packages/module",
+    "@proto-kit/sdk": "../../../framework/packages/sdk",
+    "@proto-kit/sequencer": "../../../framework/packages/sequencer",
+    "@proto-kit/library": "../../../framework/packages/library",
+    "o1js": "../../../framework/node_modules/o1js",
+    "tsyringe": "../../../framework/node_modules/tsyringe"
   }
 }

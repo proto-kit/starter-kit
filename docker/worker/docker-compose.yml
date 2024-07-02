@@ -8,11 +8,11 @@ services:
       context: ../..
     container_name: starterkit-worker
     environment:
-      - LOGGING-LEVEL=${LOGGING_LEVEL:-INFO}
+      - LOGGING_LEVEL=${LOGGING_LEVEL:-INFO}
     profiles:
       - worker
     depends_on:
       - redis
     networks:
       - db-net
-    command: [ "${INDEX_JS}", "${PROTOKIT_ENV}", "${WORKER_CONFIG}" ]
+    command: ["${INDEX_JS}", "${PROTOKIT_ENV}", "${WORKER_CONFIG}"]

@@ -4,7 +4,7 @@ import { LocalhostAppChainModules } from "@proto-kit/cli";
 import { AppChain } from "@proto-kit/sdk";
 
 const appChain = AppChain.from(
-  LocalhostAppChainModules.from(runtime.modules, protocol.modules, {}, {}),
+  LocalhostAppChainModules.from(runtime.modules, protocol.modules, {}, {})
 );
 
 appChain.configurePartial({
@@ -12,8 +12,12 @@ appChain.configurePartial({
   Runtime: {
     ...LocalhostAppChainModules.defaultConfig().Runtime,
     // Config for Balances clashes, therefore we have to also provide it here
-    ...runtime.config
-  }
+    ...runtime.config,
+  },
+  Protocol: {
+    ...LocalhostAppChainModules.defaultConfig().Protocol,
+    ...protocol.config,
+  },
 });
 
 appChain.configurePartial({
@@ -22,4 +26,4 @@ appChain.configurePartial({
 });
 
 // TODO: remove temporary `as any` once `error TS2742` is resolved
-export default appChain as any;
+export default appChain;

@@ -2,7 +2,7 @@
   "name": "chain",
   "version": "1.0.0",
   "type": "module",
-  "main": "dist/src/index.js",
+  "main": "dist/index.js",
   "watch": {
     "build-and-start": {
       "patterns": [
@@ -28,16 +28,18 @@
     "prisma:generate": "prisma generate --schema ./node_modules/@proto-kit/persistance/prisma/schema.prisma"
   },
   "peerDependencies": {
-    "@proto-kit/api": "*",
-    "@proto-kit/cli": "*",
-    "@proto-kit/common": "*",
-    "@proto-kit/library": "*",
-    "@proto-kit/module": "*",
-    "@proto-kit/protocol": "*",
-    "@proto-kit/sdk": "*",
-    "@proto-kit/sequencer": "*",
-    "o1js": "0.13.1",
-    "tsyringe": "^4.7.0"
+    "@proto-kit/api": "../../../framework/packages/api",
+    "@proto-kit/cli": "../../../framework/packages/cli",
+    "@proto-kit/common": "../../../framework/packages/common",
+    "@proto-kit/library": "../../../framework/packages/library",
+    "@proto-kit/module": "../../../framework/packages/module",
+    "@proto-kit/protocol": "../../../framework/packages/protocol",
+    "@proto-kit/sdk": "../../../framework/packages/sdk",
+    "@proto-kit/sequencer": "../../../framework/packages/sequencer",
+    "@proto-kit/deployment": "../../../framework/packages/deployment",
+    "@proto-kit/persistance": "../../../framework/packages/persistance",
+    "o1js": "../../../framework/node_modules/o1js",
+    "tsyringe": "../../../framework/node_modules/tsyringe"
   },
   "devDependencies": {
     "@jest/globals": "^29.6.1",
