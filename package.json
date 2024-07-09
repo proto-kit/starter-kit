@@ -9,14 +9,20 @@
     "test": "turbo run test",
     "migrate": "turbo run migrate",
     "start": "turbo run start",
-    "docker:up": "docker-compose -f docker/docker-compose.yml up",
-    "prisma:generate": "turbo run prisma:generate"
+    "start:headless": "turbo run start:headless",
+    "docker:up": "docker compose -f docker/docker-compose.yml up",
+    "docker:down": "docker compose -f docker/docker-compose.yml down",
+    "prisma:generate": "turbo run prisma:generate",
+    "env:dev": "dotenv -e ./packages/chain/src/environments/development/.env -- pnpm"
   },
   "devDependencies": {
     "eslint": "^8.53.0",
     "prettier": "^3.1.0",
     "tsconfig": "workspace:*",
     "turbo": "latest"
+  },
+  "dependencies": {
+    "dotenv-cli": "^7.4.2"
   },
   "packageManager": "pnpm@8.6.10",
   "name": "starter-kit"

@@ -2,7 +2,7 @@
   "name": "chain",
   "version": "1.0.0",
   "type": "module",
-  "main": "dist/src/index.js",
+  "main": "dist/index.js",
   "watch": {
     "build-and-start": {
       "patterns": [
@@ -10,7 +10,8 @@
       ],
       "extensions": [
         "*"
-      ]
+      ],
+      "quiet": true
     }
   },
   "scripts": {
@@ -19,12 +20,12 @@
     "test:watch": "npm run test --watchAll",
     "build": "pnpm run prisma:generate && tsc -p tsconfig.json",
     "start": "protokit start ./dist/configurations.js --logLevel ERROR",
-    "start:raw": "node --experimental-vm-modules --experimental-wasm-modules --experimental-wasm-threads --es-module-specifier-resolution=node ./dist/start.js",
+    "start:headless": "node --experimental-vm-modules --experimental-wasm-modules --experimental-wasm-threads --es-module-specifier-resolution=node ./dist/start.js",
     "build-and-start": "pnpm run build && pnpm run start",
     "build-and-start:local": "pnpm run build && pnpm run start --environment local",
     "dev": "npm-watch build-and-start",
     "dev:local": "npm-watch build-and-start:local",
-    "migrate": "dotenv -e ../../docker/.env -- npx prisma migrate deploy --schema ./node_modules/@proto-kit/persistance/prisma/schema.prisma",
+    "migrate": "dotenv -e ../../docker/.env.sample -- npx prisma migrate deploy --schema ./node_modules/@proto-kit/persistance/prisma/schema.prisma",
     "prisma:generate": "prisma generate --schema ./node_modules/@proto-kit/persistance/prisma/schema.prisma"
   },
   "peerDependencies": {
@@ -41,10 +42,10 @@
   },
   "devDependencies": {
     "@jest/globals": "^29.6.1",
+    "@prisma/client": "^5.7.1",
     "@types/jest": "^29.5.7",
     "@types/node": "^20.8.10",
     "@types/react-dom": "^18.2.7",
-    "@prisma/client": "^5.7.1",
     "assert": "^2.0.0",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.0",
@@ -66,7 +67,6 @@
     "util": "^0.12.5"
   },
   "dependencies": {
-    "reflect-metadata": "^0.2.1",
-    "dotenv-cli": "^7.4.2"
+    "reflect-metadata": "^0.1.13"
   }
 }

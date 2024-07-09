@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   sequencer:
     #    extends:
@@ -12,9 +10,9 @@ services:
     container_name: starterkit-sequencer
     environment:
       - DATABASE_URL=${DATABASE_URL}
-      - LOGGING-LEVEL=${LOGGING_LEVEL:-INFO}
+      - PROTOKIT_LOG_LEVEL=${PROTOKIT_LOG_LEVEL:-INFO}
     profiles:
-      - mono-sequencer
+      - simple-sequencer
     depends_on:
       postgres:
         condition: service_healthy
@@ -22,7 +20,7 @@ services:
       - db-net
     ports:
       - "8080:8080"
-    command: [ "${INDEX_JS}", "${PROTOKIT_ENV}", "${PROTOKIT_CONFIG}" ]
+    command: ["${INDEX_JS}", "${PROTOKIT_ENV}", "${PROTOKIT_CONFIG}" ]
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy-network"

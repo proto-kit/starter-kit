@@ -2,6 +2,11 @@
 
 This folder contains docker and docker-compose files to spin up protokit along with your custom code in multiple different modes
 
+## Requirements
+
+- docker `> 24.0`
+- docker-compose `> 2.22.0`
+
 ## General
 
 To run starter-kit as a docker-compose stack, two points of configuration are needed: 

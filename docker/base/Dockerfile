@@ -28,6 +28,7 @@ COPY ./packages ./packages
 RUN pnpm build --filter=chain
 
 COPY ./docker/base/entry.sh ./entry.sh
+RUN chmod +x ./entry.sh
 
 # Migrate + execute
 ENTRYPOINT ["./entry.sh"]

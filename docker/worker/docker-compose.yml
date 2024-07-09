@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   worker:
     image: starterkit-sequencer
@@ -8,11 +6,11 @@ services:
       context: ../..
     container_name: starterkit-worker
     environment:
-      - LOGGING-LEVEL=${LOGGING_LEVEL:-INFO}
+      - PROTOKIT_LOG_LEVEL=${PROTOKIT_LOG_LEVEL:-INFO}
     profiles:
       - worker
     depends_on:
       - redis
     networks:
       - db-net
-    command: [ "${INDEX_JS}", "${PROTOKIT_ENV}", "${WORKER_CONFIG}" ]
+    command: ["${INDEX_JS}", "${PROTOKIT_ENV}", "${WORKER_CONFIG}" ]

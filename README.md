@@ -44,6 +44,19 @@ pnpm dev -- --filter web
 pnpm dev -- --filter chain
 ```
 
+### Running with persistence
+
+```zsh
+# start databases
+pnpm env:dev docker:up -d
+# migrate schema to database
+pnpm env:dev migrate
+
+# build & start sequencer
+pnpm build --filter=chain
+pnpm env:dev start --filter=chain
+```
+
 ### Running tests
 ```zsh
 # run and watch tests for the `chain` package

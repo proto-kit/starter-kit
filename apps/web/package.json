@@ -27,7 +27,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.48.2",
-    "reflect-metadata": "^0.2.1",
+    "reflect-metadata": "^0.1.13",
     "tailwind-merge": "^2.0.0",
     "tailwindcss-animate": "^1.0.7",
     "truncate-middle": "^1.0.6",

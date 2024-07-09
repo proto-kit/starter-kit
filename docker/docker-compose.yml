@@ -1,5 +1,3 @@
-version: "3.9"
-
 include:
   - ./persistence/docker-compose.yml
   - ./sequencer/docker-compose.yml

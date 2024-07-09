@@ -1,6 +1,6 @@
 import { TestingAppChain } from "@proto-kit/sdk";
 import { PrivateKey } from "o1js";
-import { Balances } from "../src/balances";
+import { Balances } from "../src/runtime/balances";
 import { log } from "@proto-kit/common";
 import { BalancesKey, TokenId, UInt64 } from "@proto-kit/library";
 
