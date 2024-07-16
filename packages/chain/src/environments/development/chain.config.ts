@@ -47,8 +47,8 @@ const appChain = AppChain.from({
       BaseLayer: MinaBaseLayer,
 
       // Block Trigger type
-      // BlockTrigger: ManualBlockTrigger,
-      BlockTrigger: TimedBlockTrigger,
+      BlockTrigger: ManualBlockTrigger,
+      // BlockTrigger: TimedBlockTrigger,
 
       DatabasePruneModule,
 

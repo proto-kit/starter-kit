@@ -13,15 +13,16 @@ import {
 import { Runtime } from "@proto-kit/module";
 import { Protocol } from "@proto-kit/protocol";
 import {
+  DatabasePruneModule,
   InMemoryDatabase,
   LocalTaskQueue,
   LocalTaskWorkerModule,
   ManualBlockTrigger,
   MinaBaseLayer,
   Sequencer,
+  TimedBlockTrigger,
   VanillaTaskWorkerModules,
 } from "@proto-kit/sequencer";
-import { log } from "@proto-kit/common";
 
 const appChain = AppChain.from({
   Runtime: Runtime.from({
@@ -31,24 +32,16 @@ const appChain = AppChain.from({
     modules: VanillaProtocolModules.with(protocol.modules),
   }),
   Sequencer: Sequencer.from({
+    // TODO DistributedSequencerModules
     modules: SimpleSequencerModules.with(
-      // Queue type
-      LocalTaskQueue,
-      // BullQueue,
-
-      // Database
-      InMemoryDatabase,
-      // PrismaRedisDatabase,
-
-      // Settlement Layer
-      MinaBaseLayer,
-
-      // Block Trigger type
-      ManualBlockTrigger,
-
       {
+        TaskQueue: LocalTaskQueue,
+        Database: InMemoryDatabase,
+        BaseLayer: MinaBaseLayer,
+        BlockTrigger: ManualBlockTrigger,
+        DatabasePruneModule,
         LocalTaskWorkerModules: LocalTaskWorkerModule.from(
-          VanillaTaskWorkerModules.allTasks(),
+          VanillaTaskWorkerModules.withoutSettlement(),
         ),
       },
     ),
@@ -60,52 +53,28 @@ const appChain = AppChain.from({
 });
 
 appChain.configurePartial({
+  Runtime: runtime.config,
+  Protocol: protocol.config,
   Sequencer: {
     ...SimpleSequencerModules.defaultConfig(),
     TaskQueue: {},
-    Database: {
-      redis: {
-        host: "localhost",
-        port: 6379,
-        password: "password",
-      },
-      prisma: {
-        connection: {
-          host: "localhost",
-          port: 5432,
-          username: "admin",
-          password: "password",
-          db: {
-            name: "protokit",
-          },
-        },
-      },
-    },
+    Database: {},
     BaseLayer: {
       network: {
         local: true,
       },
     },
-    LocalTaskWorkerModules: VanillaTaskWorkerModules.defaultConfig(),
-    BlockTrigger: {
-      blockInterval: 5000,
-      settlementInterval: 150000,
+    LocalTaskWorkerModules: {
+      BlockBuildingTask: {},
+      BlockProvingTask: {},
+      BlockReductionTask: {},
+      StateTransitionReductionTask: {},
+      RuntimeProvingTask: {},
+      StateTransitionTask: {},
     },
+    BlockTrigger: {},
   },
 });
-
-appChain.configurePartial({
-  Runtime: {
-    ...VanillaRuntimeModules.defaultConfig(),
-    ...runtime.config,
-  },
-  Protocol: {
-    ...VanillaProtocolModules.defaultConfig(),
-    ...protocol.config,
-  },
-});
-
-log.setLevel("INFO");
 
 // TODO: remove temporary `as any` once `error TS2742` is resolved
 export default appChain as any;

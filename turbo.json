@@ -15,8 +15,9 @@
     "start": {
       "cache": false
     },
-    "migrate": {},
-    "dev:local": {},
+    "migrate": {
+      "cache": false
+    },
     "prisma:generate": {},
     "start:headless": {}
   }

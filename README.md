@@ -55,6 +55,10 @@ pnpm env:dev migrate
 # build & start sequencer
 pnpm build --filter=chain
 pnpm env:dev start --filter=chain
+
+# Watch sequencer for local filesystem changes
+# Be aware: Flags like --prune won't work with 'dev'
+pnpm env:dev dev --filter=chain
 ```
 
 ### Running tests

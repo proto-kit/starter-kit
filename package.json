@@ -2,18 +2,18 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev",
-    "dev:local": "turbo run dev:local",
+    "dev": "turbo run dev --env-mode=loose",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "test": "turbo run test",
-    "migrate": "turbo run migrate",
-    "start": "turbo run start",
-    "start:headless": "turbo run start:headless",
+    "migrate": "turbo run migrate --env-mode=loose",
+    "start": "turbo run start --env-mode=loose",
+    "start:headless": "turbo run start:headless --env-mode=loose",
     "docker:up": "docker compose -f docker/docker-compose.yml up",
     "docker:down": "docker compose -f docker/docker-compose.yml down",
     "prisma:generate": "turbo run prisma:generate",
-    "env:dev": "dotenv -e ./packages/chain/src/environments/development/.env -- pnpm"
+    "env:dev": "dotenv -e ./packages/chain/src/environments/development/.env -- pnpm",
+    "env:inmemory": "dotenv -e ./packages/chain/src/environments/inmemory/.env -- pnpm"
   },
   "devDependencies": {
     "eslint": "^8.53.0",

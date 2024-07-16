@@ -1,5 +1,5 @@
-import { startupEnvironment } from "@proto-kit/deployment";
+import { startEnvironment } from "@proto-kit/deployment";
 
-import env from "./configurations";
+import env from "./environments";
 
-await startupEnvironment(env);
+await startEnvironment(env);
