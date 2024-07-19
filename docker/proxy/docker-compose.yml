@@ -27,10 +27,6 @@ services:
 
       - --log.level=DEBUG
 
-      # # for testing SSL
-      # - --certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
-      # - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/test-acme.json
-
   backup:
     image: offen/docker-volume-backup:v2
     environment:
@@ -39,7 +35,6 @@ services:
       BACKUP_LATEST_SYMLINK: backup-traefik-latest.tar.gz
       BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS}
       BACKUP_CRON_EXPRESSION: "${BACKUP_CRON_EXPRESSION}"
-      # GPG_PASSPHRASE: XXXXXXXXXXXXX
     volumes:
       - ${BACKUP_DIR}:/archive
       - /var/run/docker.sock:/var/run/docker.sock:ro

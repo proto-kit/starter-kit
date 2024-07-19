@@ -39,9 +39,9 @@ pnpm install
 pnpm dev
 
 # starts UI only
-pnpm dev -- --filter web
+pnpm dev --filter web
 # starts sequencer only
-pnpm dev -- --filter chain
+pnpm dev --filter chain
 ```
 
 ### Running with persistence

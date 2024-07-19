@@ -1,8 +1,5 @@
 services:
   sequencer:
-    #    extends:
-    #      file: ../packages/chain/node_modules/@proto-kit/deployment/docker/docker-compose.yml
-    #      service: sequencer
     image: starterkit-sequencer
     build:
       dockerfile: ./docker/base/Dockerfile
@@ -27,7 +24,6 @@ services:
       - "traefik.http.routers.api_server.rule=Host(`${GRAPHQL_URL}`)"
       - "traefik.http.routers.api_server.entrypoints=websecure"
       - "traefik.http.routers.api_server.tls.certresolver=letsencrypt"
-      # - "traefik.http.routers.api_server.middlewares=SslHeader@file"
 
 networks:
   proxy-network:

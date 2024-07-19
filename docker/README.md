@@ -154,9 +154,7 @@ Coming soon
 
 ## UI / Client
 
-
-
-### Building framework from source
+## Building framework from source
 
 1. Make sure the framework is located under ../framework from the starter-kit's location
 2. Adapt your starter-kit's package.json to use the file:// references to framework

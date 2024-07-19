@@ -2,17 +2,19 @@ import {
   AppChain,
   BlockStorageNetworkStateModule,
   InMemoryTransactionSender,
-  StateServiceQueryModule
+  StateServiceQueryModule,
 } from "@proto-kit/sdk";
 import { Runtime } from "@proto-kit/module";
 import { Protocol } from "@proto-kit/protocol";
 import {
   DatabasePruneModule,
   InMemoryDatabase,
-  LocalTaskQueue, LocalTaskWorkerModule,
+  LocalTaskQueue,
+  LocalTaskWorkerModule,
   ManualBlockTrigger,
   NoopBaseLayer,
   Sequencer,
+  TimedBlockTrigger,
 } from "@proto-kit/sequencer";
 import { SimpleSequencerModules } from "@proto-kit/library";
 
@@ -22,7 +24,7 @@ import {
   apiSequencerModules,
   apiSequencerModulesConfig,
   taskModules,
-  taskModulesConfig
+  taskModulesConfig,
 } from "../../sequencer";
 
 const appChain = AppChain.from({
@@ -33,22 +35,18 @@ const appChain = AppChain.from({
     modules: protocol.modules,
   }),
   Sequencer: Sequencer.from({
-    modules: SimpleSequencerModules.with(
-        {
-          // Queue type
-          TaskQueue: LocalTaskQueue,
-          // Database
-          Database: InMemoryDatabase,
+    modules: SimpleSequencerModules.with({
+      // Queue type
+      TaskQueue: LocalTaskQueue,
+      // Database
+      Database: InMemoryDatabase,
 
-          BaseLayer: NoopBaseLayer,
-          BlockTrigger: ManualBlockTrigger,
-          DatabasePruneModule,
-          LocalTaskWorkerModules: LocalTaskWorkerModule.from(
-              taskModules,
-          ),
-          ...apiSequencerModules
-        },
-    ),
+      BaseLayer: NoopBaseLayer,
+      BlockTrigger: TimedBlockTrigger,
+      DatabasePruneModule,
+      LocalTaskWorkerModules: LocalTaskWorkerModule.from(taskModules),
+      ...apiSequencerModules,
+    }),
   }),
   modules: {
     TransactionSender: InMemoryTransactionSender,
@@ -68,11 +66,14 @@ appChain.configurePartial({
     TaskQueue: {},
     Database: {},
     BaseLayer: {},
-    BlockTrigger: {}
+    BlockTrigger: {
+      blockInterval: 5000,
+      produceEmptyBlocks: true,
+    },
   },
   NetworkStateTransportModule: {},
   QueryTransportModule: {},
-  TransactionSender: {}
+  TransactionSender: {},
 });
 
 // TODO: remove temporary `as any` once `error TS2742` is resolved
