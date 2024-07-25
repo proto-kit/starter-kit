@@ -1,33 +1,16 @@
-import {
-  AppChain,
-  BlockStorageNetworkStateModule,
-  InMemoryTransactionSender,
-  StateServiceQueryModule,
-} from "@proto-kit/sdk";
+import { AppChain } from "@proto-kit/sdk";
 import { Runtime } from "@proto-kit/module";
 import { Protocol } from "@proto-kit/protocol";
-import {
-  DatabasePruneModule,
-  InMemoryDatabase,
-  LocalTaskQueue,
-  LocalTaskWorkerModule,
-  ManualBlockTrigger,
-  NoopBaseLayer,
-  Sequencer,
-  TimedBlockTrigger,
-} from "@proto-kit/sequencer";
-import { SimpleSequencerModules } from "@proto-kit/library";
-
+import { InMemoryDatabase, Sequencer } from "@proto-kit/sequencer";
 import runtime from "../../runtime";
 import protocol from "../../protocol";
 import {
-  apiSequencerModules,
-  apiSequencerModulesConfig,
-  taskModules,
-  taskModulesConfig,
+  baseSequencerModules,
+  baseSequencerModulesConfig,
 } from "../../sequencer";
+import { baseAppChainModules } from "../../app-chain";
 
-const appChain = AppChain.from({
+export const appChain = AppChain.from({
   Runtime: Runtime.from({
     modules: runtime.modules,
   }),
@@ -35,46 +18,24 @@ const appChain = AppChain.from({
     modules: protocol.modules,
   }),
   Sequencer: Sequencer.from({
-    modules: SimpleSequencerModules.with({
-      // Queue type
-      TaskQueue: LocalTaskQueue,
-      // Database
+    modules: {
       Database: InMemoryDatabase,
-
-      BaseLayer: NoopBaseLayer,
-      BlockTrigger: TimedBlockTrigger,
-      DatabasePruneModule,
-      LocalTaskWorkerModules: LocalTaskWorkerModule.from(taskModules),
-      ...apiSequencerModules,
-    }),
-  }),
-  modules: {
-    TransactionSender: InMemoryTransactionSender,
-    QueryTransportModule: StateServiceQueryModule,
-    NetworkStateTransportModule: BlockStorageNetworkStateModule,
-  },
-});
-
-appChain.configurePartial({
-  Runtime: runtime.config,
-  Protocol: protocol.config,
-  Sequencer: {
-    ...SimpleSequencerModules.defaultConfig(),
-    ...apiSequencerModulesConfig,
-    LocalTaskWorkerModules: taskModulesConfig,
-
-    TaskQueue: {},
-    Database: {},
-    BaseLayer: {},
-    BlockTrigger: {
-      blockInterval: 5000,
-      produceEmptyBlocks: true,
+      ...baseSequencerModules,
     },
-  },
-  NetworkStateTransportModule: {},
-  QueryTransportModule: {},
-  TransactionSender: {},
+  }),
+  modules: baseAppChainModules,
 });
 
-// TODO: remove temporary `as any` once `error TS2742` is resolved
-export default appChain as any;
+export default async () => {
+  appChain.configurePartial({
+    Runtime: runtime.config,
+    Protocol: protocol.config,
+    Sequencer: {
+      ...baseSequencerModulesConfig,
+      Database: {},
+    },
+    ...baseSequencerModulesConfig,
+  });
+
+  return appChain;
+};

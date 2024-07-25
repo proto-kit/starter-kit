@@ -4,7 +4,7 @@ import { ModulesConfig } from "@proto-kit/common";
 const modules = VanillaProtocolModules.with({});
 
 const config: ModulesConfig<typeof modules> = {
-    ...VanillaProtocolModules.defaultConfig(),
-}
+  ...VanillaProtocolModules.defaultConfig(),
+};
 
-export default { modules, config }
+export default { modules, config };

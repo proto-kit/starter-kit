@@ -212,6 +212,9 @@ importers:
       '@types/react-dom':
         specifier: ^18.2.7
         version: 18.3.0
+      '@types/yargs':
+        specifier: ^17.0.32
+        version: 17.0.32
       assert:
         specifier: ^2.0.0
         version: 2.1.0
@@ -275,6 +278,9 @@ importers:
       util:
         specifier: ^0.12.5
         version: 0.12.5
+      yargs:
+        specifier: ^17.7.2
+        version: 17.7.2
 
   packages/eslint-config-custom:
     devDependencies:

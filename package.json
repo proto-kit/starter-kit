@@ -11,9 +11,10 @@
     "docker:up": "docker compose -f docker/docker-compose.yml up",
     "docker:down": "docker compose -f docker/docker-compose.yml down",
     "prisma:generate": "turbo run prisma:generate",
-    "env:dev": "dotenv -e ./packages/chain/src/environments/development/.env -- pnpm",
-    "env:inmemory": "dotenv -e ./packages/chain/src/environments/inmemory/.env -- pnpm",
-    "env:testnet": "dotenv -e ./packages/chain/src/environments/testnet/.env -- pnpm"
+    "env:load": "dotenv -e ./packages/chain/src/environments/$PROTOKIT_ENV/.env -- pnpm",
+    "env:development": "PROTOKIT_ENV=development pnpm env:load",
+    "env:inmemory": "PROTOKIT_ENV=inmemory pnpm env:load",
+    "env:sovereign": "PROTOKIT_ENV=sovereign pnpm env:load"
   },
   "devDependencies": {
     "eslint": "^8.53.0",

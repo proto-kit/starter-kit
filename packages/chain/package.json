@@ -20,8 +20,8 @@
     "test:watch": "npm run test --watchAll",
     "build": "tsc -p tsconfig.json",
     "start": "FORCE_COLOR=3 node --experimental-vm-modules --experimental-wasm-modules --experimental-wasm-threads --es-module-specifier-resolution=node ./dist/start.js",
-    "dev:run": "FORCE_COLOR=3 TS_NODE_TRANSPILE_ONLY=true node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --experimental-wasm-threads --es-module-specifier-resolution=node ./src/start.ts",
-    "dev": "nodemon --watch 'src/**' --ext 'ts' --exec \"npm run dev:run -- $1\"",
+    "dev:run": "FORCE_COLOR=3 TS_NODE_TRANSPILE_ONLY=true node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --experimental-wasm-threads --es-module-specifier-resolution=node ./src/start.ts start \"./environments/$PROTOKIT_ENV/chain.config.ts\" $1",
+    "dev": "nodemon --watch 'src/**' --ext 'ts' --exec \"pnpm dev:run\"",
     "migrate": "prisma migrate deploy --schema ./node_modules/@proto-kit/persistance/prisma/schema.prisma",
     "prisma:generate": "prisma generate --schema ./node_modules/@proto-kit/persistance/prisma/schema.prisma"
   },
@@ -45,6 +45,7 @@
     "@types/jest": "^29.5.7",
     "@types/node": "^20.8.10",
     "@types/react-dom": "^18.2.7",
+    "@types/yargs": "^17.0.32",
     "assert": "^2.0.0",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.0",
@@ -65,7 +66,8 @@
     "tsconfig": "workspace:*",
     "typescript": "4.9.4",
     "url": "^0.11.1",
-    "util": "^0.12.5"
+    "util": "^0.12.5",
+    "yargs": "^17.7.2"
   },
   "dependencies": {
     "reflect-metadata": "^0.1.13"

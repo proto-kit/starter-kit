@@ -1,43 +1,45 @@
 import {
-  DefaultGraphqlModules,
+  VanillaGraphqlModules,
   GraphqlSequencerModule,
   GraphqlServer,
 } from "@proto-kit/api";
 import {
+  PrivateMempool,
   SequencerModulesRecord,
-  VanillaTaskWorkerModules,
+  TimedBlockTrigger,
+  UnprovenProducerModule,
 } from "@proto-kit/sequencer";
 import { ModulesConfig } from "@proto-kit/common";
 
-// -- GraphQL Modules --
-export const gqlSequencerModules = DefaultGraphqlModules.with({});
-
-export const gqlSequencerModulesConfig =
-  DefaultGraphqlModules.defaultConfig() satisfies ModulesConfig<
-    typeof gqlSequencerModules
-  >;
-
-// -- API Sequencer Modules --
 export const apiSequencerModules = {
   GraphqlServer,
   Graphql: GraphqlSequencerModule.from({
-    modules: gqlSequencerModules,
+    modules: VanillaGraphqlModules.with({}),
   }),
 } satisfies SequencerModulesRecord;
 
 export const apiSequencerModulesConfig = {
-  Graphql: gqlSequencerModulesConfig,
+  Graphql: VanillaGraphqlModules.defaultConfig(),
   GraphqlServer: {
-    port: 8080,
-    host: "0.0.0.0",
-    graphiql: true,
+    port: Number(process.env.PROTOKIT_GRAPHQL_PORT),
+    host: process.env.PROTOKIT_GRAPHQL_HOST!,
+    graphiql: Boolean(process.env.PROTOKIT_GRAPHIQL_ENABLED),
   },
 } satisfies ModulesConfig<typeof apiSequencerModules>;
 
-// -- Proving task modules --
-export const taskModules = VanillaTaskWorkerModules.allTasks();
+export const baseSequencerModules = {
+  ...apiSequencerModules,
+  Mempool: PrivateMempool,
+  UnprovenProducerModule: UnprovenProducerModule,
+  BlockTrigger: TimedBlockTrigger,
+} satisfies SequencerModulesRecord;
 
-export const taskModulesConfig =
-  VanillaTaskWorkerModules.defaultConfig() satisfies ModulesConfig<
-    typeof taskModules
-  >;
+export const baseSequencerModulesConfig = {
+  ...apiSequencerModulesConfig,
+  Mempool: {},
+  UnprovenProducerModule: {},
+  BlockTrigger: {
+    blockInterval: Number(process.env.PROTOKIT_BLOCK_INTERVAL!),
+    produceEmptyBlocks: true,
+  },
+} satisfies ModulesConfig<typeof baseSequencerModules>;
