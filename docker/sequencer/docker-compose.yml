@@ -17,7 +17,6 @@ services:
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
 
-      - PROTOKIT_ENV=${PROTOKIT_ENV}
       - PROTOKIT_SHOULD_ATTEMPT_DB_MIGRATION=${PROTOKIT_SHOULD_ATTEMPT_DB_MIGRATION}
       - PROTOKIT_LOG_LEVEL=${PROTOKIT_LOG_LEVEL}
       - PROTOKIT_BLOCK_INTERVAL=${PROTOKIT_BLOCK_INTERVAL}
@@ -31,8 +30,4 @@ services:
         condition: service_healthy
     networks:
       - db-net
-      - sequencer-net
-    command: ["./packages/chain/dist/start.js start ./environments/${PROTOKIT_ENV}/chain.config.js"]
-
-networks:
-  sequencer-net:
+    command: ["./packages/chain/dist/start.js start ./environments/${PROTOKIT_ENV_FOLDER}/chain.config.js"]

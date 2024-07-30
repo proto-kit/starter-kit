@@ -7,6 +7,8 @@ FROM protokit-base:latest
 
 WORKDIR /app
 
+RUN apt update && apt install dos2unix && apt clean
+
 COPY package.json .
 COPY pnpm-workspace.yaml .
 COPY pnpm-lock.yaml .
@@ -28,6 +30,7 @@ COPY ./packages ./packages
 RUN pnpm build --filter=chain
 
 COPY ./docker/base/entry.sh ./entry.sh
+RUN dos2unix ./entry.sh
 RUN chmod +x ./entry.sh
 
 # Migrate + execute
