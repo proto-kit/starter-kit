@@ -40,6 +40,7 @@ const nextConfig = {
     return config;
   },
   compress: false,
+  output: "standalone"
 };
 
 module.exports = nextConfig;

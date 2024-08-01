@@ -9,7 +9,7 @@ appChain.configurePartial({
 
 appChain.configurePartial({
   GraphqlClient: {
-    url: `http://${process.env.PROTOKIT_GRAPHQL_HOST}:${process.env.PROTOKIT_GRAPHQL_PORT}/graphql`,
+    url: process.env.NEXT_PUBLIC_PROTOKIT_GRAPHQL_URL,
   },
 });
 

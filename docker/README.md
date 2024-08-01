@@ -161,3 +161,7 @@ Coming soon
 3. Go into the framework folder, and build a docker image containing the sources with `docker build -f ./packages/deployment/docker/development-base/Dockerfile -t protokit-base .`
 
 4. Comment out the first line of docker/base/Dockerfile to use protokit-base
+
+## Running the proxy locally
+
+<https://caddyserver.com/docs/running#local-https-with-docker>

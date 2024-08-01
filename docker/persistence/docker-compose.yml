@@ -28,6 +28,8 @@ services:
       - db
       - worker
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
     ports:
       - '6379:6379'
     command: redis-server /redis.conf --requirepass ${REDIS_PASSWORD}

@@ -7,8 +7,6 @@ FROM protokit-base:latest
 
 WORKDIR /app
 
-RUN apt update && apt install dos2unix && apt clean
-
 COPY package.json .
 COPY pnpm-workspace.yaml .
 COPY pnpm-lock.yaml .
@@ -24,6 +22,8 @@ COPY ./packages/chain/tsconfig.json ./packages/chain/tsconfig.json
 COPY ./apps/web/tsconfig.json ./apps/web/tsconfig.json
 
 RUN pnpm install --frozen-lockfile
+
+RUN apt update && apt install dos2unix && apt clean
 
 COPY ./packages ./packages
 

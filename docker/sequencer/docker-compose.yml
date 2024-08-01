@@ -28,6 +28,15 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - db-net
+      - routing-net
+      - chain-net
+    ports:
+      - 8080:8080
     command: ["./packages/chain/dist/start.js start ./environments/${PROTOKIT_ENV_FOLDER}/chain.config.js"]
+
+networks:
+  chain-net:
