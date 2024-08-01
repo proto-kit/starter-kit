@@ -23,11 +23,14 @@ COPY ./apps/web/tsconfig.json ./apps/web/tsconfig.json
 
 RUN pnpm install --frozen-lockfile
 
+RUN apt update && apt install dos2unix && apt clean
+
 COPY ./packages ./packages
 
 RUN pnpm build --filter=chain
 
 COPY ./docker/base/entry.sh ./entry.sh
+RUN dos2unix ./entry.sh
 RUN chmod +x ./entry.sh
 
 # Migrate + execute

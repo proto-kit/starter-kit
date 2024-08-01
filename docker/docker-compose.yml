@@ -1,4 +1,5 @@
 include:
   - ./persistence/docker-compose.yml
   - ./sequencer/docker-compose.yml
-  - ./worker/docker-compose.yml
+  - ./web/docker-compose.yml
+  - ./proxy/docker-compose.yml

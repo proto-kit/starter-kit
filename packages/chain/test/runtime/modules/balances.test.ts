@@ -1,6 +1,6 @@
 import { TestingAppChain } from "@proto-kit/sdk";
-import { PrivateKey } from "o1js";
-import { Balances } from "../src/runtime/balances";
+import { method, PrivateKey } from "o1js";
+import { Balances } from "../../../src/runtime/modules/balances";
 import { log } from "@proto-kit/common";
 import { BalancesKey, TokenId, UInt64 } from "@proto-kit/library";
 
@@ -30,8 +30,8 @@ describe("balances", () => {
 
     const balances = appChain.runtime.resolve("Balances");
 
-    const tx1 = await appChain.transaction(alice, () => {
-      balances.addBalance(tokenId, alice, UInt64.from(1000));
+    const tx1 = await appChain.transaction(alice, async () => {
+      await balances.addBalance(tokenId, alice, UInt64.from(1000));
     });
 
     await tx1.sign();

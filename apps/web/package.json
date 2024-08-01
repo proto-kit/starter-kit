@@ -32,7 +32,8 @@
     "tailwindcss-animate": "^1.0.7",
     "truncate-middle": "^1.0.6",
     "zod": "^3.22.4",
-    "zustand": "^4.4.6"
+    "zustand": "^4.4.6",
+    "o1js": "1.6.0"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -46,14 +47,15 @@
     "postcss": "^8",
     "prettier-plugin-tailwindcss": "^0.5.6",
     "tailwindcss": "^3.3.0",
-    "typescript": "^5"
+    "typescript": "^5.4.5"
   },
   "peerDependencies": {
+    "@proto-kit/common": "*",
+    "@proto-kit/protocol": "*",
     "@proto-kit/module": "*",
     "@proto-kit/sdk": "*",
     "@proto-kit/sequencer": "*",
     "@proto-kit/library": "*",
-    "o1js": "0.13.1",
     "tsyringe": "^4.7.0"
   }
 }

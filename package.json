@@ -8,12 +8,12 @@
     "test": "turbo run test",
     "migrate": "turbo run migrate --env-mode=loose",
     "start": "turbo run start --env-mode=loose",
-    "start:headless": "turbo run start:headless --env-mode=loose",
     "docker:up": "docker compose -f docker/docker-compose.yml up",
     "docker:down": "docker compose -f docker/docker-compose.yml down",
     "prisma:generate": "turbo run prisma:generate",
-    "env:dev": "dotenv -e ./packages/chain/src/environments/development/.env -- pnpm",
-    "env:inmemory": "dotenv -e ./packages/chain/src/environments/inmemory/.env -- pnpm"
+    "env:development": "dotenv -e ./packages/chain/src/environments/development/.env -- pnpm",
+    "env:inmemory": "dotenv -e ./packages/chain/src/environments/inmemory/.env -- pnpm",
+    "env:sovereign": "dotenv -e ./packages/chain/src/environments/sovereign/.env -- pnpm"
   },
   "devDependencies": {
     "eslint": "^8.53.0",
