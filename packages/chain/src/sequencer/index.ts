@@ -7,7 +7,7 @@ import {
   PrivateMempool,
   SequencerModulesRecord,
   TimedBlockTrigger,
-  UnprovenProducerModule,
+  BlockProducerModule,
 } from "@proto-kit/sequencer";
 import { ModulesConfig } from "@proto-kit/common";
 
@@ -30,14 +30,14 @@ export const apiSequencerModulesConfig = {
 export const baseSequencerModules = {
   ...apiSequencerModules,
   Mempool: PrivateMempool,
-  UnprovenProducerModule: UnprovenProducerModule,
+  BlockProducerModule: BlockProducerModule,
   BlockTrigger: TimedBlockTrigger,
 } satisfies SequencerModulesRecord;
 
 export const baseSequencerModulesConfig = {
   ...apiSequencerModulesConfig,
   Mempool: {},
-  UnprovenProducerModule: {},
+  BlockProducerModule: {},
   BlockTrigger: {
     blockInterval: Number(process.env.PROTOKIT_BLOCK_INTERVAL!),
     produceEmptyBlocks: true,

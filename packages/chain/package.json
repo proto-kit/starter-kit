@@ -26,18 +26,17 @@
     "prisma:generate": "prisma generate --schema ./node_modules/@proto-kit/persistance/prisma/schema.prisma"
   },
   "peerDependencies": {
-    "@proto-kit/api": "file://../../../framework/packages/api",
-    "@proto-kit/cli": "file://../../../framework/packages/cli",
-    "@proto-kit/common": "file://../../../framework/packages/common",
-    "@proto-kit/deployment": "file://../../../framework/packages/deployment",
-    "@proto-kit/library": "file://../../../framework/packages/library",
-    "@proto-kit/module": "file://../../../framework/packages/module",
-    "@proto-kit/persistance": "file://../../../framework/packages/persistance",
-    "@proto-kit/protocol": "file://../../../framework/packages/protocol",
-    "@proto-kit/sdk": "file://../../../framework/packages/sdk",
-    "@proto-kit/sequencer": "file://../../../framework/packages/sequencer",
-    "o1js": "file://../../../framework/node_modules/o1js",
-    "tsyringe": "file://../../../framework/node_modules/tsyringe"
+    "@proto-kit/api": "*",
+    "@proto-kit/common": "*",
+    "@proto-kit/deployment": "*",
+    "@proto-kit/library": "*",
+    "@proto-kit/module": "*",
+    "@proto-kit/persistance": "*",
+    "@proto-kit/protocol": "*",
+    "@proto-kit/sdk": "*",
+    "@proto-kit/sequencer": "*",
+    "o1js": "1.6.0",
+    "tsyringe": "^4.7.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.6.1",
@@ -64,7 +63,7 @@
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.2",
     "tsconfig": "workspace:*",
-    "typescript": "4.9.4",
+    "typescript": "5.4.5",
     "url": "^0.11.1",
     "util": "^0.12.5",
     "yargs": "^17.7.2"

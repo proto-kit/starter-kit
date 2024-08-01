@@ -32,7 +32,8 @@
     "tailwindcss-animate": "^1.0.7",
     "truncate-middle": "^1.0.6",
     "zod": "^3.22.4",
-    "zustand": "^4.4.6"
+    "zustand": "^4.4.6",
+    "o1js": "1.6.0"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -46,16 +47,15 @@
     "postcss": "^8",
     "prettier-plugin-tailwindcss": "^0.5.6",
     "tailwindcss": "^3.3.0",
-    "typescript": "^5"
+    "typescript": "^5.4.5"
   },
   "peerDependencies": {
-    "@proto-kit/common": "file://../../../framework/packages/common",
-    "@proto-kit/protocol": "file://../../../framework/packages/protocol",
-    "@proto-kit/module": "file://../../../framework/packages/module",
-    "@proto-kit/sdk": "file://../../../framework/packages/sdk",
-    "@proto-kit/sequencer": "file://../../../framework/packages/sequencer",
-    "@proto-kit/library": "file://../../../framework/packages/library",
-    "o1js": "file://../../../framework/node_modules/o1js",
-    "tsyringe": "file://../../../framework/node_modules/tsyringe"
+    "@proto-kit/common": "*",
+    "@proto-kit/protocol": "*",
+    "@proto-kit/module": "*",
+    "@proto-kit/sdk": "*",
+    "@proto-kit/sequencer": "*",
+    "@proto-kit/library": "*",
+    "tsyringe": "^4.7.0"
   }
 }
