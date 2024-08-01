@@ -11,15 +11,15 @@ The monorepo contains 1 package and 1 app:
 
 **Prerequisites:**
 
-- Node.js v18
+- Node.js `v18`
 - pnpm
 - nvm
 
 For running with persistance / deploying on a server
-- docker (tested with >= v24)
-- docker-compose (tested with >= v2.22.0)
+- docker `>= 24.0`
+- docker-compose `>= 2.22.0`
 
-### Setup
+## Setup
 
 ```zsh
 git clone https://github.com/proto-kit/starter-kit my-chain
@@ -29,6 +29,8 @@ cd my-chain
 nvm use
 pnpm install
 ```
+
+## Running
 
 ### Environments
 
@@ -46,7 +48,7 @@ Every command you execute should follow this pattern:
 
 This makes sure that everything is set correctly and our tooling knows which environment you want to use.
 
-### Running the sequencer & UI in-memory
+### Running in-memory
 
 ```zsh
 # starts both UI and sequencer locally
@@ -116,3 +118,20 @@ By default, the graphql endpoint is running on the same domain as your UI with t
 The caddy reverse-proxy automatically uses https for all connections, use this guide to remove certificate errors when accessing localhost sites
 
 <https://caddyserver.com/docs/running#local-https-with-docker>
+
+## CLI Options
+
+- `logLevel`: Overrides the loglevel used. Also configurable via the `PROTOKIT_LOG_LEVEL` environment variable.
+- `pruneOnStartup`: If set, prunes the database before startup, so that your chain is starting from a clean, genesis state. Alias for environment variable `PROTOKIT_PRUNE_ON_STARTUP`
+
+In order to pass in those CLI option, add it at the end of your command like this
+
+`pnpm env:inmemory dev --filter chain -- --logLevel DEBUG --pruneOnStartup`
+
+### Building the framework from source
+
+1. Make sure the framework is located under ../framework from the starter-kit's location
+2. Adapt your starter-kit's package.json to use the file:// references to framework
+3. Go into the framework folder, and build a docker image containing the sources with `docker build -f ./packages/deployment/docker/development-base/Dockerfile -t protokit-base .`
+
+4. Comment out the first line of docker/base/Dockerfile to use protokit-base
