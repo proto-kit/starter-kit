@@ -2,16 +2,27 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev",
+    "dev": "turbo run dev --env-mode=loose",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "test": "turbo run test"
+    "test": "turbo run test",
+    "migrate": "turbo run migrate --env-mode=loose",
+    "start": "turbo run start --env-mode=loose",
+    "docker:up": "docker compose -f docker/docker-compose.yml up",
+    "docker:down": "docker compose -f docker/docker-compose.yml down",
+    "prisma:generate": "turbo run prisma:generate",
+    "env:development": "dotenv -e ./packages/chain/src/environments/development/.env -- pnpm",
+    "env:inmemory": "dotenv -e ./packages/chain/src/environments/inmemory/.env -- pnpm",
+    "env:sovereign": "dotenv -e ./packages/chain/src/environments/sovereign/.env -- pnpm"
   },
   "devDependencies": {
     "eslint": "^8.53.0",
     "prettier": "^3.1.0",
     "tsconfig": "workspace:*",
     "turbo": "latest"
+  },
+  "dependencies": {
+    "dotenv-cli": "^7.4.2"
   },
   "packageManager": "pnpm@8.6.10",
   "name": "starter-kit"

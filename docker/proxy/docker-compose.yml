@@ -1,0 +1,23 @@
+services:
+  caddy:
+    image: caddy:2.8.4
+    restart: unless-stopped
+    profiles:
+      - proxy
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - routing-net
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  routing-net:
