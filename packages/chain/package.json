@@ -21,7 +21,7 @@
     "build": "pnpm run prisma:generate && tsc -p tsconfig.json",
     "start": "node --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./dist/start.js",
     "dev:run": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./src/start.ts start \"./environments/$PROTOKIT_ENV_FOLDER/chain.config.ts\" $1",
-    "dev": "pnpm run prisma:generate && nodemon --watch src -e ts --exec \"pnpm dev:run\"",
+    "dev": "pnpm run prisma:generate && pnpm run prisma:migrate && nodemon --watch src -e ts --exec \"pnpm dev:run\"",
     "migrate": "prisma migrate deploy --schema ./node_modules/@proto-kit/persistance/prisma/schema.prisma",
     "prisma:generate": "prisma generate --schema ./node_modules/@proto-kit/persistance/prisma/schema.prisma"
   },
