@@ -9,4 +9,4 @@ fi
 
 echo $@
 # We can't use start:headless here bcs that task hardcodes the .js file, we want it to be extensible
-node --experimental-vm-modules --experimental-wasm-modules --experimental-wasm-threads --es-module-specifier-resolution=node $@
+node --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node $@
