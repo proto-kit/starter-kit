@@ -110,6 +110,8 @@ yourdomain.com {
 }
 ```
 
+> HTTPS is handled automatically by Caddy, you can (learn more about automatic https here.)[https://caddyserver.com/docs/automatic-https]
+
 In most cases, you will need to change the `NEXT_PUBLIC_PROTOKIT_GRAPHQL_URL` property in the `.env` file to the domain your graphql endpoint is running in.
 By default, the graphql endpoint is running on the same domain as your UI with the `/graphql` suffix.
 
