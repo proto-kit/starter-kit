@@ -8,6 +8,7 @@
     "test": "turbo run test",
     "migrate": "turbo run migrate --env-mode=loose",
     "start": "turbo run start --env-mode=loose",
+    "docker:build": "docker compose -f docker/docker-compose.yml build",
     "docker:up": "docker compose -f docker/docker-compose.yml up",
     "docker:down": "docker compose -f docker/docker-compose.yml down",
     "prisma:generate": "turbo run prisma:generate",

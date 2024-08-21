@@ -149,7 +149,7 @@ export const useNotifyTransactions = () => {
             isMessage: false,
             sender: PublicKey.fromBase58(tx.sender),
             argsFields: tx.argsFields.map((arg) => Field(arg)),
-            argsJSON: tx.argsJSON,
+            auxiliaryData: [],
             signature: Signature.fromJSON({
               r: tx.signature.r,
               s: tx.signature.s,
