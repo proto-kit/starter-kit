@@ -103,6 +103,8 @@ then clone it on your remote server and execute it.
 pnpm env:sovereign docker:up -d
 ```
 
+UI will be accessible at `https://localhost` and GQL inspector will be available at `https://localhost/graphql`
+
 #### Configuration
 
 Go to `docker/proxy/Caddyfile` and replace the `*` matcher with your domain.
