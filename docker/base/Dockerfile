@@ -1,5 +1,5 @@
 # For regular deployment
-FROM node:22
+FROM node:18
 
 # For locally built and imported framework references
 # Make sure you build the base-image first
@@ -27,6 +27,7 @@ RUN apt update && apt install dos2unix && apt clean
 
 COPY ./packages ./packages
 
+RUN pnpm prisma:generate --filter=chain
 RUN pnpm build --filter=chain
 
 COPY ./docker/base/entry.sh ./entry.sh

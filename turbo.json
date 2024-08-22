@@ -15,10 +15,12 @@
     "start": {
       "cache": false
     },
-    "migrate": {
+    "prisma:migrate": {
       "cache": false
     },
-    "prisma:generate": {},
+    "prisma:generate": {
+      "cache": false
+    },
     "start:headless": {}
   }
 }

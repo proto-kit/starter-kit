@@ -6,11 +6,12 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "test": "turbo run test",
-    "migrate": "turbo run migrate --env-mode=loose",
+    "prisma:migrate": "turbo run prisma:migrate --env-mode=loose",
+    "prisma:generate": "turbo run prisma:generate",
     "start": "turbo run start --env-mode=loose",
+    "docker:build": "docker compose -f docker/docker-compose.yml build",
     "docker:up": "docker compose -f docker/docker-compose.yml up",
     "docker:down": "docker compose -f docker/docker-compose.yml down",
-    "prisma:generate": "turbo run prisma:generate",
     "env:development": "dotenv -e ./packages/chain/src/environments/development/.env -- pnpm",
     "env:inmemory": "dotenv -e ./packages/chain/src/environments/inmemory/.env -- pnpm",
     "env:sovereign": "dotenv -e ./packages/chain/src/environments/sovereign/.env -- pnpm"
@@ -24,6 +25,6 @@
   "dependencies": {
     "dotenv-cli": "^7.4.2"
   },
-  "packageManager": "pnpm@8.6.10",
+  "packageManager": "pnpm@9.8.0+sha256.56a9e76b51796ca7f73b85e44cf83712862091f4d498c0ce4d5b7ecdc6ba18f7",
   "name": "starter-kit"
 }

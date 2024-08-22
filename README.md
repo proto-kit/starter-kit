@@ -11,8 +11,8 @@ The monorepo contains 1 package and 1 app:
 
 **Prerequisites:**
 
-- Node.js `v22` (we recommend using NVM)
-- pnpm
+- Node.js `v18` (we recommend using NVM)
+- pnpm `v9.8`
 - nvm
 
 For running with persistance / deploying on a server
@@ -76,10 +76,12 @@ pnpm run test --filter=chain -- --watchAll
 ```zsh
 # start databases
 pnpm env:development docker:up -d
-# migrate schema to database
-pnpm env:development migrate
+# generate prisma client
+pnpm env:development prisma:generate
+# migrate database schema
+pnpm env:development prisma:migrate
 
-# build & start sequencer
+# build & start sequencer, make sure to prisma:generate & migrate before
 pnpm build --filter=chain
 pnpm env:development start --filter=chain
 
@@ -101,6 +103,8 @@ then clone it on your remote server and execute it.
 pnpm env:sovereign docker:up -d
 ```
 
+UI will be accessible at `https://localhost` and GQL inspector will be available at `https://localhost/graphql`
+
 #### Configuration
 
 Go to `docker/proxy/Caddyfile` and replace the `*` matcher with your domain.
@@ -109,6 +113,8 @@ yourdomain.com {
     ...
 }
 ```
+
+> HTTPS is handled automatically by Caddy, you can (learn more about automatic https here.)[https://caddyserver.com/docs/automatic-https]
 
 In most cases, you will need to change the `NEXT_PUBLIC_PROTOKIT_GRAPHQL_URL` property in the `.env` file to the domain your graphql endpoint is running in.
 By default, the graphql endpoint is running on the same domain as your UI with the `/graphql` suffix.
