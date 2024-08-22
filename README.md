@@ -76,11 +76,12 @@ pnpm run test --filter=chain -- --watchAll
 ```zsh
 # start databases
 pnpm env:development docker:up -d
-# generate & migrate schema to database
+# generate prisma client
 pnpm env:development prisma:generate
+# migrate database schema
 pnpm env:development prisma:migrate
 
-# build & start sequencer
+# build & start sequencer, make sure to prisma:generate & migrate before
 pnpm build --filter=chain
 pnpm env:development start --filter=chain
 
