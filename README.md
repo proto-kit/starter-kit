@@ -12,7 +12,7 @@ The monorepo contains 1 package and 1 app:
 **Prerequisites:**
 
 - Node.js `v18` (we recommend using NVM)
-- pnpm
+- pnpm `v9.8`
 - nvm
 
 For running with persistance / deploying on a server
