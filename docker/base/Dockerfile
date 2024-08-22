@@ -27,6 +27,7 @@ RUN apt update && apt install dos2unix && apt clean
 
 COPY ./packages ./packages
 
+RUN pnpm prisma:generate --filter=chain
 RUN pnpm build --filter=chain
 
 COPY ./docker/base/entry.sh ./entry.sh
