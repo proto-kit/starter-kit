@@ -16,11 +16,11 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "test": "node --experimental-vm-modules --experimental-wasm-modules ./node_modules/jest/bin/jest.js",
+    "test": "node --experimental-vm-modules --experimental-wasm-modules --experimental-wasm-threads ./node_modules/jest/bin/jest.js",
     "test:watch": "npm run test --watchAll",
     "build": " tsc -p tsconfig.json",
-    "start": "node --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./dist/start.js",
-    "dev:run": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./src/start.ts start \"./environments/$PROTOKIT_ENV_FOLDER/chain.config.ts\" $1",
+    "start": "node --experimental-vm-modules --experimental-wasm-modules --experimental-wasm-threads --es-module-specifier-resolution=node ./dist/start.js start \"./environments/$PROTOKIT_ENV_FOLDER/chain.config.js\" $1",
+    "dev:run": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-threads --experimental-wasm-modules --es-module-specifier-resolution=node ./src/start.ts start \"./environments/$PROTOKIT_ENV_FOLDER/chain.config.ts\" $1",
     "dev": "nodemon --watch src -e ts --exec \"pnpm dev:run\"",
     "prisma:migrate": "prisma migrate deploy --schema ./node_modules/@proto-kit/persistance/prisma/schema.prisma",
     "prisma:generate": "prisma generate --schema ./node_modules/@proto-kit/persistance/prisma/schema.prisma"
