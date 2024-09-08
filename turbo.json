@@ -11,14 +11,24 @@
       "cache": false,
       "persistent": true
     },
+    "indexer:dev": {
+      "cache": false,
+      "persistent": true
+    },
     "test": {},
     "start": {
       "cache": false
     },
-    "prisma:migrate": {
+    "indexer:prisma:generate": {
+      "cache": false
+    },
+    "indexer:prisma:migrate": {
       "cache": false
     },
     "prisma:generate": {
+      "cache": false
+    },
+    "prisma:migrate": {
       "cache": false
     },
     "start:headless": {}
