@@ -6,35 +6,36 @@ services:
       context: ../..
     container_name: starterkit-indexer
     environment:
-      - POSTGRES_PASSWORD=${INDEXER_POSTGRES_PASSWORD}
-      - POSTGRES_USER=${INDEXER_POSTGRES_USER}
-      - POSTGRES_DB=${INDEXER_POSTGRES_DB}
-      - POSTGRES_HOST=${INDEXER_POSTGRES_HOST}
-      - POSTGRES_PORT=${INDEXER_POSTGRES_PORT}
-      - DATABASE_URL=${INDEXER_DATABASE_URL}
+      # - POSTGRES_PASSWORD=${INDEXER_POSTGRES_PASSWORD}
+      # - POSTGRES_USER=${INDEXER_POSTGRES_USER}
+      # - POSTGRES_DB=${INDEXER_POSTGRES_DB}
+      # - POSTGRES_HOST=${INDEXER_POSTGRES_HOST}
+      # - POSTGRES_PORT=${INDEXER_POSTGRES_PORT}
+      - INDEXER_DATABASE_URL=${INDEXER_DATABASE_URL}
 
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
 
-      - PROTOKIT_SHOULD_ATTEMPT_DB_MIGRATION=${PROTOKIT_SHOULD_ATTEMPT_DB_MIGRATION}
+      - PROTOKIT_SHOULD_ATTEMPT_INDEXER_DB_MIGRATION=${PROTOKIT_SHOULD_ATTEMPT_INDEXER_DB_MIGRATION}
       - PROTOKIT_LOG_LEVEL=${PROTOKIT_LOG_LEVEL}
-      - PROTOKIT_GRAPHQL_HOST=${PROTOKIT_GRAPHQL_HOST}
-      - PROTOKIT_GRAPHQL_PORT=${PROTOKIT_GRAPHQL_PORT}
-      - PROTOKIT_GRAPHIQL_ENABLED=${PROTOKIT_GRAPHIQL_ENABLED}
+      - PROTOKIT_INDEXER_GRAPHQL_HOST=${PROTOKIT_INDEXER_GRAPHQL_HOST}
+      - PROTOKIT_INDEXER_GRAPHQL_PORT=${PROTOKIT_INDEXER_GRAPHQL_PORT}
+      - PROTOKIT_INDEXER_GRAPHIQL_ENABLED=${PROTOKIT_INDEXER_GRAPHIQL_ENABLED}
     profiles:
       - monolithic-indexer
     depends_on:
-      postgres:
+      indexer-postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
     networks:
       - indexer-db-net
       - routing-net
+      - queue-net
     ports:
       - 8081:8080
     command: ["./packages/chain/dist/start.js start ./environments/${PROTOKIT_ENV_FOLDER}/indexer.config.js"]
 
 networks:
-  chain-net:
+  indexer-net:

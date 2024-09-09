@@ -14,13 +14,13 @@ COPY turbo.json .
 
 COPY ./packages/tsconfig/package.json ./packages/tsconfig/package.json
 COPY ./packages/chain/package.json ./packages/chain/package.json
+COPY ./packages/eslint-config-custom/package.json ./packages/eslint-config-custom/package.json
 COPY ./apps/web/package.json ./apps/web/package.json
 
-RUN corepack use pnpm@9.8.0
+RUN corepack enable
 
 COPY ./tsconfig.json .
 COPY ./packages/chain/tsconfig.json ./packages/chain/tsconfig.json
-COPY ./packages/tsconfig/tsconfig.json ./packages/tsconfig/tsconfig.json
 COPY ./apps/web/tsconfig.json ./apps/web/tsconfig.json
 
 RUN pnpm install --frozen-lockfile
@@ -30,6 +30,7 @@ RUN apt update && apt install dos2unix && apt clean
 COPY ./packages ./packages
 
 RUN pnpm prisma:generate --filter=chain
+RUN pnpm indexer:prisma:generate --filter=chain
 RUN pnpm build --filter=chain
 
 COPY ./docker/base/entry.sh ./entry.sh

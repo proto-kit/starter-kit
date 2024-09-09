@@ -8,8 +8,10 @@ import protocol from "../../protocol";
 import {
   baseSequencerModules,
   baseSequencerModulesConfig,
+  indexerSequencerModules,
+  indexerSequencerModulesConfig,
 } from "../../sequencer";
-import { Startable } from "@proto-kit/deployment";
+import { BullQueue, Startable } from "@proto-kit/deployment";
 import { Arguments } from "../../start";
 import {
   baseAppChainModules,
@@ -28,6 +30,8 @@ export const appChain = AppChain.from({
       // ordering of the modules matters due to dependency resolution
       Database: PrismaRedisDatabase,
       ...baseSequencerModules,
+      ...indexerSequencerModules,
+      TaskQueue: BullQueue,
       DatabasePruneModule,
     },
   }),
@@ -40,8 +44,16 @@ export default async (args: Arguments): Promise<Startable> => {
     Protocol: protocol.config,
     Sequencer: {
       ...baseSequencerModulesConfig,
+      ...indexerSequencerModulesConfig,
       DatabasePruneModule: {
         pruneOnStartup: args.pruneOnStartup,
+      },
+      TaskQueue: {
+        redis: {
+          host: process.env.REDIS_HOST!,
+          port: Number(process.env.REDIS_PORT)!,
+          password: process.env.REDIS_PASSWORD!,
+        },
       },
       Database: {
         redis: {
