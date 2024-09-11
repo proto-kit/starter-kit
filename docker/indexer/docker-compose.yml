@@ -6,11 +6,6 @@ services:
       context: ../..
     container_name: starterkit-indexer
     environment:
-      # - POSTGRES_PASSWORD=${INDEXER_POSTGRES_PASSWORD}
-      # - POSTGRES_USER=${INDEXER_POSTGRES_USER}
-      # - POSTGRES_DB=${INDEXER_POSTGRES_DB}
-      # - POSTGRES_HOST=${INDEXER_POSTGRES_HOST}
-      # - POSTGRES_PORT=${INDEXER_POSTGRES_PORT}
       - INDEXER_DATABASE_URL=${INDEXER_DATABASE_URL}
 
       - REDIS_HOST=${REDIS_HOST}

@@ -1,5 +1,5 @@
 # For regular deployment
-# FROM node:22
+# FROM node:18
 
 # For locally built and imported framework references
 # Make sure you build the base-image first

@@ -12,18 +12,8 @@
       "cache": false,
       "persistent": true
     },
-    "indexer:dev": {
-      "cache": false,
-      "persistent": true
-    },
     "test": {},
     "start": {
-      "cache": false
-    },
-    "indexer:prisma:generate": {
-      "cache": false
-    },
-    "indexer:prisma:migrate": {
       "cache": false
     },
     "prisma:generate": {
