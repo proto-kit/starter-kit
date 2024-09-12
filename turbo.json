@@ -12,14 +12,38 @@
       "cache": false,
       "persistent": true
     },
+    "sequencer:dev": {
+      "cache": false
+    },
+    "indexer:dev": {
+      "cache": false
+    },
     "test": {},
     "start": {
+      "cache": false
+    },
+    "sequencer:start": {
+      "cache": false
+    },
+    "indexer:start": {
       "cache": false
     },
     "prisma:generate": {
       "cache": false
     },
     "prisma:migrate": {
+      "cache": false
+    },
+    "sequencer:prisma:generate": {
+      "cache": false
+    },
+    "sequencer:prisma:migrate": {
+      "cache": false
+    },
+    "indexer:prisma:generate": {
+      "cache": false
+    },
+    "indexer:prisma:migrate": {
       "cache": false
     },
     "start:headless": {}

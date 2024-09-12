@@ -106,7 +106,7 @@ pnpm env:development docker:up -d
 pnpm env:development prisma:generate
 
 # migrate database schemas
-pnpm env:development sequencer:prisma:migrate
+pnpm env:development prisma:migrate
 ```
 
 #### Pruning data
