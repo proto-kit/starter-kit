@@ -15,6 +15,8 @@
     "indexer:prisma:migrate": "turbo run indexer:prisma:migrate --env-mode=loose",
     "indexer:prisma:generate": "turbo run indexer:prisma:generate",
     "start": "turbo run start --env-mode=loose",
+    "sequencer:start": "turbo run sequencer:start --env-mode=loose",
+    "indexer:start": "turbo run indexer:start --env-mode=loose",
     "docker:build": "docker compose -f docker/docker-compose.yml build",
     "docker:up": "docker compose -f docker/docker-compose.yml up",
     "docker:down": "docker compose -f docker/docker-compose.yml down",
