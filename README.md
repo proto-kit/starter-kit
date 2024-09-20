@@ -4,11 +4,22 @@
 
 - [ ] Create a dark pool for 2 tokens
 - [ ] Whitelist users for a dark pool
+  - [ ] With specific address
+  - [ ] With zk proof
 - [ ] Execute trades with private values
   - [ ] Optionally, make the trade public
 - [ ] Anyone can lend to dark pools
 - [ ] See last price on pool (average of latest bid and ask)
 - [ ] Provide hooks for before and after trades (expose some address field for IHook function)
+
+
+
+Create a dark pool
+- pools: StateMap<PoolId, Pool>
+- poolCount: State<PoolCount>
+- add entry in pools, increment poolCount
+- Pool: tokenA, tokenB,
+
 
 
 ## Quick start
