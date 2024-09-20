@@ -1,7 +1,12 @@
 import { runtimeModule, state, runtimeMethod } from "@proto-kit/module";
 import { StateMap, assert } from "@proto-kit/protocol";
-import { Balance, Balances as BaseBalances, TokenId } from "@proto-kit/library";
-import { PublicKey } from "o1js";
+import {
+  Balance,
+  BalancesKey,
+  Balances as BaseBalances,
+  TokenId,
+} from "@proto-kit/library";
+import { Provable, PublicKey } from "o1js";
 
 interface BalancesConfig {
   totalSupply: Balance;
@@ -9,7 +14,7 @@ interface BalancesConfig {
 
 @runtimeModule()
 export class Balances extends BaseBalances<BalancesConfig> {
-  @state() public tokenSupply = StateMap.from<TokenId, Balance>(
+  @state() public totalSupply = StateMap.from<TokenId, Balance>(
     TokenId,
     Balance
   );
@@ -20,14 +25,14 @@ export class Balances extends BaseBalances<BalancesConfig> {
     address: PublicKey,
     amount: Balance
   ): Promise<void> {
-    const tokenSupply = await this.tokenSupply.get(tokenId);
-    const newTokenSupply = Balance.from(tokenSupply.value).add(amount);
-    await this.tokenSupply.set(tokenId, newTokenSupply);
+    const key = BalancesKey.from(tokenId, address);
+    const balance = await this.balances.get(key);
+    const newBalance = Balance.from(balance.value).add(amount);
     assert(
-      newTokenSupply.lessThanOrEqual(this.config.totalSupply),
+      newBalance.lessThanOrEqual(this.config.totalSupply),
       "Circulating supply would be higher than total supply"
     );
-    await this.tokenSupply.set(tokenId, newTokenSupply);
+    await this.totalSupply.set(tokenId, newBalance);
     await this.mint(tokenId, address, amount);
   }
 
@@ -37,13 +42,18 @@ export class Balances extends BaseBalances<BalancesConfig> {
     address: PublicKey,
     amount: Balance
   ): Promise<void> {
-    const tokenSupply = await this.tokenSupply.get(tokenId);
-    const newTokenSupply = Balance.from(tokenSupply.value).sub(amount);
-    await this.tokenSupply.set(tokenId, newTokenSupply);
+    const key = BalancesKey.from(tokenId, address);
+    const balance = await this.balances.get(key);
+    assert(
+      Balance.from(balance.value).greaterThanOrEqual(amount),
+      "Insufficient balance"
+    );
+    const newBalance = Balance.from(balance.value).sub(amount);
+    await this.totalSupply.set(tokenId, newBalance);
     await this.burn(tokenId, address, amount);
   }
 
   public getTokenSupply(tokenId: TokenId) {
-    return this.tokenSupply.get(tokenId);
+    return this.totalSupply.get(tokenId);
   }
 }

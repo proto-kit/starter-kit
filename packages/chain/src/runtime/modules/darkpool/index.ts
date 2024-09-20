@@ -24,6 +24,7 @@ export const errors = {
   reserveAIsZero: () => `Reserve A must be greater than zero`,
   lpTokenSupplyIsZero: () => `LP token supply is zero`,
   amountOutIsInsufficient: () => `Amount out is insufficient`,
+  minimumLiquidityInsufficient: () => `Minimum liquidity is insufficient`,
 };
 
 // we need a placeholder pool value until protokit supports value-less dictonaries or state arrays
@@ -34,19 +35,20 @@ export class TokenIdPath extends Struct({
   path: Provable.Array(TokenId, MAX_PATH_LENGTH),
 }) {}
 
-export interface XYKConfig {
+export interface DarkPoolConfig {
   feeDivider: bigint;
   fee: bigint;
+  minimumLiquidity: Balance;
 }
 
 /**
- * Runtime module responsible for providing trading/management functionalities for XYK pools.
+ * Runtime module responsible for providing trading/management functionalities for Dark Pools.
  *
  * @author kaupangdx https://github.com/kaupangdx/kaupangdx-new
  * @author marcuspang https://github.com/marcuspang/ethglobal-singapore
  */
 @runtimeModule()
-export class XYK extends RuntimeModule<XYKConfig> {
+export class DarkPool extends RuntimeModule<DarkPoolConfig> {
   // all existing pools in the system
   @state() public pools = StateMap.from<PoolKey, Field>(PoolKey, Field);
 
@@ -66,7 +68,7 @@ export class XYK extends RuntimeModule<XYKConfig> {
   }
 
   /**
-   * Creates an XYK pool if one doesnt exist yet, and if the creator has
+   * Creates a Dark Pool if one doesnt exist yet, and if the creator has
    * sufficient balance to do so.
    *
    * @param creator
@@ -84,19 +86,13 @@ export class XYK extends RuntimeModule<XYKConfig> {
   ) {
     const tokenPair = TokenPair.from(tokenAId, tokenBId);
     const poolKey = PoolKey.fromTokenPair(tokenPair);
-    const areTokensDistinct = tokenAId.equals(tokenBId).not();
-    const poolDoesNotExist = (await this.poolExists(poolKey)).not();
 
-    // TODO: add check for minimal liquidity in pools
+    const areTokensDistinct = tokenAId.equals(tokenBId).not();
     areTokensDistinct.assertTrue(errors.tokensNotDistinct());
+
+    const poolDoesNotExist = (await this.poolExists(poolKey)).not();
     poolDoesNotExist.assertTrue(errors.poolAlreadyExists());
 
-    // transfer liquidity from the creator to the pool
-    await this.balances.transfer(tokenAId, creator, poolKey, tokenAAmount);
-    await this.balances.transfer(tokenBId, creator, poolKey, tokenBAmount);
-
-    // determine initial LP token supply
-    const lpTokenId = LPTokenId.fromTokenPair(tokenPair);
     const initialLPTokenSupply = Balance.from(
       // if tokenA supply is greater than tokenB supply, use tokenA supply, otherwise use tokenB supply
       Provable.if(
@@ -106,6 +102,19 @@ export class XYK extends RuntimeModule<XYKConfig> {
         tokenBAmount
       ).value as any
     );
+
+    const isMinimumLiquiditySufficient =
+      initialLPTokenSupply.greaterThanOrEqual(this.config.minimumLiquidity);
+    isMinimumLiquiditySufficient.assertTrue(
+      errors.minimumLiquidityInsufficient()
+    );
+
+    // transfer liquidity from the creator to the pool
+    await this.balances.transfer(tokenAId, creator, poolKey, tokenAAmount);
+    await this.balances.transfer(tokenBId, creator, poolKey, tokenBAmount);
+
+    // determine initial LP token supply
+    const lpTokenId = LPTokenId.fromTokenPair(tokenPair);
 
     await this.tokenRegistry.addTokenId(lpTokenId);
     await this.balances.addBalance(lpTokenId, creator, initialLPTokenSupply);
@@ -143,10 +152,7 @@ export class XYK extends RuntimeModule<XYKConfig> {
       Provable.if(reserveANotZero, reserveA.value, Balance.from(1).value) as any
     );
 
-    // TODO: why do i need Balance.from on the `amountA` argument???
-    const amountB = Balance.from(tokenAAmount)
-      .mul(reserveB)
-      .div(adjustedReserveA);
+    const amountB = tokenAAmount.mul(reserveB).div(adjustedReserveA);
     const isAmountBLimitSufficient =
       tokenBAmountLimit.greaterThanOrEqual(amountB);
 

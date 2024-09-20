@@ -12,16 +12,6 @@
 - [ ] See last price on pool (average of latest bid and ask)
 - [ ] Provide hooks for before and after trades (expose some address field for IHook function)
 
-
-
-Create a dark pool
-- pools: StateMap<PoolId, Pool>
-- poolCount: State<PoolCount>
-- add entry in pools, increment poolCount
-- Pool: tokenA, tokenB,
-
-
-
 ## Quick start
 
 The monorepo contains 1 package and 1 app:
@@ -36,6 +26,7 @@ The monorepo contains 1 package and 1 app:
 - nvm
 
 For running with persistance / deploying on a server
+
 - docker `>= 24.0`
 - docker-compose `>= 2.22.0`
 
@@ -55,6 +46,7 @@ The starter-kit offers different environments to run you appchain.
 You can use those environments to configure the mode of operation for your appchain depending on which stage of development you are in.
 
 The starter kit comes with a set of pre-configured environments:
+
 - `inmemory`: Runs everything in-memory without persisting the data. Useful for early stages of runtime development.
 - `development`: Runs the sequencer locally and persists all state in databases running in docker.
 - `sovereign`: Runs your appchain fully in docker (except the UI) for testnet deployments without settlement.
@@ -83,6 +75,7 @@ pnpm env:inmemory dev --filter chain
 Navigate to `localhost:3000` to see the example UI, or to `localhost:8080/graphql` to see the GQL interface of the locally running sequencer.
 
 ### Running tests
+
 ```zsh
 # run and watch tests for the `chain` package
 pnpm run test --filter=chain -- --watchAll
@@ -125,6 +118,7 @@ UI will be accessible at `https://localhost` and GQL inspector will be available
 #### Configuration
 
 Go to `docker/proxy/Caddyfile` and replace the `*` matcher with your domain.
+
 ```
 yourdomain.com {
     ...
