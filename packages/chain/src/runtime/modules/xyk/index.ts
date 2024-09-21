@@ -448,11 +448,23 @@ export class XYK extends RuntimeModule<XYKConfig> {
     );
   }
 
+  /**
+   * Whitelists a user for a pool. Here, we do not care whether the pool exists or not.
+   *
+   * @param user
+   * @param poolKey
+   */
   @runtimeMethod()
   public async whitelistUser(user: PublicKey, poolKey: PoolKey) {
     await this.poolWhitelist.set({ user, poolKey }, Bool(true));
   }
 
+  /**
+   * Dewhitelists a user for a pool. Here, we do not care whether the pool exists or not.
+   *
+   * @param user
+   * @param poolKey
+   */
   @runtimeMethod()
   public async dewhitelistUser(user: PublicKey, poolKey: PoolKey) {
     await this.poolWhitelist.set({ user, poolKey }, Bool(false));

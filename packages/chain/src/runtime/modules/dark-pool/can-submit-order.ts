@@ -18,7 +18,8 @@ class CanSubmitOrderPublicInput extends Struct({
 class CanSubmitOrderPublicOutput extends Struct({
   poolKey: PoolKey,
   canSubmit: Bool,
-  encryptedOrderField: Field,
+  // TODO: not everything should be public!
+  order: Order,
 }) {}
 
 export async function canSubmitOrder(
@@ -35,11 +36,10 @@ export async function canSubmitOrder(
   return new CanSubmitOrderPublicOutput({
     poolKey: input.poolKey,
     canSubmit: Bool(true),
-    encryptedOrderField: order.hash(),
+    order,
   });
 }
 
-// TODO: use this when taking in anew order
 export const canSubmitOrderProgram = ZkProgram({
   name: "canSubmitOrder",
   publicInput: CanSubmitOrderPublicInput,
