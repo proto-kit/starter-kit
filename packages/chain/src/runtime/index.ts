@@ -1,16 +1,16 @@
-import { Balance, UInt64, VanillaRuntimeModules } from "@proto-kit/library";
 import { ModulesConfig } from "@proto-kit/common";
+import { Balance, UInt64, VanillaRuntimeModules } from "@proto-kit/library";
 
 import { Balances } from "./modules/balances";
-import { TokenRegistry } from "./modules/tokens";
-import { XYK } from "./modules/xyk";
+import { DarkPool } from "./modules/dark-pool";
 import { Faucet } from "./modules/faucet";
+import { TokenRegistry } from "./modules/tokens";
 
 export const modules = VanillaRuntimeModules.with({
   Balances,
   TokenRegistry,
   Faucet,
-  XYK,
+  DarkPool,
 });
 
 export const config: ModulesConfig<typeof modules> = {
@@ -20,9 +20,10 @@ export const config: ModulesConfig<typeof modules> = {
   TokenRegistry: {
     maxTokens: UInt64.from(100),
   },
-  XYK: {
+  DarkPool: {
     feeDivider: 1000n,
     fee: 3n,
+    minimumLiquidity: Balance.from(1),
   },
   Faucet: {},
 };
