@@ -1,11 +1,20 @@
 import { TokenId, UInt64 } from "@proto-kit/library";
 import { runtimeMethod, runtimeModule, state } from "@proto-kit/module";
 import { assert, State, StateMap } from "@proto-kit/protocol";
-import { Bool, Field, Poseidon, PublicKey, Struct } from "o1js";
+import {
+  Bool,
+  Field,
+  UInt64 as O1UInt64,
+  Poseidon,
+  PublicKey,
+  Struct,
+} from "o1js";
 import { XYK } from "../xyk";
 import { PoolKey } from "../xyk/pool-key";
 import { TokenPair } from "../xyk/token-pair";
 import { calculateExecutionAmounts } from "./utils";
+import type { CanSubmitOrderProof } from "./can-submit-order";
+import "reflect-metadata";
 
 export class OrderId extends UInt64 {}
 
@@ -102,13 +111,35 @@ export class DarkPool extends XYK {
   @state() public firstSellOrderId = State.from<OrderId>(OrderId);
   @state() public lastSellOrderId = State.from<OrderId>(OrderId);
 
+  /**
+   * State root of whitelisted users
+   */
+  @state() public stateRoot = State.from<Field>(Field);
+
   @runtimeMethod()
-  public async submitOrder(order: Order) {
+  public async setStateRoot(root: Field) {
+    this.stateRoot.set(root);
+  }
+
+  @runtimeMethod()
+  public async submitOrder(proof: CanSubmitOrderProof) {
+    proof.verify();
+
+    const stateRoot = await this.stateRoot.get();
+    assert(
+      proof.publicInput.stateRoot.equals(stateRoot.value),
+      "State root does not match"
+    );
+    assert(proof.publicOutput.canSubmit, "Cannot submit order");
+
+    const order = proof.publicOutput.order;
     const sender = this.transaction.sender.value;
     const isBuy = order.tokenIn.lessThanOrEqual(order.tokenOut);
+    const isBuyBoolean = isBuy.equals(Bool(true));
     const poolKey = PoolKey.fromTokenPair(
       TokenPair.from(order.tokenIn, order.tokenOut)
     );
+
     const isWhitelisted = await this.poolWhitelist.get({
       user: sender,
       poolKey,
@@ -116,30 +147,22 @@ export class DarkPool extends XYK {
     assert(isWhitelisted.value, "User is not whitelisted for this pool");
 
     // Transfer tokens from sender to pool
-    if (isBuy.equals(Bool(true))) {
-      await this.balances.transfer(
-        order.tokenIn,
-        sender,
-        this.transaction.sender.value,
-        order.amountIn
-      );
-    } else {
-      await this.balances.transfer(
-        order.tokenOut,
-        sender,
-        this.transaction.sender.value,
-        order.amountOut
-      );
-    }
+    const tokenToTransfer = isBuyBoolean ? order.tokenIn : order.tokenOut;
+    const amountToTransfer = isBuyBoolean ? order.amountIn : order.amountOut;
+    await this.balances.transfer(
+      tokenToTransfer,
+      sender,
+      this.transaction.sender.value,
+      amountToTransfer
+    );
 
     // Update order book with order data
-    const orderId = isBuy.equals(Bool(true))
-      ? await this.buyOrderCounter.get()
-      : await this.sellOrderCounter.get();
+    const orderCounter = isBuyBoolean
+      ? this.buyOrderCounter
+      : this.sellOrderCounter;
+    const orderId = await orderCounter.get();
     const newOrderId = orderId.orElse(UInt64.from(0)).add(UInt64.from(1));
-    const orderBook = isBuy.equals(Bool(true))
-      ? this.buyOrderBook
-      : this.sellOrderBook;
+    const orderBook = isBuyBoolean ? this.buyOrderBook : this.sellOrderBook;
     await orderBook.set(newOrderId, order);
 
     // Update user order counter
@@ -157,14 +180,18 @@ export class DarkPool extends XYK {
     await this.orderIdToNextOrderId.set(newOrderId, newOrderId);
 
     // Update first and last order ids
-    const firstOrderId = isBuy.equals(Bool(true))
+    const firstOrderId = isBuyBoolean
       ? await this.firstBuyOrderId.get()
       : await this.firstSellOrderId.get();
     if (firstOrderId.isSome.equals(Bool(false))) {
-      await this.firstBuyOrderId.set(newOrderId);
+      if (isBuy) {
+        await this.firstBuyOrderId.set(newOrderId);
+      } else {
+        await this.firstSellOrderId.set(newOrderId);
+      }
     }
 
-    const lastOrderId = isBuy.equals(Bool(true))
+    const lastOrderId = isBuyBoolean
       ? await this.lastBuyOrderId.get()
       : await this.lastSellOrderId.get();
     if (lastOrderId.isSome.equals(Bool(true))) {
@@ -172,7 +199,7 @@ export class DarkPool extends XYK {
     }
 
     // Update counters
-    if (isBuy.equals(Bool(true))) {
+    if (isBuyBoolean) {
       await this.lastBuyOrderId.set(newOrderId);
       await this.buyOrderCounter.set(newUserOrderCount);
     } else {
@@ -185,38 +212,66 @@ export class DarkPool extends XYK {
   public async removeOrder(orderId: OrderId) {
     let order = await this.buyOrderBook.get(orderId);
     let isBuy = Bool(true);
+    let orderBook = this.buyOrderBook;
+    let orderCounter = this.buyOrderCounter;
+    let lastOrderIdState = this.lastBuyOrderId;
     if (order.isSome.equals(Bool(false))) {
       order = await this.sellOrderBook.get(orderId);
       isBuy = Bool(false);
+      orderBook = this.sellOrderBook;
+      orderCounter = this.sellOrderCounter;
+      lastOrderIdState = this.lastSellOrderId;
     }
+
     assert(order.isSome, "Order does not exist");
 
+    // Update user order counter
     const userOrderCount = await this.userOrderCounter.get(order.value.user);
     const newUserOrderCount = userOrderCount
       .orElse(UInt64.from(0))
       .sub(UInt64.from(1));
     await this.userOrderCounter.set(order.value.user, newUserOrderCount);
 
+    // Update order chain
     const nextOrderId = await this.orderIdToNextOrderId.get(orderId);
-    if (nextOrderId.isSome.equals(Bool(true))) {
-      await this.orderIdToNextOrderId.set(orderId, nextOrderId.value);
+    const lastOrderId = await lastOrderIdState.get();
+    if (lastOrderId.value.equals(orderId)) {
+      await lastOrderIdState.set(nextOrderId.value);
+    } else if (nextOrderId.isSome.equals(Bool(true))) {
+      const prevOrderId = await this.findPreviousOrderId(orderId, isBuy);
+      if (prevOrderId) {
+        await this.orderIdToNextOrderId.set(prevOrderId, nextOrderId.value);
+      }
     }
 
-    if (isBuy.equals(Bool(true))) {
-      const lastOrderId = await this.lastBuyOrderId.get();
-      if (lastOrderId.value.equals(orderId)) {
-        await this.lastBuyOrderId.set(nextOrderId.value);
-      }
-      await this.buyOrderCounter.set(newUserOrderCount);
-      await this.buyOrderBook.set(orderId, Order.empty());
-    } else {
-      const lastOrderId = await this.lastSellOrderId.get();
-      if (lastOrderId.value.equals(orderId)) {
-        await this.lastSellOrderId.set(nextOrderId.value);
-      }
-      await this.sellOrderCounter.set(newUserOrderCount);
-      await this.sellOrderBook.set(orderId, Order.empty());
+    // Remove order from book and update counter
+    await orderBook.set(orderId, Order.empty());
+    const newOrderCounter = (await orderCounter.get())
+      .orElse(UInt64.from(1))
+      .sub(UInt64.from(1));
+    await orderCounter.set(newOrderCounter);
+  }
+
+  private async findPreviousOrderId(
+    orderId: OrderId,
+    isBuy: Bool
+  ): Promise<OrderId | undefined> {
+    let currentOrderId = isBuy
+      ? await this.firstBuyOrderId.get()
+      : await this.firstSellOrderId.get();
+    let prevOrderId: OrderId | undefined;
+
+    while (
+      currentOrderId.isSome.equals(Bool(true)) &&
+      !currentOrderId.value.equals(orderId)
+    ) {
+      prevOrderId = currentOrderId.value;
+      currentOrderId = await this.orderIdToNextOrderId.get(
+        currentOrderId.value
+      );
     }
+
+    return prevOrderId;
   }
 
   // TODO: is this safe to expose as runtimeMethod?
@@ -232,51 +287,49 @@ export class DarkPool extends XYK {
     let sellOrderId = await this.firstSellOrderId.get();
     // Iterate through order book
     // We match buy orders with sell orders
-    while (buyOrderId.isSome) {
+    while (
+      buyOrderId.isSome.equals(Bool(true)) &&
+      sellOrderId.isSome.equals(Bool(true))
+    ) {
       const buyOrder = await this.buyOrderBook.get(buyOrderId.value);
-      if (buyOrder.isSome.equals(Bool(false))) {
+      const sellOrder = await this.sellOrderBook.get(sellOrderId.value);
+
+      if (
+        buyOrder.isSome.equals(Bool(false)) ||
+        sellOrder.isSome.equals(Bool(false))
+      ) {
         break;
       }
+
+      const [buyOrderActive, buyOrderExpired] = this.checkOrderValidity(
+        buyOrder.value,
+        currentBlockHeight
+      );
       // If the buy order is not active, skip it
-      if (
-        buyOrder.value.minBlockHeight.value.greaterThan(
-          currentBlockHeight.value
-        )
-      ) {
+      if (!buyOrderActive) {
         buyOrderId = await this.orderIdToNextOrderId.get(buyOrderId.value);
         continue;
       }
       // If the buy order is expired, remove it and continue
-      if (
-        buyOrder.value.maxBlockHeight.value.lessThan(currentBlockHeight.value)
-      ) {
-        await this.removeOrder(buyOrderId.value);
-        buyOrderId = await this.orderIdToNextOrderId.get(buyOrderId.value);
+      if (buyOrderExpired.equals(Bool(true))) {
+        buyOrderId = await this.handleInactiveOrder(buyOrderId.value, true);
         continue;
       }
 
-      const sellOrder = await this.sellOrderBook.get(sellOrderId.value);
-      if (sellOrder.isSome.equals(Bool(false))) {
-        break;
-      }
+      const [sellOrderActive, sellOrderExpired] = this.checkOrderValidity(
+        sellOrder.value,
+        currentBlockHeight
+      );
       // If the sell order is not active, skip it
-      if (
-        sellOrder.value.minBlockHeight.value.greaterThan(
-          currentBlockHeight.value
-        )
-      ) {
+      if (!sellOrderActive) {
         sellOrderId = await this.orderIdToNextOrderId.get(sellOrderId.value);
         continue;
       }
       // If the sell order is expired, remove it and continue
-      if (
-        sellOrder.value.maxBlockHeight.value.lessThan(currentBlockHeight.value)
-      ) {
-        await this.removeOrder(sellOrderId.value);
-        sellOrderId = await this.orderIdToNextOrderId.get(sellOrderId.value);
+      if (sellOrderExpired.equals(Bool(true))) {
+        sellOrderId = await this.handleInactiveOrder(sellOrderId.value, false);
         continue;
       }
-
       const buyOrderRatio = buyOrder.value.amountOut.div(
         buyOrder.value.amountIn
       );
@@ -284,13 +337,11 @@ export class DarkPool extends XYK {
         sellOrder.value.amountOut
       );
 
-      // No match, move to next order
       if (buyOrderRatio.greaterThan(sellOrderRatio)) {
         sellOrderId = await this.orderIdToNextOrderId.get(sellOrderId.value);
         continue;
       }
 
-      // Match orders
       const [executedAmountIn, executedAmountOut] = calculateExecutionAmounts(
         sellOrder.value.amountIn,
         sellOrder.value.amountOut,
@@ -298,87 +349,119 @@ export class DarkPool extends XYK {
         buyOrder.value.amountOut
       );
 
-      // If it is possible to execute the trade, continue
       if (
         executedAmountIn.greaterThan(UInt64.from(0)) &&
         executedAmountOut.greaterThan(UInt64.from(0))
       ) {
-        await this.balances.transfer(
-          buyOrder.value.tokenIn,
-          buyOrder.value.user,
-          sellOrder.value.user,
-          executedAmountIn
-        );
-        await this.balances.transfer(
-          sellOrder.value.tokenOut,
-          sellOrder.value.user,
-          buyOrder.value.user,
+        await this.executeMatch(
+          buyOrder.value,
+          sellOrder.value,
+          executedAmountIn,
           executedAmountOut
         );
 
-        // Update orders
-        const updatedBuyOrder = new Order({
-          user: buyOrder.value.user,
-          tokenIn: buyOrder.value.tokenIn,
-          tokenOut: buyOrder.value.tokenOut,
-          amountIn: buyOrder.value.amountIn.sub(executedAmountIn),
-          amountOut: buyOrder.value.amountOut.sub(executedAmountOut),
-          minBlockHeight: buyOrder.value.minBlockHeight,
-          maxBlockHeight: buyOrder.value.maxBlockHeight,
-        });
-
-        const updatedSellOrder = new Order({
-          user: sellOrder.value.user,
-          tokenIn: sellOrder.value.tokenIn,
-          tokenOut: sellOrder.value.tokenOut,
-          amountIn: sellOrder.value.amountIn.sub(executedAmountOut),
-          amountOut: sellOrder.value.amountOut.sub(executedAmountIn),
-          minBlockHeight: sellOrder.value.minBlockHeight,
-          maxBlockHeight: sellOrder.value.maxBlockHeight,
-        });
-
-        // Remove or update orders
-        if (updatedBuyOrder.amountIn.equals(UInt64.from(0))) {
-          await this.removeOrder(buyOrderId.value);
-          buyOrderId = await this.orderIdToNextOrderId.get(buyOrderId.value);
-        } else {
-          await this.buyOrderBook.set(buyOrderId.value, updatedBuyOrder);
-        }
-
-        if (updatedSellOrder.amountIn.equals(UInt64.from(0))) {
-          await this.removeOrder(sellOrderId.value);
-          sellOrderId = await this.orderIdToNextOrderId.get(sellOrderId.value);
-        } else {
-          await this.sellOrderBook.set(sellOrderId.value, updatedSellOrder);
-        }
+        [buyOrderId.value, sellOrderId.value] =
+          await this.updateOrdersAfterMatch(
+            buyOrderId.value,
+            sellOrderId.value,
+            executedAmountIn,
+            executedAmountOut
+          );
       } else {
-        // No match, move to next order
         buyOrderId = await this.orderIdToNextOrderId.get(buyOrderId.value);
       }
     }
   }
 
-  public async getUserOrders(user: PublicKey) {
-    const userOrderCount = await this.userOrderCounter.get(user);
-    const userOrderIds = [];
-    let i = UInt64.from(0);
-    while (userOrderCount.value.greaterThan(i)) {
-      const userOrderId = await this.userOrderIdByIndex.get({
-        orderId: i,
-        user,
-      });
-      userOrderIds.push(userOrderId.value);
-      i = i.add(UInt64.from(1));
+  private checkOrderValidity(
+    order: Order,
+    currentBlockHeight: O1UInt64
+  ): [Bool, Bool] {
+    const isActive = order.minBlockHeight.value.lessThanOrEqual(
+      currentBlockHeight.value
+    );
+    const isExpired = order.maxBlockHeight.value.lessThan(
+      currentBlockHeight.value
+    );
+    return [isActive, isExpired];
+  }
+
+  private async handleInactiveOrder(orderId: OrderId, isBuy: boolean) {
+    const nextOrderId = await this.orderIdToNextOrderId.get(orderId);
+    if (isBuy) {
+      await this.removeOrder(orderId);
+    }
+    return nextOrderId;
+  }
+
+  private async executeMatch(
+    buyOrder: Order,
+    sellOrder: Order,
+    executedAmountIn: UInt64,
+    executedAmountOut: UInt64
+  ) {
+    await this.balances.transfer(
+      buyOrder.tokenIn,
+      buyOrder.user,
+      sellOrder.user,
+      executedAmountIn
+    );
+    await this.balances.transfer(
+      sellOrder.tokenOut,
+      sellOrder.user,
+      buyOrder.user,
+      executedAmountOut
+    );
+  }
+
+  private async updateOrdersAfterMatch(
+    buyOrderId: OrderId,
+    sellOrderId: OrderId,
+    executedAmountIn: UInt64,
+    executedAmountOut: UInt64
+  ) {
+    const updatedBuyOrder = await this.updateOrder(
+      buyOrderId,
+      this.buyOrderBook,
+      executedAmountIn,
+      executedAmountOut
+    );
+    const updatedSellOrder = await this.updateOrder(
+      sellOrderId,
+      this.sellOrderBook,
+      executedAmountOut,
+      executedAmountIn
+    );
+
+    let newBuyOrderId: OrderId | undefined;
+    let newSellOrderId: OrderId | undefined;
+
+    if (updatedBuyOrder.amountIn.equals(UInt64.from(0))) {
+      await this.removeOrder(buyOrderId);
+      newBuyOrderId = (await this.orderIdToNextOrderId.get(buyOrderId)).value;
     }
 
-    const orders = [];
-    for (const userOrderId of userOrderIds) {
-      const order = await this.buyOrderBook.get(userOrderId);
-      assert(order.isSome, "Order does not exist");
-
-      orders.push(order.value);
+    if (updatedSellOrder.amountIn.equals(UInt64.from(0))) {
+      await this.removeOrder(sellOrderId);
+      newSellOrderId = (await this.orderIdToNextOrderId.get(sellOrderId)).value;
     }
 
-    return orders;
+    return [newBuyOrderId ?? buyOrderId, newSellOrderId ?? sellOrderId];
+  }
+
+  private async updateOrder(
+    orderId: OrderId,
+    orderBook: StateMap<OrderId, Order>,
+    executedAmountIn: UInt64,
+    executedAmountOut: UInt64
+  ): Promise<Order> {
+    const order = (await orderBook.get(orderId)).value;
+    const updatedOrder = new Order({
+      ...order,
+      amountIn: order.amountIn.sub(executedAmountIn),
+      amountOut: order.amountOut.sub(executedAmountOut),
+    });
+    await orderBook.set(orderId, updatedOrder);
+    return updatedOrder;
   }
 }
