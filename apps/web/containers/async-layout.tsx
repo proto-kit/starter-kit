@@ -1,19 +1,19 @@
 import Header from "@/components/header";
 import { Toaster } from "@/components/ui/toaster";
-import { useBalancesStore, useObserveBalance } from "@/lib/stores/balances";
 import { useChainStore, usePollBlockHeight } from "@/lib/stores/chain";
 import { useClientStore } from "@/lib/stores/client";
 import { useNotifyTransactions, useWalletStore } from "@/lib/stores/wallet";
-import { ReactNode, useEffect, useMemo } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactNode, useEffect } from "react";
+
+const queryClient = new QueryClient();
 
 export default function AsyncLayout({ children }: { children: ReactNode }) {
   const wallet = useWalletStore();
   const client = useClientStore();
   const chain = useChainStore();
-  const balances = useBalancesStore();
 
   usePollBlockHeight();
-  useObserveBalance();
   useNotifyTransactions();
 
   useEffect(() => {
@@ -25,23 +25,16 @@ export default function AsyncLayout({ children }: { children: ReactNode }) {
     wallet.observeWalletChange();
   }, []);
 
-  const loading = useMemo(
-    () => client.loading || balances.loading,
-    [client.loading, balances.loading],
-  );
-
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <Header
         loading={client.loading}
-        balance={balances.balances[wallet.wallet ?? ""]}
-        balanceLoading={loading}
         wallet={wallet.wallet}
         onConnectWallet={wallet.connectWallet}
         blockHeight={chain.block?.height ?? "-"}
       />
       {children}
       <Toaster />
-    </>
+    </QueryClientProvider>
   );
 }

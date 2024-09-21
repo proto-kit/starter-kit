@@ -1,14 +1,18 @@
 import { EventEmitter, log, noop } from "@proto-kit/common";
+import { MethodParameterEncoder, type Runtime } from "@proto-kit/module";
 import {
+  PendingTransaction,
   sequencerModule,
   SequencerModule,
   type Mempool,
   type MempoolEvents,
-  type PendingTransaction,
   type TransactionStorage,
 } from "@proto-kit/sequencer";
 import { TransactionValidator } from "@proto-kit/sequencer/dist/mempool/verification/TransactionValidator";
+import { Field, PrivateKey, PublicKey, Signature, UInt64 } from "o1js";
+import "reflect-metadata";
 import { inject } from "tsyringe";
+import baseRuntime from "../../runtime";
 
 @sequencerModule()
 export class DarkPoolMempool extends SequencerModule implements Mempool {
@@ -17,7 +21,9 @@ export class DarkPoolMempool extends SequencerModule implements Mempool {
   public constructor(
     private readonly transactionValidator: TransactionValidator,
     @inject("TransactionStorage")
-    private readonly transactionStorage: TransactionStorage
+    private readonly transactionStorage: TransactionStorage,
+    @inject("Runtime")
+    private readonly runtime: Runtime<(typeof baseRuntime)["modules"]>
   ) {
     super();
   }
@@ -52,9 +58,42 @@ export class DarkPoolMempool extends SequencerModule implements Mempool {
 
   public async getTxs(): Promise<PendingTransaction[]> {
     const txs = await this.transactionStorage.getPendingUserTransactions();
-    txs.forEach((tx) => {
-      console.log("Method", tx.methodId.toString());
+    // TODO: for each dark pool order creation, check if it can be matched with an existing order
+    const darkPool = this.runtime.resolve("DarkPool");
+    const submitOrderMethodId = this.runtime.methodIdResolver.getMethodId(
+      "DarkPool",
+      "submitOrder"
+    );
+    let hasSubmitOrder = false;
+    txs.forEach(async (tx) => {
+      if (tx.methodId.equals(submitOrderMethodId)) {
+        hasSubmitOrder = true;
+      }
     });
+    if (hasSubmitOrder) {
+      const encoder = MethodParameterEncoder.fromMethod(
+        darkPool,
+        "matchOrders"
+      );
+      const matchOrdersMethodId = this.runtime.methodIdResolver.getMethodId(
+        "DarkPool",
+        "matchOrders"
+      );
+      const { fields, auxiliary } = encoder.encode([]);
+
+      console.log("Adding match order transaction...");
+      txs.push(
+        new PendingTransaction({
+          methodId: Field.from(matchOrdersMethodId),
+          nonce: (txs.at(-1)?.nonce ?? UInt64.from(0)).add(1),
+          sender: PublicKey.empty(),
+          signature: Signature.create(PrivateKey.random(), [Field(0)]),
+          argsFields: fields,
+          auxiliaryData: auxiliary,
+          isMessage: false,
+        })
+      );
+    }
     return txs;
   }
 

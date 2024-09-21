@@ -60,7 +60,8 @@ describe("DarkPool", () => {
         user: alice,
         amountIn: UInt64.from(100),
         amountOut: UInt64.from(50),
-        isAtoB: Bool(true),
+        tokenIn: tokenAId,
+        tokenOut: tokenBId,
       });
 
       // Whitelist the user
@@ -73,7 +74,7 @@ describe("DarkPool", () => {
 
       // Act
       tx = await appChain.transaction(alice, async () => {
-        await darkPool.submitOrder(order, poolKey);
+        await darkPool.submitOrder(order, Bool(true));
       });
       await tx.sign();
       await tx.send();
@@ -81,19 +82,19 @@ describe("DarkPool", () => {
 
       // Assert
       const submittedOrder =
-        await appChain.query.runtime.DarkPool.orderBook.get(UInt64.from(1));
+        await appChain.query.runtime.DarkPool.buyOrderBook.get(UInt64.from(1));
       expect(submittedOrder).toEqual(order);
 
       const userOrderCount =
-        await appChain.query.runtime.DarkPool.userOrderCount.get(alice);
+        await appChain.query.runtime.DarkPool.userOrderCounter.get(alice);
       expect(userOrderCount).toEqual(UInt64.from(1));
 
       const firstOrderId =
-        await appChain.query.runtime.DarkPool.firstOrderId.get();
+        await appChain.query.runtime.DarkPool.firstBuyOrderId.get();
       expect(firstOrderId).toEqual(UInt64.from(1));
 
       const lastOrderId =
-        await appChain.query.runtime.DarkPool.lastOrderId.get();
+        await appChain.query.runtime.DarkPool.lastBuyOrderId.get();
       expect(lastOrderId).toEqual(UInt64.from(1));
     });
 
@@ -106,12 +107,13 @@ describe("DarkPool", () => {
         user: alice,
         amountIn: UInt64.from(100),
         amountOut: UInt64.from(50),
-        isAtoB: Bool(true),
+        tokenIn: tokenAId,
+        tokenOut: tokenBId,
       });
 
       // Act & Assert
       const tx = await appChain.transaction(alice, async () => {
-        await darkPool.submitOrder(order, poolKey);
+        await darkPool.submitOrder(order, Bool(true));
       });
       await tx.sign();
       await tx.send();
@@ -132,7 +134,8 @@ describe("DarkPool", () => {
         user: alice,
         amountIn: UInt64.from(100),
         amountOut: UInt64.from(50),
-        isAtoB: Bool(true),
+        tokenIn: tokenAId,
+        tokenOut: tokenBId,
       });
       const appChain = await startAppChain();
       appChain.setSigner(alicePrivateKey);
@@ -146,7 +149,7 @@ describe("DarkPool", () => {
       await appChain.produceBlock();
 
       tx = await appChain.transaction(alice, async () => {
-        await darkPool.submitOrder(order, poolKey);
+        await darkPool.submitOrder(order, Bool(true));
       });
       await tx.sign();
       await tx.send();
@@ -154,7 +157,7 @@ describe("DarkPool", () => {
 
       // Act
       const retrievedOrder =
-        await appChain.query.runtime.DarkPool.orderBook.get(UInt64.from(1));
+        await appChain.query.runtime.DarkPool.buyOrderBook.get(UInt64.from(1));
 
       // Assert
       expect(retrievedOrder).toEqual(order);
@@ -164,7 +167,9 @@ describe("DarkPool", () => {
       // Act
       const appChain = await startAppChain();
       const retrievedOrder =
-        await appChain.query.runtime.DarkPool.orderBook.get(UInt64.from(999));
+        await appChain.query.runtime.DarkPool.buyOrderBook.get(
+          UInt64.from(999)
+        );
 
       // Assert
       expect(retrievedOrder).toBeUndefined();
@@ -238,7 +243,8 @@ describe("DarkPool", () => {
         user: alice,
         amountIn: UInt64.from(100),
         amountOut: UInt64.from(50),
-        isAtoB: Bool(true),
+        tokenIn: tokenAId,
+        tokenOut: tokenBId,
       });
       let tx = await appChain.transaction(alice, async () => {
         await darkPool.whitelistUser(alice, poolKey);
@@ -248,7 +254,7 @@ describe("DarkPool", () => {
       await appChain.produceBlock();
 
       tx = await appChain.transaction(alice, async () => {
-        await darkPool.submitOrder(order, poolKey);
+        await darkPool.submitOrder(order, Bool(true));
       });
       await tx.sign();
       await tx.send();
@@ -263,13 +269,12 @@ describe("DarkPool", () => {
       await appChain.produceBlock();
 
       // Assert
-      const removedOrder = await appChain.query.runtime.DarkPool.orderBook.get(
-        UInt64.from(1)
-      );
+      const removedOrder =
+        await appChain.query.runtime.DarkPool.buyOrderBook.get(UInt64.from(1));
       expect(removedOrder).toEqual(Order.empty());
 
       const userOrderCount =
-        await appChain.query.runtime.DarkPool.userOrderCount.get(alice);
+        await appChain.query.runtime.DarkPool.userOrderCounter.get(alice);
       expect(userOrderCount).toEqual(UInt64.from(0));
     });
 

@@ -1,11 +1,12 @@
 "use client";
+
 import { Faucet } from "@/components/faucet";
-import { useFaucet } from "@/lib/stores/balances";
+import { useAddBalance } from "@/lib/stores/balances";
 import { useWalletStore } from "@/lib/stores/wallet";
 
 export default function Home() {
   const wallet = useWalletStore();
-  const drip = useFaucet();
+  const { mutate } = useAddBalance();
 
   return (
     <div className="mx-auto -mt-32 h-full pt-16">
@@ -14,7 +15,12 @@ export default function Home() {
           <Faucet
             wallet={wallet.wallet}
             onConnectWallet={wallet.connectWallet}
-            onDrip={drip}
+            onDrip={(tokenId, amount) =>
+              mutate({
+                tokenId,
+                amount,
+              })
+            }
             loading={false}
           />
         </div>

@@ -1,11 +1,25 @@
-import { TokenId } from "@proto-kit/library";
-import { Bool, MerkleMap, Poseidon, PrivateKey, UInt64 } from "o1js";
+import { TokenId, UInt64 } from "@proto-kit/library";
+import { Bool, MerkleMap, Poseidon, PrivateKey } from "o1js";
 import { Order } from "../../../../src/runtime/modules/dark-pool";
 import { canSubmitOrderProgram } from "../../../../src/runtime/modules/dark-pool/can-submit-order";
 import { PoolKey } from "../../../../src/runtime/modules/xyk/pool-key";
 import { TokenPair } from "../../../../src/runtime/modules/xyk/token-pair";
+import { TestingAppChain } from "@proto-kit/sdk";
 
 describe("DarkPool can submit order", () => {
+  const appChain = TestingAppChain.fromRuntime({});
+  appChain.configurePartial({
+    Runtime: {
+      Balances: {
+        totalSupply: UInt64.from(0),
+      },
+    },
+  });
+
+  beforeAll(async () => {
+    await appChain.start();
+  });
+
   const aliceKey = PrivateKey.random();
   const alice = aliceKey.toPublicKey();
   const tokenA = TokenId.from(1);
@@ -15,7 +29,8 @@ describe("DarkPool can submit order", () => {
     user: alice,
     amountIn: UInt64.from(1000),
     amountOut: UInt64.from(900),
-    isAtoB: Bool(true),
+    tokenIn: tokenA,
+    tokenOut: tokenB,
   });
 
   it("should submit order if in merkle tree", async () => {
@@ -36,7 +51,7 @@ describe("DarkPool can submit order", () => {
       order
     );
 
-    expect(proof.publicOutput.canSubmit).toBe(true);
+    expect(proof.publicOutput.canSubmit.toBoolean()).toBe(true);
     expect(proof.publicOutput.poolKey.toBase58()).toEqual(poolKey.toBase58());
   });
 

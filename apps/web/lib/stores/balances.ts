@@ -1,31 +1,34 @@
-import { create } from "zustand";
-import { Client, useClientStore } from "./client";
-import { immer } from "zustand/middleware/immer";
-import { PendingTransaction, UnsignedTransaction } from "@proto-kit/sequencer";
+import { toast } from "@/components/ui/use-toast";
 import { Balance, BalancesKey, TokenId } from "@proto-kit/library";
-import { PublicKey, UInt64 } from "o1js";
-import { useCallback, useEffect } from "react";
+import { PendingTransaction, UnsignedTransaction } from "@proto-kit/sequencer";
+import { useMutation } from "@tanstack/react-query";
+import { PublicKey } from "o1js";
+import { useEffect } from "react";
+import { create } from "zustand";
+import { immer } from "zustand/middleware/immer";
 import { useChainStore } from "./chain";
+import { Client, useClientStore } from "./client";
 import { useWalletStore } from "./wallet";
 
 export interface BalancesState {
   loading: boolean;
   balances: {
-    // address - balance
-    [key: string]: string;
-  };
-  totalSupply: {
     // TokenId - balance
     [key: string]: string;
   };
-  loadBalance: (client: Client, address: string) => Promise<void>;
+  lastTokenId: string;
+  loadBalance: (
+    client: Client,
+    tokenId: TokenId,
+    address: string,
+  ) => Promise<void>;
+  loadAllBalances: (client: Client, address: string) => Promise<void>;
   addBalance: (
     client: Client,
     tokenId: TokenId,
     sender: PublicKey,
     amount: Balance,
-  ) => Promise<void>;
-  faucet: (client: Client, address: string) => Promise<PendingTransaction>;
+  ) => Promise<PendingTransaction>;
 }
 
 function isPendingTransaction(
@@ -35,8 +38,6 @@ function isPendingTransaction(
     throw new Error("Transaction is not a PendingTransaction");
 }
 
-export const tokenId = TokenId.from(0);
-
 export const useBalancesStore = create<
   BalancesState,
   [["zustand/immer", never]]
@@ -45,33 +46,45 @@ export const useBalancesStore = create<
     loading: Boolean(false),
     balances: {},
     totalSupply: {},
-    async loadBalance(client: Client, address: string) {
+    lastTokenId: TokenId.from(1).toString(),
+    async loadBalance(client: Client, tokenId: TokenId, address: string) {
       set((state) => {
         state.loading = true;
       });
 
       const key = BalancesKey.from(tokenId, PublicKey.fromBase58(address));
-
       const balance = await client.query.runtime.Balances.balances.get(key);
 
       set((state) => {
         state.loading = false;
-        state.balances[address] = balance?.toString() ?? "0";
+        state.balances[tokenId.toString()] = balance?.toString() ?? "0";
       });
     },
-    async faucet(client: Client, address: string) {
-      const balances = client.runtime.resolve("Balances");
-      const sender = PublicKey.fromBase58(address);
-
-      const tx = await client.transaction(sender, async () => {
-        await balances.addBalance(tokenId, sender, Balance.from(1000));
+    async loadAllBalances(client: Client, address: string) {
+      set((state) => {
+        state.loading = true;
       });
+      const lastTokenId =
+        (await client.query.runtime.TokenRegistry.lastTokenIdId.get()) ??
+        TokenId.from(1);
+      const lastTokenIdNumber = +lastTokenId.toString();
 
-      await tx.sign();
-      await tx.send();
-
-      isPendingTransaction(tx.transaction);
-      return tx.transaction;
+      const balances: Record<string, string> = {};
+      for (let i = 0; i < lastTokenIdNumber; i++) {
+        // const tokenId = await client.query.runtime.TokenRegistry.tokenIds.get(
+        //   TokenIdId.from(i),
+        // );
+        const tokenId = TokenId.from(i);
+        const key = BalancesKey.from(tokenId, PublicKey.fromBase58(address));
+        const balance = await client.query.runtime.Balances.balances.get(key);
+        if (balance !== undefined) {
+          balances[tokenId.toString()] = balance.toString();
+        }
+      }
+      set((state) => {
+        state.balances = balances;
+        state.lastTokenId = lastTokenId.toString();
+      });
     },
     async addBalance(
       client: Client,
@@ -89,36 +102,57 @@ export const useBalancesStore = create<
       await tx.send();
 
       isPendingTransaction(tx.transaction);
+      return tx.transaction;
     },
   })),
 );
 
-export const useObserveBalance = () => {
+export const useAddBalance = () => {
   const client = useClientStore();
-  const chain = useChainStore();
-  const wallet = useWalletStore();
   const balances = useBalancesStore();
+  const wallet = useWalletStore();
+
+  return useMutation({
+    mutationFn: async ({
+      tokenId,
+      amount,
+    }: {
+      tokenId: TokenId;
+      amount: Balance;
+    }) => {
+      if (!client.client || !wallet.wallet) return;
+
+      const pendingTransaction = await balances.addBalance(
+        client.client,
+        tokenId,
+        PublicKey.fromBase58(wallet.wallet),
+        amount,
+      );
+
+      wallet.addPendingTransaction(pendingTransaction);
+      return pendingTransaction;
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useLoadAllBalances = () => {
+  const client = useClientStore();
+  const balances = useBalancesStore();
+  const wallet = useWalletStore();
+  const chain = useChainStore();
 
   useEffect(() => {
     if (!client.client || !wallet.wallet) return;
 
-    balances.loadBalance(client.client, wallet.wallet);
-  }, [client.client, chain.block?.height, wallet.wallet]);
-};
-
-export const useFaucet = () => {
-  const client = useClientStore();
-  const balances = useBalancesStore();
-  const wallet = useWalletStore();
-
-  return useCallback(async () => {
-    if (!client.client || !wallet.wallet) return;
-
-    const pendingTransaction = await balances.faucet(
-      client.client,
-      wallet.wallet,
-    );
-
-    wallet.addPendingTransaction(pendingTransaction);
-  }, [client.client, wallet.wallet]);
+    if (chain.block?.height) {
+      balances.loadAllBalances(client.client, wallet.wallet);
+    }
+  }, [chain.block?.height]);
 };

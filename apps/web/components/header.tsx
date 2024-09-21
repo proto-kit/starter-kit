@@ -1,18 +1,25 @@
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useBalancesStore, useLoadAllBalances } from "@/lib/stores/balances";
 import protokit from "@/public/protokit-zinc.svg";
 import Image from "next/image";
-// @ts-ignore
 import truncateMiddle from "truncate-middle";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Chain } from "./chain";
 import { Separator } from "./ui/separator";
+import Link from "next/link";
 
 export interface HeaderProps {
   loading: boolean;
   wallet?: string;
   onConnectWallet: () => void;
-  balance?: string;
-  balanceLoading: boolean;
   blockHeight?: string;
 }
 
@@ -20,15 +27,15 @@ export default function Header({
   loading,
   wallet,
   onConnectWallet,
-  balance,
-  balanceLoading,
   blockHeight,
 }: HeaderProps) {
   return (
-    <div className="flex items-center justify-between border-b p-2 shadow-sm">
+    <header className="sticky top-0 flex items-center justify-between border-b p-2 shadow-sm">
       <div className="container flex">
         <div className="flex basis-6/12 items-center justify-start">
-          <Image className="h-8 w-8" src={protokit} alt={"Protokit logo"} />
+          <Link href="/">
+            <Image className="h-8 w-8" src={protokit} alt={"Protokit logo"} />
+          </Link>
           <Separator className="mx-4 h-8" orientation={"vertical"} />
           <div className="flex grow">
             <Chain height={blockHeight} />
@@ -39,14 +46,10 @@ export default function Header({
           {wallet && (
             <div className="mr-4 flex shrink flex-col items-end justify-center">
               <div>
-                <p className="text-xs">Your balance</p>
+                <p className="pr-2 text-xs">Your balance</p>
               </div>
               <div className="w-32 pt-0.5 text-right">
-                {balanceLoading && balance === undefined ? (
-                  <Skeleton className="h-4 w-full" />
-                ) : (
-                  <p className="text-xs font-bold">{balance} MINA</p>
-                )}
+                <TokenBalanceDialog />
               </div>
             </div>
           )}
@@ -58,6 +61,38 @@ export default function Header({
           </Button>
         </div>
       </div>
-    </div>
+    </header>
+  );
+}
+
+function TokenBalanceDialog() {
+  "use client";
+
+  const { balances } = useBalancesStore();
+  useLoadAllBalances();
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button className="h-auto text-xs font-bold" variant={"ghost"}>
+          {balances?.[0] ?? 0} (ID #0)
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Your balances</DialogTitle>
+          <DialogDescription></DialogDescription>
+          <div>
+            {balances === undefined
+              ? "No balances"
+              : Object.entries(balances).map(([tokenId, balance]) => (
+                  <div key={tokenId}>
+                    {balance} ID #{tokenId}
+                  </div>
+                ))}
+          </div>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
   );
 }

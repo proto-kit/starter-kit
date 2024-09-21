@@ -39,6 +39,7 @@ export async function canSubmitOrder(
   });
 }
 
+// TODO: use this when taking in anew order
 export const canSubmitOrderProgram = ZkProgram({
   name: "canSubmitOrder",
   publicInput: CanSubmitOrderPublicInput,
