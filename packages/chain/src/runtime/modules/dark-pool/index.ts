@@ -38,11 +38,6 @@ export class Order extends Struct({
   }
 }
 
-export class PoolWhitelist extends Struct({
-  poolKey: PoolKey,
-  user: PublicKey,
-}) {}
-
 export class OrderIdUser extends Struct({
   orderId: OrderId,
   user: PublicKey,
@@ -59,13 +54,6 @@ export class OrderIdUser extends Struct({
  */
 @runtimeModule()
 export class DarkPool extends XYK {
-  /**
-   * Mapping of pool keys to a boolean indicating if the pool is whitelisted.
-   */
-  @state() public poolWhitelist = StateMap.from<PoolWhitelist, Bool>(
-    PoolWhitelist,
-    Bool
-  );
   /**
    * Mapping of order ids to buy orders.
    * TODO: This should not be a runtime state

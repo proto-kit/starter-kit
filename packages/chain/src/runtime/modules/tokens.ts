@@ -1,4 +1,4 @@
-import { UInt64, TokenId } from "@proto-kit/library";
+import { TokenId, UInt64 } from "@proto-kit/library";
 import { RuntimeModule, runtimeModule, state } from "@proto-kit/module";
 import { State, StateMap } from "@proto-kit/protocol";
 import { Field } from "o1js";
@@ -17,7 +17,12 @@ interface TokenRegistryConfig {
  */
 @runtimeModule()
 export class TokenRegistry extends RuntimeModule<TokenRegistryConfig> {
-  @state() public tokenIds = StateMap.from<TokenIdId, TokenId>(
+  @state() public tokenIdToTokenIdId = StateMap.from<TokenId, TokenIdId>(
+    TokenId,
+    TokenIdId
+  );
+  // TODO: improve registry logic
+  @state() public tokenIdIdToTokenId = StateMap.from<TokenIdId, TokenId>(
     TokenIdId,
     TokenId
   );
@@ -27,6 +32,7 @@ export class TokenRegistry extends RuntimeModule<TokenRegistryConfig> {
     const lastTokenIdId = (await this.lastTokenIdId.get()).value;
     const nextTokenIdId = lastTokenIdId.add(1);
     await this.lastTokenIdId.set(nextTokenIdId);
-    await this.tokenIds.set(nextTokenIdId, tokenId);
+    await this.tokenIdToTokenIdId.set(tokenId, nextTokenIdId);
+    await this.tokenIdIdToTokenId.set(nextTokenIdId, tokenId);
   }
 }

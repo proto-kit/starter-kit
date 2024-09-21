@@ -2,15 +2,40 @@
 
 ## Features
 
-- [ ] Create a dark pool for 2 tokens
-- [ ] Whitelist users for a dark pool
-  - [ ] With specific address
+- [x] Create a dark pool for 2 tokens
+- [x] Whitelist users for a dark pool
+  - [x] With specific address
   - [ ] With zk proof
 - [ ] Execute trades with private values
   - [ ] Optionally, make the trade public
 - [ ] Anyone can lend to dark pools
 - [ ] See last price on pool (average of latest bid and ask)
 - [ ] Provide hooks for before and after trades (expose some address field for IHook function)
+
+## Architecture
+
+```mermaid
+graph TD
+
+    subgraph L2_Rollup[L2 Rollup - Dark Pool]
+        RN[Relayer Network]
+        LP[Dark Pools]
+    end
+
+    subgraph Client[Client Side]
+        UW[User Wallet]
+        CZKP[ZK Proof Generation]
+    end
+
+    %% L2 internal connections
+    RN --> LP
+    LP --> RN
+
+    %% External connections
+    UW -- createPool, whitelistUser, addLiquidity, removeLiquidity --- RN
+    UW -- submitTrade ---> CZKP
+    CZKP ---> RN
+```
 
 ## Quick start
 

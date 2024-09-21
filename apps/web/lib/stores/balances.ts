@@ -1,21 +1,19 @@
 import { toast } from "@/components/ui/use-toast";
 import { Balance, BalancesKey, TokenId } from "@proto-kit/library";
-import { PendingTransaction, UnsignedTransaction } from "@proto-kit/sequencer";
+import { PendingTransaction } from "@proto-kit/sequencer";
 import { useMutation } from "@tanstack/react-query";
 import { PublicKey } from "o1js";
 import { useEffect } from "react";
 import { create } from "zustand";
-import { immer } from "zustand/middleware/immer";
 import { useChainStore } from "./chain";
 import { Client, useClientStore } from "./client";
 import { useWalletStore } from "./wallet";
+import { isPendingTransaction } from "../utils";
+import { persist } from "zustand/middleware";
 
 export interface BalancesState {
   loading: boolean;
-  balances: {
-    // TokenId - balance
-    [key: string]: string;
-  };
+  balances: Record<string, string>; // TokenId - balance
   lastTokenId: string;
   loadBalance: (
     client: Client,
@@ -31,80 +29,79 @@ export interface BalancesState {
   ) => Promise<PendingTransaction>;
 }
 
-function isPendingTransaction(
-  transaction: PendingTransaction | UnsignedTransaction | undefined,
-): asserts transaction is PendingTransaction {
-  if (!(transaction instanceof PendingTransaction))
-    throw new Error("Transaction is not a PendingTransaction");
-}
+export const useBalancesStore = create<BalancesState>()(
+  persist(
+    (set, get) => ({
+      loading: Boolean(false),
+      balances: {},
+      totalSupply: {},
+      lastTokenId: TokenId.from(1).toString(),
+      async loadBalance(client: Client, tokenId: TokenId, address: string) {
+        set((state) => {
+          state.loading = true;
+          return state;
+        });
 
-export const useBalancesStore = create<
-  BalancesState,
-  [["zustand/immer", never]]
->(
-  immer((set) => ({
-    loading: Boolean(false),
-    balances: {},
-    totalSupply: {},
-    lastTokenId: TokenId.from(1).toString(),
-    async loadBalance(client: Client, tokenId: TokenId, address: string) {
-      set((state) => {
-        state.loading = true;
-      });
-
-      const key = BalancesKey.from(tokenId, PublicKey.fromBase58(address));
-      const balance = await client.query.runtime.Balances.balances.get(key);
-
-      set((state) => {
-        state.loading = false;
-        state.balances[tokenId.toString()] = balance?.toString() ?? "0";
-      });
-    },
-    async loadAllBalances(client: Client, address: string) {
-      set((state) => {
-        state.loading = true;
-      });
-      const lastTokenId =
-        (await client.query.runtime.TokenRegistry.lastTokenIdId.get()) ??
-        TokenId.from(1);
-      const lastTokenIdNumber = +lastTokenId.toString();
-
-      const balances: Record<string, string> = {};
-      for (let i = 0; i < lastTokenIdNumber; i++) {
-        // const tokenId = await client.query.runtime.TokenRegistry.tokenIds.get(
-        //   TokenIdId.from(i),
-        // );
-        const tokenId = TokenId.from(i);
         const key = BalancesKey.from(tokenId, PublicKey.fromBase58(address));
         const balance = await client.query.runtime.Balances.balances.get(key);
-        if (balance !== undefined) {
-          balances[tokenId.toString()] = balance.toString();
+
+        set((state) => {
+          state.loading = false;
+          state.balances[tokenId.toString()] = balance?.toString() ?? "0";
+          return state;
+        });
+      },
+      async loadAllBalances(client: Client, address: string) {
+        set((state) => {
+          state.loading = true;
+          return state;
+        });
+        const lastTokenId =
+          (await client.query.runtime.TokenRegistry.lastTokenIdId.get()) ??
+          TokenId.from(1);
+        const lastTokenIdNumber = +lastTokenId.toString();
+
+        const balances: Record<string, string> = {};
+        for (let i = 0; i < lastTokenIdNumber; i++) {
+          // const tokenId = await client.query.runtime.TokenRegistry.tokenIds.get(
+          //   TokenIdId.from(i),
+          // );
+          const tokenId = TokenId.from(i);
+          const key = BalancesKey.from(tokenId, PublicKey.fromBase58(address));
+          const balance = await client.query.runtime.Balances.balances.get(key);
+          if (balance !== undefined) {
+            balances[tokenId.toString()] = balance.toString();
+          }
         }
-      }
-      set((state) => {
-        state.balances = balances;
-        state.lastTokenId = lastTokenId.toString();
-      });
+        set((state) => {
+          state.balances = balances;
+          state.lastTokenId = lastTokenId.toString();
+          return state;
+        });
+      },
+      async addBalance(
+        client: Client,
+        tokenId: TokenId,
+        sender: PublicKey,
+        amount: Balance,
+      ) {
+        const balances = client.runtime.resolve("Balances");
+
+        const tx = await client.transaction(sender, async () => {
+          await balances.addBalance(tokenId, sender, amount);
+        });
+
+        await tx.sign();
+        await tx.send();
+
+        isPendingTransaction(tx.transaction);
+        return tx.transaction;
+      },
+    }),
+    {
+      name: "balances",
     },
-    async addBalance(
-      client: Client,
-      tokenId: TokenId,
-      sender: PublicKey,
-      amount: Balance,
-    ) {
-      const balances = client.runtime.resolve("Balances");
-
-      const tx = await client.transaction(sender, async () => {
-        await balances.addBalance(tokenId, sender, amount);
-      });
-
-      await tx.sign();
-      await tx.send();
-
-      isPendingTransaction(tx.transaction);
-      return tx.transaction;
-    },
-  })),
+  ),
 );
 
 export const useAddBalance = () => {

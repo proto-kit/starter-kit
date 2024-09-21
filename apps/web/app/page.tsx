@@ -18,6 +18,7 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { useBalancesStore } from "@/lib/stores/balances";
 import { useClientStore } from "@/lib/stores/client";
+import { usePoolsStore } from "@/lib/stores/pools";
 import { useWalletStore } from "@/lib/stores/wallet";
 import { cn } from "@/lib/utils";
 import { Balance, TokenId } from "@proto-kit/library";
@@ -26,24 +27,34 @@ import { useMutation } from "@tanstack/react-query";
 import { Order } from "chain/dist/runtime/modules/dark-pool";
 import { PoolKey } from "chain/dist/runtime/modules/xyk/pool-key";
 import { TokenPair } from "chain/dist/runtime/modules/xyk/token-pair";
-import { ChevronDownIcon, RefreshCwIcon, SettingsIcon } from "lucide-react";
+import {
+  ChevronDownIcon,
+  PlusIcon,
+  RefreshCwIcon,
+  SettingsIcon,
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Bool, PublicKey } from "o1js";
 import { useState } from "react";
 import "reflect-metadata";
+import truncateMiddle from "truncate-middle";
 
 export default function Home() {
   const [inToken, setInToken] = useState<TokenId>(TokenId.from(0));
   const [inTokenAmount, setInTokenAmount] = useState<number>(0);
   const [outToken, setOutToken] = useState<TokenId>(TokenId.from(1));
   const [outTokenAmount, setOutTokenAmount] = useState<number>(0);
-  const [selectedPool, setSelectedPool] = useState<PoolKey>(
-    PoolKey.fromTokenPair(TokenPair.from(inToken, outToken)),
+  const [selectedPool, setSelectedPool] = useState<string>(
+    PoolKey.fromTokenPair(TokenPair.from(inToken, outToken)).toBase58(),
   );
   const [slippage, setSlippage] = useState<number>(0.5); // in %
+  const router = useRouter();
 
   const client = useClientStore();
   const balances = useBalancesStore();
   const wallet = useWalletStore();
+  const { pools } = usePoolsStore();
   const { toast } = useToast();
 
   const inTokenBalance = balances.balances[inToken.toString()];
@@ -92,7 +103,7 @@ export default function Home() {
   }
 
   return (
-    <div className="mx-auto grid w-full max-w-md gap-6 rounded-xl border bg-background p-6 shadow-sm">
+    <div className="mx-auto mt-8 grid w-full max-w-md gap-6 rounded-xl border bg-background p-6 shadow-sm">
       <div className="grid gap-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Swap</h2>
@@ -125,24 +136,30 @@ export default function Home() {
             </DropdownMenu>
           </div>
         </div>
-        <div>
+        <div className="flex space-x-2">
           <Select
-          // value={selectedPool}
-          // onValueChange={(value) => setSelectedPool(value as Address)}
+            value={selectedPool.toString()}
+            onValueChange={(value) => setSelectedPool(value)}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select a pool" />
             </SelectTrigger>
             <SelectContent>
-              {/* {pools
-                ?.filter((pool) => pool.status === "success")
-                .map((pool) => (
-                  <SelectItem key={pool.result} value={pool.result}>
-                    {trimAddress(pool.result)}
-                  </SelectItem>
-                ))} */}
+              {Object.keys(pools).map((pool) => (
+                <SelectItem key={pool} value={pool}>
+                  {truncateMiddle(pool, 10, 10, "...")}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
+          <Button variant="ghost" size="icon">
+            <Link href="/pools">
+              <>
+                <PlusIcon className="h-5 w-5" />
+                <span className="sr-only">Create</span>
+              </>
+            </Link>
+          </Button>
         </div>
         <div className="grid gap-2">
           <div className="flex items-center justify-between">
@@ -159,7 +176,7 @@ export default function Home() {
             <Input
               type="number"
               placeholder="0.0"
-              className="w-24 text-right"
+              className="w-16 text-right"
               value={inTokenAmount}
               onChange={(e) => {
                 setInTokenAmount(parseFloat(e.target.value));
@@ -187,7 +204,7 @@ export default function Home() {
             <Input
               type="number"
               placeholder="0.0"
-              className="w-24 text-right"
+              className="w-16 text-right"
               value={outTokenAmount}
               onChange={(e) => {
                 setOutTokenAmount(parseFloat(e.target.value));
@@ -215,10 +232,11 @@ export default function Home() {
             Price (#{inToken.toString()} = #{outToken.toString()})
           </span>
           <span>
-            {inTokenAmount} ={" "}
+            1 (#{inToken.toString()}) ={" "}
             {isNaN(outTokenAmount / inTokenAmount)
               ? "0"
-              : (outTokenAmount / inTokenAmount).toFixed(3)}
+              : (outTokenAmount / inTokenAmount).toFixed(3)}{" "}
+            (#{outToken.toString()})
           </span>
         </div>
         <div className="flex items-center justify-between">

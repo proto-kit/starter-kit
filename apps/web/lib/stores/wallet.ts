@@ -1,14 +1,14 @@
 import { useToast } from "@/components/ui/use-toast";
-import { PendingTransaction, UnsignedTransaction } from "@proto-kit/sequencer";
 import { MethodIdResolver } from "@proto-kit/module";
-import { useCallback, useEffect, useMemo } from "react";
-import { create } from "zustand";
-import { immer } from "zustand/middleware/immer";
-import truncateMiddle from "truncate-middle";
+import { PendingTransaction, UnsignedTransaction } from "@proto-kit/sequencer";
 import { usePrevious } from "@uidotdev/usehooks";
-import { useClientStore } from "./client";
+import { Field, PublicKey, Signature, UInt64 } from "o1js";
+import { useCallback, useEffect, useMemo } from "react";
+import truncateMiddle from "truncate-middle";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import { useChainStore } from "./chain";
-import { Bool, Field, PublicKey, Signature, UInt64 } from "o1js";
+import { useClientStore } from "./client";
 
 export interface WalletState {
   wallet?: string;
@@ -17,61 +17,75 @@ export interface WalletState {
   observeWalletChange: () => void;
 
   pendingTransactions: PendingTransaction[];
-  addPendingTransaction: (pendingTransaction: PendingTransaction) => void;
+  addPendingTransaction: (
+    pendingTransaction: PendingTransaction,
+    callback?: () => void,
+  ) => void;
   removePendingTransaction: (pendingTransaction: PendingTransaction) => void;
 }
 
-export const useWalletStore = create<WalletState, [["zustand/immer", never]]>(
-  immer((set) => ({
-    async initializeWallet() {
-      if (typeof mina === "undefined") {
-        throw new Error("Auro wallet not installed");
-      }
+export const useWalletStore = create<WalletState>()(
+  persist(
+    (set, get) => ({
+      async initializeWallet() {
+        if (typeof mina === "undefined") {
+          throw new Error("Auro wallet not installed");
+        }
 
-      const [wallet] = await mina.getAccounts();
+        const [wallet] = await mina.getAccounts();
 
-      set((state) => {
-        state.wallet = wallet;
-      });
-    },
-    async connectWallet() {
-      if (typeof mina === "undefined") {
-        throw new Error("Auro wallet not installed");
-      }
-
-      const [wallet] = await mina.requestAccounts();
-
-      set((state) => {
-        state.wallet = wallet;
-      });
-    },
-    observeWalletChange() {
-      if (typeof mina === "undefined") {
-        throw new Error("Auro wallet not installed");
-      }
-
-      mina.on("accountsChanged", ([wallet]) => {
         set((state) => {
           state.wallet = wallet;
+          return state;
         });
-      });
-    },
+      },
+      async connectWallet() {
+        if (typeof mina === "undefined") {
+          throw new Error("Auro wallet not installed");
+        }
 
-    pendingTransactions: [] as PendingTransaction[],
-    addPendingTransaction(pendingTransaction) {
-      set((state) => {
-        // @ts-expect-error
-        state.pendingTransactions.push(pendingTransaction);
-      });
-    },
-    removePendingTransaction(pendingTransaction) {
-      set((state) => {
-        state.pendingTransactions = state.pendingTransactions.filter((tx) => {
-          return tx.hash().toString() !== pendingTransaction.hash().toString();
+        const [wallet] = await mina.requestAccounts();
+
+        set((state) => {
+          state.wallet = wallet;
+          return state;
         });
-      });
+      },
+      observeWalletChange() {
+        if (typeof mina === "undefined") {
+          throw new Error("Auro wallet not installed");
+        }
+
+        mina.on("accountsChanged", ([wallet]) => {
+          set((state) => {
+            state.wallet = wallet;
+            return state;
+          });
+        });
+      },
+
+      pendingTransactions: [] as PendingTransaction[],
+      addPendingTransaction(pendingTransaction) {
+        set((state) => {
+          state.pendingTransactions.push(pendingTransaction);
+          return state;
+        });
+      },
+      removePendingTransaction(pendingTransaction) {
+        set((state) => {
+          state.pendingTransactions = state.pendingTransactions.filter((tx) => {
+            return (
+              tx.hash().toString() !== pendingTransaction.hash().toString()
+            );
+          });
+          return state;
+        });
+      },
+    }),
+    {
+      name: "wallet",
     },
-  })),
+  ),
 );
 
 export const useNotifyTransactions = () => {

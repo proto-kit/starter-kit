@@ -7,14 +7,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useBalancesStore, useLoadAllBalances } from "@/lib/stores/balances";
+import { cn } from "@/lib/utils";
 import protokit from "@/public/protokit-zinc.svg";
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import truncateMiddle from "truncate-middle";
 import { Chain } from "./chain";
 import { Separator } from "./ui/separator";
-import Link from "next/link";
 
 export interface HeaderProps {
   loading: boolean;
@@ -29,20 +30,50 @@ export default function Header({
   onConnectWallet,
   blockHeight,
 }: HeaderProps) {
+  const pathname = usePathname();
   return (
     <header className="sticky top-0 flex items-center justify-between border-b p-2 shadow-sm">
       <div className="container flex">
-        <div className="flex basis-6/12 items-center justify-start">
+        <div className="flex basis-8/12 items-center justify-start">
           <Link href="/">
             <Image className="h-8 w-8" src={protokit} alt={"Protokit logo"} />
           </Link>
           <Separator className="mx-4 h-8" orientation={"vertical"} />
-          <div className="flex grow">
+          <div className="flex">
             <Chain height={blockHeight} />
           </div>
+          <Separator className="mx-4 h-8" orientation={"vertical"} />
+          <div className="flex grow space-x-4">
+            <Link
+              href="/"
+              className={cn(
+                "hover:underline",
+                pathname === "/" && "font-semibold",
+              )}
+            >
+              Swap
+            </Link>
+            <Link
+              href="/pools"
+              className={cn(
+                "hover:underline",
+                pathname === "/pools" && "font-semibold",
+              )}
+            >
+              Pools
+            </Link>
+            <Link
+              href="/faucet"
+              className={cn(
+                "hover:underline",
+                pathname === "/faucet" && "font-semibold",
+              )}
+            >
+              Faucet
+            </Link>
+          </div>
         </div>
-        <div className="flex basis-6/12 flex-row items-center justify-end">
-          {/* balance */}
+        <div className="flex basis-4/12 flex-row items-center justify-end">
           {wallet && (
             <div className="mr-4 flex shrink flex-col items-end justify-center">
               <div>
@@ -53,11 +84,8 @@ export default function Header({
               </div>
             </div>
           )}
-          {/* connect wallet */}
-          <Button loading={loading} className="w-44" onClick={onConnectWallet}>
-            <div>
-              {wallet ? truncateMiddle(wallet, 7, 7, "...") : "Connect wallet"}
-            </div>
+          <Button loading={loading} onClick={onConnectWallet}>
+            {wallet ? truncateMiddle(wallet, 7, 7, "...") : "Connect wallet"}
           </Button>
         </div>
       </div>

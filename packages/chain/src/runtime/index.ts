@@ -23,7 +23,7 @@ export const config: ModulesConfig<typeof modules> = {
   DarkPool: {
     feeDivider: 1000n,
     fee: 3n,
-    minimumLiquidity: Balance.from(1),
+    minimumLiquidity: Balance.from(0),
   },
   Faucet: {},
 };

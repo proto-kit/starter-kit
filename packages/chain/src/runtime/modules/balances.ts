@@ -6,7 +6,9 @@ import {
 } from "@proto-kit/library";
 import { runtimeMethod, runtimeModule, state } from "@proto-kit/module";
 import { StateMap, assert } from "@proto-kit/protocol";
-import { PublicKey } from "o1js";
+import { Bool, PublicKey } from "o1js";
+import { inject } from "tsyringe";
+import { TokenRegistry } from "./tokens";
 
 interface BalancesConfig {
   totalSupply: Balance;
@@ -19,12 +21,24 @@ export class Balances extends BaseBalances<BalancesConfig> {
     Balance
   );
 
+  public constructor(
+    @inject("TokenRegistry") public tokenRegistry: TokenRegistry
+  ) {
+    super();
+  }
+
   @runtimeMethod()
   public async addBalance(
     tokenId: TokenId,
     address: PublicKey,
     amount: Balance
   ): Promise<void> {
+    // Check if current tokenId is already in registry
+    const tokenIdId = await this.tokenRegistry.tokenIdToTokenIdId.get(tokenId);
+    // If not, add it
+    if (tokenIdId.isSome.equals(Bool(false))) {
+      await this.tokenRegistry.addTokenId(tokenId);
+    }
     const key = BalancesKey.from(tokenId, address);
     const balance = await this.balances.get(key);
     const newBalance = Balance.from(balance.value).add(amount);

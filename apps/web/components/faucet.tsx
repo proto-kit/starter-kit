@@ -1,4 +1,5 @@
 "use client";
+
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -50,50 +51,48 @@ export function Faucet({
         </p>
       </div>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <div className="pt-3">
-            <FormField
-              name="to"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    To{" "}
-                    <span className="text-sm text-zinc-500">(your wallet)</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled
-                      placeholder={wallet ?? "Please connect a wallet first"}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="tokenId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Token ID</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Enter token ID" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Amount</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Enter amount" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            name="to"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  To{" "}
+                  <span className="text-sm text-zinc-500">(your wallet)</span>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    disabled
+                    placeholder={wallet ?? "Please connect a wallet first"}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <FormField
+            name="tokenId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Token ID</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Enter token ID" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            name="amount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Amount</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Enter amount" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <Button
             size={"lg"}

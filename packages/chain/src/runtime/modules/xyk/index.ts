@@ -6,7 +6,7 @@ import {
   state,
 } from "@proto-kit/module";
 import { StateMap, assert } from "@proto-kit/protocol";
-import { Field, Provable, PublicKey, Struct } from "o1js";
+import { Bool, Field, Provable, PublicKey, Struct } from "o1js";
 import { inject } from "tsyringe";
 import { Balances } from "../balances";
 import type { TokenRegistry } from "../tokens";
@@ -41,6 +41,11 @@ export interface XYKConfig {
   minimumLiquidity: Balance;
 }
 
+export class PoolWhitelist extends Struct({
+  poolKey: PoolKey,
+  user: PublicKey,
+}) {}
+
 /**
  * Runtime module responsible for providing trading/management functionalities for Dark Pools.
  *
@@ -51,6 +56,13 @@ export interface XYKConfig {
 export class XYK extends RuntimeModule<XYKConfig> {
   // all existing pools in the system
   @state() public pools = StateMap.from<PoolKey, Field>(PoolKey, Field);
+  /**
+   * Mapping of pool keys to a boolean indicating if the pool is whitelisted.
+   */
+  @state() public poolWhitelist = StateMap.from<PoolWhitelist, Bool>(
+    PoolWhitelist,
+    Bool
+  );
 
   /**
    * Provide access to the underlying Balances runtime to manipulate balances
@@ -362,6 +374,11 @@ export class XYK extends RuntimeModule<XYKConfig> {
     await this.balances.transfer(lastTokenOut, lastPoolKey, seller, amountOut);
   }
 
+  public async whitelistPool(poolKey: PoolKey, user: PublicKey) {
+    const poolWhitelist = new PoolWhitelist({ poolKey, user });
+    await this.poolWhitelist.set(poolWhitelist, Bool(true));
+  }
+
   @runtimeMethod()
   public async createPoolSigned(
     tokenAId: TokenId,
@@ -376,6 +393,10 @@ export class XYK extends RuntimeModule<XYKConfig> {
       tokenBId,
       tokenAAmount,
       tokenBAmount
+    );
+    await this.whitelistPool(
+      PoolKey.fromTokenPair(TokenPair.from(tokenAId, tokenBId)),
+      creator
     );
   }
 
