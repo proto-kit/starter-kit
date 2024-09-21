@@ -1,6 +1,6 @@
 import { TokenId } from "@proto-kit/library";
-import { PoolKey } from "../../../../src/runtime/modules/darkpool/pool-key";
-import { TokenPair } from "../../../../src/runtime/modules/darkpool/token-pair";
+import { PoolKey } from "../../../../src/runtime/modules/xyk/pool-key";
+import { TokenPair } from "../../../../src/runtime/modules/xyk/token-pair";
 import "reflect-metadata";
 
 describe("pool-key", () => {

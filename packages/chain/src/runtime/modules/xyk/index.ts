@@ -35,7 +35,7 @@ export class TokenIdPath extends Struct({
   path: Provable.Array(TokenId, MAX_PATH_LENGTH),
 }) {}
 
-export interface DarkPoolConfig {
+export interface XYKConfig {
   feeDivider: bigint;
   fee: bigint;
   minimumLiquidity: Balance;
@@ -48,7 +48,7 @@ export interface DarkPoolConfig {
  * @author marcuspang https://github.com/marcuspang/ethglobal-singapore
  */
 @runtimeModule()
-export class DarkPool extends RuntimeModule<DarkPoolConfig> {
+export class XYK extends RuntimeModule<XYKConfig> {
   // all existing pools in the system
   @state() public pools = StateMap.from<PoolKey, Field>(PoolKey, Field);
 
@@ -143,11 +143,16 @@ export class DarkPool extends RuntimeModule<DarkPoolConfig> {
     tokenBId = tokenPair.tokenBId;
     const poolKey = PoolKey.fromTokenPair(tokenPair);
     const poolDoesExists = await this.poolExists(poolKey);
+    Provable.log({ poolKey, poolDoesExists });
+    poolDoesExists.assertTrue(errors.poolDoesNotExist());
+
     const amountANotZero = tokenAAmount.greaterThan(Balance.from(0));
+    amountANotZero.assertTrue(errors.amountAIsZero());
 
     const reserveA = await this.balances.getBalance(tokenAId, poolKey);
-    const reserveB = await this.balances.getBalance(tokenBId, poolKey);
     const reserveANotZero = reserveA.greaterThan(Balance.from(0));
+    reserveANotZero.assertTrue(errors.reserveAIsZero());
+    const reserveB = await this.balances.getBalance(tokenBId, poolKey);
     const adjustedReserveA = Balance.from(
       Provable.if(reserveANotZero, reserveA.value, Balance.from(1).value) as any
     );
@@ -155,6 +160,7 @@ export class DarkPool extends RuntimeModule<DarkPoolConfig> {
     const amountB = tokenAAmount.mul(reserveB).div(adjustedReserveA);
     const isAmountBLimitSufficient =
       tokenBAmountLimit.greaterThanOrEqual(amountB);
+    isAmountBLimitSufficient.assertTrue(errors.amountBLimitInsufficient());
 
     const lpTokenId = LPTokenId.fromTokenPair(tokenPair);
     const lpTokenTotalSupply = (await this.balances.getTokenSupply(lpTokenId))
@@ -165,11 +171,6 @@ export class DarkPool extends RuntimeModule<DarkPoolConfig> {
     const lpTokensToMint = lpTokenTotalSupply
       .mul(tokenAAmount)
       .div(adjustedReserveA);
-
-    poolDoesExists.assertTrue(errors.poolDoesNotExist());
-    amountANotZero.assertTrue(errors.amountAIsZero());
-    reserveANotZero.assertTrue(errors.reserveAIsZero());
-    isAmountBLimitSufficient.assertTrue(errors.amountBLimitInsufficient());
 
     await this.balances.transfer(tokenAId, provider, poolKey, tokenAAmount);
     await this.balances.transfer(tokenBId, provider, poolKey, amountB);
@@ -190,10 +191,15 @@ export class DarkPool extends RuntimeModule<DarkPoolConfig> {
     tokenBId = tokenPair.tokenBId;
     const poolKey = PoolKey.fromTokenPair(tokenPair);
     const poolDoesExists = await this.poolExists(poolKey);
+    poolDoesExists.assertTrue(errors.poolDoesNotExist());
+
     const lpTokenId = LPTokenId.fromTokenPair(tokenPair);
     const lpTokenTotalSupply = (await this.balances.getTokenSupply(lpTokenId))
       .value;
+
     const lpTokenTotalSupplyIsZero = lpTokenTotalSupply.equals(Balance.from(0));
+    lpTokenTotalSupplyIsZero.not().assertTrue(errors.lpTokenSupplyIsZero());
+
     const adjustedLpTokenTotalSupply = Balance.from(
       Provable.if(
         lpTokenTotalSupplyIsZero,
@@ -216,8 +222,6 @@ export class DarkPool extends RuntimeModule<DarkPoolConfig> {
     const isTokenBAmountLimitSufficient =
       tokenBLAmountLimit.greaterThanOrEqual(tokenBAmount);
 
-    poolDoesExists.assertTrue(errors.poolDoesNotExist());
-    lpTokenTotalSupplyIsZero.not().assertTrue(errors.lpTokenSupplyIsZero());
     isTokenAAmountLimitSufficient.assertTrue(errors.amountALimitInsufficient());
     isTokenBAmountLimitSufficient.assertTrue(errors.amountBLimitInsufficient());
 

@@ -1,5 +1,5 @@
 import { TokenId } from "@proto-kit/library";
-import { TokenPair } from "../../../../src/runtime/modules/darkpool/token-pair";
+import { TokenPair } from "../../../../src/runtime/modules/xyk/token-pair";
 import "reflect-metadata";
 
 describe("token-pair", () => {

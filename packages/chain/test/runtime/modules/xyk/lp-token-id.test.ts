@@ -1,7 +1,7 @@
 import { TokenId } from "@proto-kit/library";
 import "reflect-metadata";
-import { LPTokenId } from "../../../../src/runtime/modules/darkpool/lp-token-id";
-import { TokenPair } from "../../../../src/runtime/modules/darkpool/token-pair";
+import { LPTokenId } from "../../../../src/runtime/modules/xyk/lp-token-id";
+import { TokenPair } from "../../../../src/runtime/modules/xyk/token-pair";
 
 describe("lp-token-id", () => {
   it("should be derived deterministically from token pair", async () => {
