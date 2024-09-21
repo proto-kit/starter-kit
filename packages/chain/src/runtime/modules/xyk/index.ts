@@ -9,10 +9,10 @@ import { StateMap, assert } from "@proto-kit/protocol";
 import { Field, Provable, PublicKey, Struct } from "o1js";
 import { inject } from "tsyringe";
 import { Balances } from "../balances";
+import type { TokenRegistry } from "../tokens";
 import { LPTokenId } from "./lp-token-id";
 import { PoolKey } from "./pool-key";
 import { TokenPair } from "./token-pair";
-import type { TokenRegistry } from "../tokens";
 
 export const errors = {
   tokensNotDistinct: () => `Tokens must be different`,
@@ -88,10 +88,10 @@ export class XYK extends RuntimeModule<XYKConfig> {
     const poolKey = PoolKey.fromTokenPair(tokenPair);
 
     const areTokensDistinct = tokenAId.equals(tokenBId).not();
-    areTokensDistinct.assertTrue(errors.tokensNotDistinct());
+    assert(areTokensDistinct, errors.tokensNotDistinct());
 
     const poolDoesNotExist = (await this.poolExists(poolKey)).not();
-    poolDoesNotExist.assertTrue(errors.poolAlreadyExists());
+    assert(poolDoesNotExist, errors.poolAlreadyExists());
 
     const initialLPTokenSupply = Balance.from(
       // if tokenA supply is greater than tokenB supply, use tokenA supply, otherwise use tokenB supply
@@ -105,9 +105,7 @@ export class XYK extends RuntimeModule<XYKConfig> {
 
     const isMinimumLiquiditySufficient =
       initialLPTokenSupply.greaterThanOrEqual(this.config.minimumLiquidity);
-    isMinimumLiquiditySufficient.assertTrue(
-      errors.minimumLiquidityInsufficient()
-    );
+    assert(isMinimumLiquiditySufficient, errors.minimumLiquidityInsufficient());
 
     // transfer liquidity from the creator to the pool
     await this.balances.transfer(tokenAId, creator, poolKey, tokenAAmount);
@@ -143,15 +141,14 @@ export class XYK extends RuntimeModule<XYKConfig> {
     tokenBId = tokenPair.tokenBId;
     const poolKey = PoolKey.fromTokenPair(tokenPair);
     const poolDoesExists = await this.poolExists(poolKey);
-    Provable.log({ poolKey, poolDoesExists });
-    poolDoesExists.assertTrue(errors.poolDoesNotExist());
+    assert(poolDoesExists, errors.poolDoesNotExist());
 
     const amountANotZero = tokenAAmount.greaterThan(Balance.from(0));
-    amountANotZero.assertTrue(errors.amountAIsZero());
+    assert(amountANotZero, errors.amountAIsZero());
 
     const reserveA = await this.balances.getBalance(tokenAId, poolKey);
     const reserveANotZero = reserveA.greaterThan(Balance.from(0));
-    reserveANotZero.assertTrue(errors.reserveAIsZero());
+    assert(reserveANotZero, errors.reserveAIsZero());
     const reserveB = await this.balances.getBalance(tokenBId, poolKey);
     const adjustedReserveA = Balance.from(
       Provable.if(reserveANotZero, reserveA.value, Balance.from(1).value) as any
@@ -160,7 +157,7 @@ export class XYK extends RuntimeModule<XYKConfig> {
     const amountB = tokenAAmount.mul(reserveB).div(adjustedReserveA);
     const isAmountBLimitSufficient =
       tokenBAmountLimit.greaterThanOrEqual(amountB);
-    isAmountBLimitSufficient.assertTrue(errors.amountBLimitInsufficient());
+    assert(isAmountBLimitSufficient, errors.amountBLimitInsufficient());
 
     const lpTokenId = LPTokenId.fromTokenPair(tokenPair);
     const lpTokenTotalSupply = (await this.balances.getTokenSupply(lpTokenId))
@@ -191,14 +188,14 @@ export class XYK extends RuntimeModule<XYKConfig> {
     tokenBId = tokenPair.tokenBId;
     const poolKey = PoolKey.fromTokenPair(tokenPair);
     const poolDoesExists = await this.poolExists(poolKey);
-    poolDoesExists.assertTrue(errors.poolDoesNotExist());
+    assert(poolDoesExists, errors.poolDoesNotExist());
 
     const lpTokenId = LPTokenId.fromTokenPair(tokenPair);
     const lpTokenTotalSupply = (await this.balances.getTokenSupply(lpTokenId))
       .value;
 
     const lpTokenTotalSupplyIsZero = lpTokenTotalSupply.equals(Balance.from(0));
-    lpTokenTotalSupplyIsZero.not().assertTrue(errors.lpTokenSupplyIsZero());
+    assert(lpTokenTotalSupplyIsZero.not(), errors.lpTokenSupplyIsZero());
 
     const adjustedLpTokenTotalSupply = Balance.from(
       Provable.if(
@@ -222,8 +219,8 @@ export class XYK extends RuntimeModule<XYKConfig> {
     const isTokenBAmountLimitSufficient =
       tokenBLAmountLimit.greaterThanOrEqual(tokenBAmount);
 
-    isTokenAAmountLimitSufficient.assertTrue(errors.amountALimitInsufficient());
-    isTokenBAmountLimitSufficient.assertTrue(errors.amountBLimitInsufficient());
+    assert(isTokenAAmountLimitSufficient, errors.amountALimitInsufficient());
+    assert(isTokenBAmountLimitSufficient, errors.amountBLimitInsufficient());
 
     await this.balances.transfer(tokenAId, poolKey, provider, tokenAAmount);
     await this.balances.transfer(tokenBId, poolKey, provider, tokenBAmount);
@@ -310,7 +307,7 @@ export class XYK extends RuntimeModule<XYKConfig> {
     const initialPoolKey = PoolKey.fromTokenPair(initialTokenPair);
     const pathBeginswWithExistingPool = await this.poolExists(initialPoolKey);
 
-    pathBeginswWithExistingPool.assertTrue(errors.poolDoesNotExist());
+    assert(pathBeginswWithExistingPool, errors.poolDoesNotExist());
 
     let amountOut = Balance.zero;
     let lastPoolKey = PoolKey.empty();
@@ -360,7 +357,7 @@ export class XYK extends RuntimeModule<XYKConfig> {
     const isAmountOutMinLimitSufficient =
       amountOut.greaterThanOrEqual(amountOutMinLimit);
 
-    isAmountOutMinLimitSufficient.assertTrue(errors.amountOutIsInsufficient());
+    assert(isAmountOutMinLimitSufficient, errors.amountOutIsInsufficient());
 
     await this.balances.transfer(lastTokenOut, lastPoolKey, seller, amountOut);
   }

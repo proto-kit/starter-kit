@@ -8,6 +8,7 @@ import {
 } from "o1js";
 import { PoolKey } from "../xyk/pool-key";
 import { Order } from ".";
+import { assert } from "@proto-kit/protocol";
 
 class CanSubmitOrderPublicInput extends Struct({
   poolKey: PoolKey,
@@ -26,10 +27,10 @@ export async function canSubmitOrder(
   order: Order
 ) {
   const [computedRoot, key] = witness.computeRootAndKeyV2(Bool(true).toField());
-  input.stateRoot.assertEquals(computedRoot);
+  assert(input.stateRoot.equals(computedRoot));
 
   const userKey = Poseidon.hash(order.user.toFields());
-  userKey.assertEquals(key);
+  assert(userKey.equals(key));
 
   return new CanSubmitOrderPublicOutput({
     poolKey: input.poolKey,

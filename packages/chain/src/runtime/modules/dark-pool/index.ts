@@ -1,7 +1,7 @@
 import { runtimeMethod, runtimeModule, state } from "@proto-kit/module";
-import { State, StateMap } from "@proto-kit/protocol";
+import { assert, State, StateMap } from "@proto-kit/protocol";
 import { UInt64 } from "@proto-kit/library";
-import { assert, Bool, Field, Poseidon, PublicKey, Struct } from "o1js";
+import { Bool, Field, Poseidon, Provable, PublicKey, Struct } from "o1js";
 import { XYK } from "../xyk";
 import { PoolKey } from "../xyk/pool-key";
 
@@ -105,9 +105,7 @@ export class DarkPool extends XYK {
       user: sender,
       poolKey,
     });
-    isWhitelisted.isSome
-      .and(isWhitelisted.value)
-      .assertTrue("User is not whitelisted for this pool");
+    assert(isWhitelisted.value, "User is not whitelisted for this pool");
 
     const orderId = await this.orderCounter.get();
     const newOrderId = orderId.orElse(UInt64.from(0)).add(UInt64.from(1));
@@ -156,7 +154,7 @@ export class DarkPool extends XYK {
   @runtimeMethod()
   public async removeOrder(orderId: OrderId) {
     const order = await this.orderBook.get(orderId);
-    order.isSome.assertTrue("Order does not exist");
+    assert(order.isSome, "Order does not exist");
 
     const userOrderCount = await this.userOrderCount.get(order.value.user);
     const newUserOrderCount = userOrderCount

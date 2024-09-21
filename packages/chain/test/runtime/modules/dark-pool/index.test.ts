@@ -1,13 +1,9 @@
 import { Balance, TokenId, UInt64 } from "@proto-kit/library";
-import { TestingAppChain } from "@proto-kit/sdk";
-import { Bool, Field, Poseidon, PrivateKey, PublicKey } from "o1js";
+import { StateServiceQueryModule, TestingAppChain } from "@proto-kit/sdk";
+import { Bool, PrivateKey, Provable } from "o1js";
 import "reflect-metadata";
 import { Balances } from "../../../../src/runtime/modules/balances";
-import {
-  DarkPool,
-  Order,
-  PoolWhitelist,
-} from "../../../../src/runtime/modules/dark-pool";
+import { DarkPool, Order } from "../../../../src/runtime/modules/dark-pool";
 import { Faucet } from "../../../../src/runtime/modules/faucet";
 import { TokenRegistry } from "../../../../src/runtime/modules/tokens";
 import { LPTokenId } from "../../../../src/runtime/modules/xyk/lp-token-id";
@@ -29,6 +25,21 @@ const config = {
   Faucet: {},
 };
 
+const startAppChain = async () => {
+  const appChain = TestingAppChain.fromRuntime({
+    Faucet,
+    Balances,
+    DarkPool,
+    TokenRegistry,
+  });
+  appChain.configurePartial({
+    Runtime: config,
+    QueryTransportModule: StateServiceQueryModule,
+  });
+  await appChain.start();
+  return appChain;
+};
+
 describe("DarkPool", () => {
   const tokenAId = TokenId.from(0);
   const tokenBId = TokenId.from(1);
@@ -42,17 +53,7 @@ describe("DarkPool", () => {
   describe("submitOrder", () => {
     it("should submit an order successfully when user is whitelisted", async () => {
       // Setup
-      const appChain = TestingAppChain.fromRuntime({
-        Faucet,
-        Balances,
-        DarkPool,
-        TokenRegistry,
-      });
-      appChain.configurePartial({
-        Runtime: config,
-      });
-
-      await appChain.start();
+      const appChain = await startAppChain();
       appChain.setSigner(alicePrivateKey);
       const darkPool = appChain.runtime.resolve("DarkPool");
       const order = new Order({
@@ -63,44 +64,42 @@ describe("DarkPool", () => {
       });
 
       // Whitelist the user
-      await darkPool.whitelistUser(alice, poolKey);
+      let tx = await appChain.transaction(alice, async () => {
+        await darkPool.whitelistUser(alice, poolKey);
+      });
+      await tx.sign();
+      await tx.send();
       await appChain.produceBlock();
 
       // Act
-      const tx = await appChain.transaction(alice, () =>
-        darkPool.submitOrder(order, poolKey)
-      );
+      tx = await appChain.transaction(alice, async () => {
+        await darkPool.submitOrder(order, poolKey);
+      });
       await tx.sign();
       await tx.send();
       await appChain.produceBlock();
 
       // Assert
-      const submittedOrder = await darkPool.orderBook.get(UInt64.from(1));
-      expect(submittedOrder.isSome).toBe(true);
-      expect(submittedOrder.value).toEqual(order);
+      const submittedOrder =
+        await appChain.query.runtime.DarkPool.orderBook.get(UInt64.from(1));
+      expect(submittedOrder).toEqual(order);
 
-      const userOrderCount = await darkPool.userOrderCount.get(alice);
-      expect(userOrderCount.value).toEqual(UInt64.from(1));
+      const userOrderCount =
+        await appChain.query.runtime.DarkPool.userOrderCount.get(alice);
+      expect(userOrderCount).toEqual(UInt64.from(1));
 
-      const firstOrderId = await darkPool.firstOrderId.get();
-      expect(firstOrderId.value).toEqual(UInt64.from(1));
+      const firstOrderId =
+        await appChain.query.runtime.DarkPool.firstOrderId.get();
+      expect(firstOrderId).toEqual(UInt64.from(1));
 
-      const lastOrderId = await darkPool.lastOrderId.get();
-      expect(lastOrderId.value).toEqual(UInt64.from(1));
+      const lastOrderId =
+        await appChain.query.runtime.DarkPool.lastOrderId.get();
+      expect(lastOrderId).toEqual(UInt64.from(1));
     });
 
     it("should fail when user is not whitelisted", async () => {
       // Setup
-      const appChain = TestingAppChain.fromRuntime({
-        Faucet,
-        Balances,
-        DarkPool,
-        TokenRegistry,
-      });
-      appChain.configurePartial({
-        Runtime: config,
-      });
-      await appChain.start();
+      const appChain = await startAppChain();
       appChain.setSigner(alicePrivateKey);
       const darkPool = appChain.runtime.resolve("DarkPool");
       const order = new Order({
@@ -111,9 +110,187 @@ describe("DarkPool", () => {
       });
 
       // Act & Assert
-      await expect(
-        appChain.transaction(alice, () => darkPool.submitOrder(order, poolKey))
-      ).rejects.toThrow("User is not whitelisted for this pool");
+      const tx = await appChain.transaction(alice, async () => {
+        await darkPool.submitOrder(order, poolKey);
+      });
+      await tx.sign();
+      await tx.send();
+
+      const block = await appChain.produceBlock();
+      const transaction = block?.transactions[0];
+      expect(transaction?.status.toBoolean()).toBe(false);
+      expect(transaction?.statusMessage).toBe(
+        "User is not whitelisted for this pool"
+      );
+    });
+  });
+
+  describe("getOrder", () => {
+    it("should return the correct order", async () => {
+      // Setup
+      const order = new Order({
+        user: alice,
+        amountIn: UInt64.from(100),
+        amountOut: UInt64.from(50),
+        isAtoB: Bool(true),
+      });
+      const appChain = await startAppChain();
+      appChain.setSigner(alicePrivateKey);
+      const darkPool = appChain.runtime.resolve("DarkPool");
+
+      let tx = await appChain.transaction(alice, async () => {
+        await darkPool.whitelistUser(alice, poolKey);
+      });
+      await tx.sign();
+      await tx.send();
+      await appChain.produceBlock();
+
+      tx = await appChain.transaction(alice, async () => {
+        await darkPool.submitOrder(order, poolKey);
+      });
+      await tx.sign();
+      await tx.send();
+      await appChain.produceBlock();
+
+      // Act
+      const retrievedOrder =
+        await appChain.query.runtime.DarkPool.orderBook.get(UInt64.from(1));
+
+      // Assert
+      expect(retrievedOrder).toEqual(order);
+    });
+
+    it("should return None for non-existent order", async () => {
+      // Act
+      const appChain = await startAppChain();
+      const retrievedOrder =
+        await appChain.query.runtime.DarkPool.orderBook.get(UInt64.from(999));
+
+      // Assert
+      expect(retrievedOrder).toBeUndefined();
+    });
+  });
+
+  describe("whitelistUser", () => {
+    it("should whitelist a user for a pool", async () => {
+      // Setup
+      const appChain = await startAppChain();
+      appChain.setSigner(alicePrivateKey);
+      const darkPool = appChain.runtime.resolve("DarkPool");
+
+      // Act
+      let tx = await appChain.transaction(alice, async () => {
+        await darkPool.whitelistUser(alice, poolKey);
+      });
+      await tx.sign();
+      await tx.send();
+      await appChain.produceBlock();
+
+      // Assert
+      const isWhitelisted =
+        await appChain.query.runtime.DarkPool.poolWhitelist.get({
+          user: alice,
+          poolKey,
+        });
+      expect(isWhitelisted?.toBoolean()).toBe(true);
+    });
+  });
+
+  describe("dewhitelistUser", () => {
+    it("should dewhitelist a user for a pool", async () => {
+      // Setup
+      const appChain = await startAppChain();
+      appChain.setSigner(alicePrivateKey);
+      const darkPool = appChain.runtime.resolve("DarkPool");
+
+      let tx = await appChain.transaction(alice, async () => {
+        await darkPool.whitelistUser(alice, poolKey);
+      });
+      await tx.sign();
+      await tx.send();
+      await appChain.produceBlock();
+
+      // Act
+      tx = await appChain.transaction(alice, async () => {
+        await darkPool.dewhitelistUser(alice, poolKey);
+      });
+      await tx.sign();
+      await tx.send();
+      await appChain.produceBlock();
+
+      // Assert
+      const isWhitelisted =
+        await appChain.query.runtime.DarkPool.poolWhitelist.get({
+          user: alice,
+          poolKey,
+        });
+      expect(isWhitelisted?.toBoolean()).toBe(false);
+    });
+  });
+
+  describe("removeOrder", () => {
+    it("should remove an existing order", async () => {
+      // Setup
+      const appChain = await startAppChain();
+      appChain.setSigner(alicePrivateKey);
+      const darkPool = appChain.runtime.resolve("DarkPool");
+      const order = new Order({
+        user: alice,
+        amountIn: UInt64.from(100),
+        amountOut: UInt64.from(50),
+        isAtoB: Bool(true),
+      });
+      let tx = await appChain.transaction(alice, async () => {
+        await darkPool.whitelistUser(alice, poolKey);
+      });
+      await tx.sign();
+      await tx.send();
+      await appChain.produceBlock();
+
+      tx = await appChain.transaction(alice, async () => {
+        await darkPool.submitOrder(order, poolKey);
+      });
+      await tx.sign();
+      await tx.send();
+      await appChain.produceBlock();
+
+      // Act
+      tx = await appChain.transaction(alice, async () => {
+        await darkPool.removeOrder(UInt64.from(1));
+      });
+      await tx.sign();
+      await tx.send();
+      await appChain.produceBlock();
+
+      // Assert
+      const removedOrder = await appChain.query.runtime.DarkPool.orderBook.get(
+        UInt64.from(1)
+      );
+      expect(removedOrder).toEqual(Order.empty());
+
+      const userOrderCount =
+        await appChain.query.runtime.DarkPool.userOrderCount.get(alice);
+      expect(userOrderCount).toEqual(UInt64.from(0));
+    });
+
+    it("should fail when trying to remove a non-existent order", async () => {
+      // Setup
+      const appChain = await startAppChain();
+      appChain.setSigner(alicePrivateKey);
+      const darkPool = appChain.runtime.resolve("DarkPool");
+
+      // Act & Assert
+      const tx = await appChain.transaction(alice, async () => {
+        await darkPool.removeOrder(UInt64.from(999));
+      });
+      await tx.sign();
+      await tx.send();
+
+      // Assert
+      const block = await appChain.produceBlock();
+      const transaction = block?.transactions[0];
+      expect(transaction?.status.toBoolean()).toBe(false);
+      expect(transaction?.statusMessage).toBe("Order does not exist");
     });
   });
 });
