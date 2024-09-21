@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useToast } from "@/components/ui/use-toast";
 import { useBalancesStore } from "@/lib/stores/balances";
+import { useChainStore } from "@/lib/stores/chain";
 import { useClientStore } from "@/lib/stores/client";
 import { usePoolsStore } from "@/lib/stores/pools";
 import { useWalletStore } from "@/lib/stores/wallet";
@@ -68,6 +69,7 @@ export default function Home() {
   const [blockDelays, setBlockDelays] = useState<number[]>([0, 10]);
 
   const client = useClientStore();
+  const chain = useChainStore();
   const balances = useBalancesStore();
   const wallet = useWalletStore();
   const pools = usePoolsStore();
@@ -85,6 +87,7 @@ export default function Home() {
       const tx = await client.client.transaction(
         PublicKey.fromBase58(wallet.wallet),
         async () => {
+          const currentBlock = chain.block?.height ? +chain.block.height : 0;
           await DarkPool.submitOrder(
             new Order({
               amountIn: Balance.from(inTokenAmount),
@@ -92,8 +95,8 @@ export default function Home() {
               tokenIn: TokenId.from(inToken),
               tokenOut: TokenId.from(outToken),
               user: PublicKey.fromBase58(wallet.wallet!),
-              minBlockHeight: UInt64.from(0),
-              maxBlockHeight: UInt64.from(100),
+              minBlockHeight: UInt64.from(currentBlock + blockDelays[0]),
+              maxBlockHeight: UInt64.from(currentBlock + blockDelays[1]),
             }),
           );
         },
