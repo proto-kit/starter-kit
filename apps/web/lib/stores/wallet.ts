@@ -92,6 +92,7 @@ export const useNotifyTransactions = () => {
     (
       status: "PENDING" | "SUCCESS" | "FAILURE",
       transaction: UnsignedTransaction | PendingTransaction,
+      statusMessage?: string,
     ) => {
       if (!client.client) return;
 
@@ -110,7 +111,6 @@ export const useNotifyTransactions = () => {
       const [moduleName, methodName] = resolvedMethodDetails;
 
       const hash = truncateMiddle(transaction.hash().toString(), 15, 15, "...");
-
       function title() {
         switch (status) {
           case "PENDING":
@@ -124,7 +124,7 @@ export const useNotifyTransactions = () => {
 
       toast({
         title: title(),
-        description: `Hash: ${hash}`,
+        description: `Hash: ${hash}${statusMessage ? `\nMessage: ${statusMessage}` : ""}`,
       });
     },
     [client.client],
@@ -168,9 +168,9 @@ export const useNotifyTransactions = () => {
       },
     );
 
-    confirmedPendingTransactions?.forEach(({ tx, status }) => {
+    confirmedPendingTransactions?.forEach(({ tx, status, statusMessage }) => {
       wallet.removePendingTransaction(tx);
-      notifyTransaction(status ? "SUCCESS" : "FAILURE", tx);
+      notifyTransaction(status ? "SUCCESS" : "FAILURE", tx, statusMessage);
     });
   }, [
     chain.block,
