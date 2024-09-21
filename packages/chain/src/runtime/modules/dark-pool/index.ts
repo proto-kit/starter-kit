@@ -1,12 +1,11 @@
 import { TokenId, UInt64 } from "@proto-kit/library";
 import { runtimeMethod, runtimeModule, state } from "@proto-kit/module";
 import { assert, State, StateMap } from "@proto-kit/protocol";
-import { Bool, Field, Poseidon, Provable, PublicKey, Struct } from "o1js";
+import { Bool, Field, Poseidon, PublicKey, Struct } from "o1js";
 import { XYK } from "../xyk";
 import { PoolKey } from "../xyk/pool-key";
 import { TokenPair } from "../xyk/token-pair";
 import { calculateExecutionAmounts } from "./utils";
-import type { sender } from "o1js/dist/node/lib/mina/mina";
 
 export class OrderId extends UInt64 {}
 
@@ -109,6 +108,14 @@ export class DarkPool extends XYK {
     });
     assert(isWhitelisted.value, "User is not whitelisted for this pool");
 
+    // Transfer tokens from sender to pool
+    await this.balances.transfer(
+      order.tokenIn,
+      sender,
+      this.transaction.sender.value,
+      order.amountIn
+    );
+
     const orderId = isBuy.equals(Bool(true))
       ? await this.buyOrderCounter.get()
       : await this.sellOrderCounter.get();
@@ -151,16 +158,6 @@ export class DarkPool extends XYK {
       await this.lastSellOrderId.set(newOrderId);
       await this.sellOrderCounter.set(newUserOrderCount);
     }
-  }
-
-  @runtimeMethod()
-  public async whitelistUser(user: PublicKey, poolKey: PoolKey) {
-    await this.poolWhitelist.set({ user, poolKey }, Bool(true));
-  }
-
-  @runtimeMethod()
-  public async dewhitelistUser(user: PublicKey, poolKey: PoolKey) {
-    await this.poolWhitelist.set({ user, poolKey }, Bool(false));
   }
 
   @runtimeMethod()

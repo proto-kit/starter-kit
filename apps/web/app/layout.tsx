@@ -4,6 +4,7 @@ import { Inter as FontSans } from "next/font/google";
 import { cn } from "@/lib/utils";
 
 import AsyncLayoutDynamic from "@/containers/async-layout-dynamic";
+import { ThemeProvider } from "@/components/ui/theme-provider";
 
 export const fontSans = FontSans({
   subsets: ["latin"],
@@ -23,7 +24,14 @@ export default function RootLayout({
           fontSans.variable,
         )}
       >
-        <AsyncLayoutDynamic>{children}</AsyncLayoutDynamic>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AsyncLayoutDynamic>{children}</AsyncLayoutDynamic>
+        </ThemeProvider>
       </body>
     </html>
   );

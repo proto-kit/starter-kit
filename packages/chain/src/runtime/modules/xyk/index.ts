@@ -9,7 +9,7 @@ import { StateMap, assert } from "@proto-kit/protocol";
 import { Bool, Field, Provable, PublicKey, Struct } from "o1js";
 import { inject } from "tsyringe";
 import { Balances } from "../balances";
-import type { TokenRegistry } from "../tokens";
+import type { TokenRegistry } from "../token-registry";
 import { LPTokenId } from "./lp-token-id";
 import { PoolKey } from "./pool-key";
 import { TokenPair } from "./token-pair";
@@ -374,11 +374,6 @@ export class XYK extends RuntimeModule<XYKConfig> {
     await this.balances.transfer(lastTokenOut, lastPoolKey, seller, amountOut);
   }
 
-  public async whitelistPool(poolKey: PoolKey, user: PublicKey) {
-    const poolWhitelist = new PoolWhitelist({ poolKey, user });
-    await this.poolWhitelist.set(poolWhitelist, Bool(true));
-  }
-
   @runtimeMethod()
   public async createPoolSigned(
     tokenAId: TokenId,
@@ -394,9 +389,12 @@ export class XYK extends RuntimeModule<XYKConfig> {
       tokenAAmount,
       tokenBAmount
     );
-    await this.whitelistPool(
-      PoolKey.fromTokenPair(TokenPair.from(tokenAId, tokenBId)),
-      creator
+    await this.poolWhitelist.set(
+      {
+        poolKey: PoolKey.fromTokenPair(TokenPair.from(tokenAId, tokenBId)),
+        user: creator,
+      },
+      Bool(true)
     );
   }
 
@@ -448,5 +446,15 @@ export class XYK extends RuntimeModule<XYKConfig> {
       amountIn,
       amountOutMinLimit
     );
+  }
+
+  @runtimeMethod()
+  public async whitelistUser(user: PublicKey, poolKey: PoolKey) {
+    await this.poolWhitelist.set({ user, poolKey }, Bool(true));
+  }
+
+  @runtimeMethod()
+  public async dewhitelistUser(user: PublicKey, poolKey: PoolKey) {
+    await this.poolWhitelist.set({ user, poolKey }, Bool(false));
   }
 }

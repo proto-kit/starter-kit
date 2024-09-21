@@ -20,27 +20,19 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
 import { useBalancesStore } from "@/lib/stores/balances";
 import { useClientStore } from "@/lib/stores/client";
-import { usePoolsStore } from "@/lib/stores/pools";
+import { useAddLiquidity, usePoolsStore } from "@/lib/stores/pools";
 import { useWalletStore } from "@/lib/stores/wallet";
 import { Balance, TokenId } from "@proto-kit/library";
-import type { PendingTransaction } from "@proto-kit/sequencer";
-import { useMutation } from "@tanstack/react-query";
-import { Order } from "chain/dist/runtime/modules/dark-pool";
 import { PoolKey } from "chain/dist/runtime/modules/xyk/pool-key";
 import { TokenPair } from "chain/dist/runtime/modules/xyk/token-pair";
-import {
-  ChevronDownIcon,
-  PlusIcon,
-  SettingsIcon
-} from "lucide-react";
+import { ChevronDownIcon, PlusIcon, SettingsIcon } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Bool, PublicKey } from "o1js";
 import { useState } from "react";
 import "reflect-metadata";
 import truncateMiddle from "truncate-middle";
 
-export default function Home() {
+export default function LendingPage() {
   const searchParams = useSearchParams();
   const tokenA = searchParams.get("tokenA");
   const tokenB = searchParams.get("tokenB");
@@ -65,46 +57,16 @@ export default function Home() {
   const inTokenBalance = balances.balances[inToken.toString()] || "0";
   const outTokenBalance = balances.balances[outToken.toString()] || "0";
 
-  const { mutate: submitOrder, isPending: isSubmitOrderPending } = useMutation({
-    mutationFn: async () => {
-      if (!client.client || !wallet.wallet) return;
-
-      const DarkPool = client.client!.runtime.resolve("DarkPool");
-
-      const tx = await client.client.transaction(
-        PublicKey.fromBase58(wallet.wallet),
-        async () => {
-          await DarkPool.submitOrder(
-            new Order({
-              amountIn: Balance.from(inTokenAmount),
-              amountOut: Balance.from(outTokenAmount),
-              tokenIn: TokenId.from(inToken),
-              tokenOut: TokenId.from(outToken),
-              user: PublicKey.fromBase58(wallet.wallet!),
-            }),
-            Bool(true),
-          );
-        },
-      );
-      await tx.sign();
-      await tx.send();
-
-      if (tx.transaction) {
-        wallet.addPendingTransaction(tx.transaction as PendingTransaction);
-      }
-    },
-    onError: (error) => {
-      console.error(error);
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
+  const { mutate: submitOrder, isPending: isSubmitOrderPending } =
+    useAddLiquidity();
 
   function onClick() {
-    submitOrder();
+    submitOrder({
+      tokenAId: TokenId.from(inToken),
+      tokenBId: TokenId.from(outToken),
+      tokenAAmount: Balance.from(inTokenAmount),
+      tokenBAmountLimit: Balance.from(outTokenAmount),
+    });
   }
 
   function onSelectPool(pool: string) {
@@ -120,7 +82,7 @@ export default function Home() {
     <div className="mx-auto mt-8 grid w-full max-w-md gap-6 rounded-xl border bg-background p-6 shadow-sm">
       <div className="grid gap-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Swap</h2>
+          <h2 className="text-lg font-semibold">Lend Liquidity</h2>
           <div className="flex space-x-2">
             <div className="flex items-center space-x-2">
               <Label htmlFor="private">Private</Label>
@@ -184,12 +146,6 @@ export default function Home() {
               // max={inTokenBalance !== undefined ? inTokenBalance.toString() : 0}
             />
           </div>
-          <div className="text-center">
-            {/* TODO: maybe let user switch tokens */}
-            <Button variant="ghost" className="h-auto px-1 py-1" disabled>
-              <ChevronDownIcon className={"h-4 w-4 transition-all"} />
-            </Button>
-          </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="flex flex-col">
@@ -221,13 +177,13 @@ export default function Home() {
             ? "Enter Amounts"
             : isSubmitOrderPending
               ? "Submitting..."
-              : "Submit Swap"}
+              : "Add Liquidity"}
         </Button>
       </div>
       <div className="grid gap-2">
         <div className="flex items-center justify-between">
           <span className="text-muted-foreground">
-            Price (#{inToken.toString()} = #{outToken.toString()})
+            Ratio (#{inToken.toString()} = #{outToken.toString()})
           </span>
           <span>
             1 (#{inToken.toString()}) ={" "}

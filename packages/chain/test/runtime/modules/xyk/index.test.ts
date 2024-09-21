@@ -4,7 +4,7 @@ import { PrivateKey, Provable } from "o1js";
 import "reflect-metadata";
 import { Balances } from "../../../../src/runtime/modules/balances";
 import { Faucet } from "../../../../src/runtime/modules/faucet";
-import { TokenRegistry } from "../../../../src/runtime/modules/tokens";
+import { TokenRegistry } from "../../../../src/runtime/modules/token-registry";
 import { errors, TokenIdPath, XYK } from "../../../../src/runtime/modules/xyk";
 import { LPTokenId } from "../../../../src/runtime/modules/xyk/lp-token-id";
 import { PoolKey } from "../../../../src/runtime/modules/xyk/pool-key";
@@ -36,151 +36,6 @@ describe("xyk", () => {
   const tokenBInitialLiquidity = Balance.from(1_000_000);
   const poolKey = PoolKey.fromTokenPair(TokenPair.from(tokenAId, tokenBId));
   const lpTokenId = LPTokenId.fromTokenPair(TokenPair.from(tokenAId, tokenBId));
-
-  // async function createPoolSigned(
-  //   senderPrivateKey: PrivateKey,
-  //   tokenAId: TokenId,
-  //   tokenBId: TokenId,
-  //   tokenAAmount: Balance,
-  //   tokenBAmount: Balance,
-  //   options?: { nonce: number }
-  // ) {
-  //   const XYK = appChain.runtime.resolve("XYK");
-  //   appChain.setSigner(senderPrivateKey);
-
-  //   const tx = await appChain.transaction(
-  //     senderPrivateKey.toPublicKey(),
-  //     async () => {
-  //       await XYK.createPoolSigned(
-  //         tokenAId,
-  //         tokenBId,
-  //         tokenAAmount,
-  //         tokenBAmount
-  //       );
-  //     },
-  //     options
-  //   );
-
-  //   await tx.sign();
-  //   await tx.send();
-
-  //   console.log(tx.transaction);
-
-  //   return tx;
-  // }
-
-  // async function addLiquiditySigned(
-  //   senderPrivateKey: PrivateKey,
-  //   tokenAId: TokenId,
-  //   tokenBId: TokenId,
-  //   tokenAAmount: Balance,
-  //   tokenBLimit: Balance,
-  //   options?: { nonce: number }
-  // ) {
-  //   const XYK = appChain.runtime.resolve("XYK");
-  //   appChain.setSigner(senderPrivateKey);
-
-  //   const tx = await appChain.transaction(
-  //     senderPrivateKey.toPublicKey(),
-  //     async () => {
-  //       await XYK.addLiquiditySigned(
-  //         tokenAId,
-  //         tokenBId,
-  //         tokenAAmount,
-  //         tokenBLimit
-  //       );
-  //     },
-  //     options
-  //   );
-
-  //   await tx.sign();
-  //   await tx.send();
-
-  //   return tx;
-  // }
-
-  // async function removeLiquiditySigned(
-  //   senderPrivateKey: PrivateKey,
-  //   tokenAId: TokenId,
-  //   tokenBId: TokenId,
-  //   lpTokenAmount: Balance,
-  //   tokenAAmountLimit: Balance,
-  //   tokenBAmountLimit: Balance,
-  //   options?: { nonce: number }
-  // ) {
-  //   const XYK = appChain.runtime.resolve("XYK");
-  //   appChain.setSigner(senderPrivateKey);
-
-  //   const tx = await appChain.transaction(
-  //     senderPrivateKey.toPublicKey(),
-  //     async () => {
-  //       await XYK.removeLiquiditySigned(
-  //         tokenAId,
-  //         tokenBId,
-  //         lpTokenAmount,
-  //         tokenAAmountLimit,
-  //         tokenBAmountLimit
-  //       );
-  //     },
-  //     options
-  //   );
-
-  //   await tx.sign();
-  //   await tx.send();
-
-  //   return tx;
-  // }
-
-  // async function sellPathSigned(
-  //   senderPrivateKey: PrivateKey,
-  //   path: TokenIdPath,
-  //   amountIn: Balance,
-  //   amountOutMinLimit: Balance,
-  //   options?: { nonce: number }
-  // ) {
-  //   const XYK = appChain.runtime.resolve("XYK");
-  //   appChain.setSigner(senderPrivateKey);
-
-  //   const tx = await appChain.transaction(
-  //     senderPrivateKey.toPublicKey(),
-  //     async () => {
-  //       await XYK.sellPathSigned(path, amountIn, amountOutMinLimit);
-  //     },
-  //     options
-  //   );
-
-  //   await tx.sign();
-  //   await tx.send();
-
-  //   return tx;
-  // }
-
-  // async function queryPool(tokenAId: TokenId, tokenBId: TokenId) {
-  //   const poolKey = PoolKey.fromTokenPair(TokenPair.from(tokenAId, tokenBId));
-  //   const poolExists = await appChain.query.runtime.XYK.pools.get(poolKey);
-  //   return {
-  //     pool: poolExists ?? Field.from(1),
-  //     liquidity: {
-  //       tokenA: await appChain.query.runtime.Balances.balances.get({
-  //         address: poolKey,
-  //         tokenId: tokenAId,
-  //       }),
-  //       tokenB: await appChain.query.runtime.Balances.balances.get({
-  //         address: poolKey,
-  //         tokenId: tokenBId,
-  //       }),
-  //     },
-  //   };
-  // }
-
-  // async function queryBalance(tokenId: TokenId, address: PublicKey) {
-  //   return {
-  //     balance: await appChain.query.runtime.Balances.balances.get({
-  //       tokenId,
-  //       address,
-  //     }),
-  //   };
-  // }
 
   describe("initial state", () => {
     it("should have no liquidity", async () => {
@@ -229,13 +84,13 @@ describe("xyk", () => {
       await appChain.start();
       appChain.setSigner(alicePrivateKey);
 
-      let nonce = 0;
       await drip(appChain, alicePrivateKey, tokenAId, tokenAInitialLiquidity, {
-        nonce: nonce++,
+        nonce: 0,
       });
       await drip(appChain, alicePrivateKey, tokenBId, tokenBInitialLiquidity, {
-        nonce: nonce++,
+        nonce: 1,
       });
+      await appChain.produceBlock();
 
       const xyk = appChain.runtime.resolve("XYK");
       const tx = await appChain.transaction(
@@ -249,13 +104,11 @@ describe("xyk", () => {
           );
         },
         {
-          nonce: nonce++,
+          nonce: 2,
         }
       );
-
       await tx.sign();
       await tx.send();
-
       await appChain.produceBlock();
 
       const pool = await appChain.query.runtime.XYK.pools.get(poolKey);
@@ -302,13 +155,13 @@ describe("xyk", () => {
       await appChain.start();
       appChain.setSigner(alicePrivateKey);
 
-      let nonce = 0;
       await drip(appChain, alicePrivateKey, tokenAId, tokenAInitialLiquidity, {
-        nonce: nonce++,
+        nonce: 0,
       });
       await drip(appChain, alicePrivateKey, tokenBId, tokenBInitialLiquidity, {
-        nonce: nonce++,
+        nonce: 1,
       });
+      await appChain.produceBlock();
 
       const xyk = appChain.runtime.resolve("XYK");
       let tx = await appChain.transaction(
@@ -322,7 +175,7 @@ describe("xyk", () => {
           );
         },
         {
-          nonce: nonce++,
+          nonce: 2,
         }
       );
       await tx.sign();
@@ -340,15 +193,15 @@ describe("xyk", () => {
           );
         },
         {
-          nonce: nonce++,
+          nonce: 3,
         }
       );
       await tx.sign();
       await tx.send();
+      const block = await appChain.produceBlock();
 
-      await expect(appChain.produceBlock()).rejects.toThrow(
-        errors.poolAlreadyExists()
-      );
+      const transaction = block?.transactions[0];
+      expect(transaction?.statusMessage).toBe(errors.poolAlreadyExists());
     });
   });
 
@@ -364,14 +217,13 @@ describe("xyk", () => {
         Runtime: config,
       });
       await appChain.start();
-      let nonce = 0;
       await drip(
         appChain,
         alicePrivateKey,
         tokenAId,
         Balance.from(tokenAInitialLiquidity.mul(2)),
         {
-          nonce: nonce++,
+          nonce: 0,
         }
       );
       await drip(
@@ -380,21 +232,31 @@ describe("xyk", () => {
         tokenBId,
         Balance.from(tokenBInitialLiquidity.mul(2)),
         {
-          nonce: nonce++,
+          nonce: 1,
         }
-      );
-
-      const xyk = appChain.runtime.resolve("XYK");
-      await xyk.createPool(
-        alice,
-        tokenAId,
-        tokenBId,
-        tokenAInitialLiquidity,
-        tokenBInitialLiquidity
       );
       await appChain.produceBlock();
 
-      const tx = await appChain.transaction(
+      const xyk = appChain.runtime.resolve("XYK");
+      let tx = await appChain.transaction(
+        alice,
+        async () => {
+          await xyk.createPoolSigned(
+            tokenAId,
+            tokenBId,
+            tokenAInitialLiquidity,
+            tokenBInitialLiquidity
+          );
+        },
+        {
+          nonce: 2,
+        }
+      );
+      await tx.sign();
+      await tx.send();
+      await appChain.produceBlock();
+
+      tx = await appChain.transaction(
         alice,
         async () => {
           await xyk.addLiquiditySigned(
@@ -405,13 +267,12 @@ describe("xyk", () => {
           );
         },
         {
-          nonce: nonce++,
+          nonce: 3,
         }
       );
       await tx.sign();
       await tx.send();
-      const block = await appChain.produceBlock();
-      console.log({ block: JSON.stringify(block, null, 2) });
+      await appChain.produceBlock();
 
       const aliceLpBalance = await appChain.query.runtime.Balances.balances.get(
         {
@@ -419,7 +280,6 @@ describe("xyk", () => {
           tokenId: lpTokenId,
         }
       );
-
       const tokenALiquidity =
         await appChain.query.runtime.Balances.balances.get({
           address: poolKey,
@@ -456,32 +316,41 @@ describe("xyk", () => {
       });
       await appChain.start();
       appChain.setSigner(alicePrivateKey);
-      let nonce = 0;
 
       await drip(appChain, alicePrivateKey, tokenAId, tokenAInitialLiquidity, {
-        nonce: nonce++,
+        nonce: 0,
       });
       await drip(appChain, alicePrivateKey, tokenBId, tokenBInitialLiquidity, {
-        nonce: nonce++,
+        nonce: 1,
       });
-
+      await appChain.produceBlock();
       const xyk = appChain.runtime.resolve("XYK");
-      await xyk.createPoolSigned(
-        tokenAId,
-        tokenBId,
-        tokenAInitialLiquidity,
-        tokenBInitialLiquidity
+      let tx = await appChain.transaction(
+        alice,
+        async () => {
+          await xyk.createPoolSigned(
+            tokenAId,
+            tokenBId,
+            tokenAInitialLiquidity,
+            tokenBInitialLiquidity
+          );
+          await xyk.addLiquiditySigned(
+            tokenAId,
+            tokenBId,
+            tokenAInitialLiquidity,
+            tokenBInitialLiquidity
+          );
+        },
+        {
+          nonce: 2,
+        }
       );
-      await appChain.produceBlock();
-      await xyk.addLiquiditySigned(
-        tokenAId,
-        tokenBId,
-        tokenAInitialLiquidity,
-        tokenBInitialLiquidity
-      );
+      await tx.sign();
+      await tx.send();
       await appChain.produceBlock();
 
-      const tx = await appChain.transaction(
+      // Act
+      tx = await appChain.transaction(
         alice,
         async () => {
           await xyk.removeLiquiditySigned(
@@ -493,12 +362,11 @@ describe("xyk", () => {
           );
         },
         {
-          nonce: nonce++,
+          nonce: 3,
         }
       );
       await tx.sign();
       await tx.send();
-
       await appChain.produceBlock();
       const aliceLpBalance = await appChain.query.runtime.Balances.balances.get(
         {
@@ -506,7 +374,6 @@ describe("xyk", () => {
           tokenId: lpTokenId,
         }
       );
-
       const tokenALiquidity =
         await appChain.query.runtime.Balances.balances.get({
           address: poolKey,
@@ -518,9 +385,9 @@ describe("xyk", () => {
           tokenId: tokenBId,
         });
 
-      expect(aliceLpBalance?.toString()).toEqual("0");
-      expect(tokenALiquidity?.toString()).toEqual("0");
-      expect(tokenBLiquidity?.toString()).toEqual("0");
+      expect(aliceLpBalance).toBeUndefined();
+      expect(tokenALiquidity).toBeUndefined();
+      expect(tokenBLiquidity).toBeUndefined();
     });
   });
 
@@ -537,28 +404,46 @@ describe("xyk", () => {
       });
       await appChain.start();
       appChain.setSigner(alicePrivateKey);
-      let nonce = 0;
 
       await drip(
         appChain,
         alicePrivateKey,
         tokenAId,
-        tokenAInitialLiquidity.mul(2)
+        tokenAInitialLiquidity.mul(2),
+        {
+          nonce: 0,
+        }
       );
       await drip(
         appChain,
         alicePrivateKey,
         tokenBId,
-        tokenBInitialLiquidity.mul(2)
+        tokenBInitialLiquidity.mul(2),
+        {
+          nonce: 1,
+        }
       );
+      await appChain.produceBlock();
 
       const xyk = appChain.runtime.resolve("XYK");
-      await xyk.createPoolSigned(
-        tokenAId,
-        tokenBId,
-        tokenAInitialLiquidity,
-        tokenBInitialLiquidity
+      let tx = await appChain.transaction(
+        alice,
+        async () => {
+          await xyk.createPoolSigned(
+            tokenAId,
+            tokenBId,
+            tokenAInitialLiquidity,
+            tokenBInitialLiquidity
+          );
+        },
+        {
+          nonce: 2,
+        }
       );
+      await tx.sign();
+      await tx.send();
+      await appChain.produceBlock();
+
       const path = new TokenIdPath({
         path: [
           tokenAId,
@@ -569,20 +454,18 @@ describe("xyk", () => {
         ],
       });
 
-      const tx = await appChain.transaction(
+      tx = await appChain.transaction(
         alice,
         async () => {
           await xyk.sellPathSigned(path, Balance.from(100), Balance.from(1));
         },
         {
-          nonce: nonce++,
+          nonce: 3,
         }
       );
       await tx.sign();
       await tx.send();
-
-      const block = await appChain.produceBlock();
-      Provable.log("block", block);
+      await appChain.produceBlock();
 
       const balanceA = await appChain.query.runtime.Balances.balances.get({
         address: alice,
@@ -595,8 +478,83 @@ describe("xyk", () => {
 
       expect(balanceA?.toString()).toEqual("999900");
       expect(balanceB?.toString()).toEqual("1000099");
+    });
+  });
 
-      Provable.log("balances", {});
+  describe("whitelist", () => {
+    it("should whitelist creators", async () => {
+      const appChain = TestingAppChain.fromRuntime({
+        Faucet,
+        Balances,
+        XYK,
+        TokenRegistry,
+      });
+      appChain.configurePartial({
+        Runtime: config,
+      });
+      await appChain.start();
+      appChain.setSigner(alicePrivateKey);
+
+      const xyk = appChain.runtime.resolve("XYK");
+      const tx = await appChain.transaction(
+        alice,
+        async () => {
+          await xyk.createPoolSigned(
+            tokenAId,
+            tokenBId,
+            tokenAInitialLiquidity,
+            tokenBInitialLiquidity
+          );
+        },
+        {
+          nonce: 0,
+        }
+      );
+      await tx.sign();
+      await tx.send();
+      await appChain.produceBlock();
+      Provable.log({ alice, poolKey });
+      const isWhitelisted = await appChain.query.runtime.XYK.poolWhitelist.get({
+        user: alice,
+        poolKey,
+      });
+
+      expect(isWhitelisted?.toBoolean()).toBe(true);
+    });
+
+    it("should work when called directly", async () => {
+      const appChain = TestingAppChain.fromRuntime({
+        Faucet,
+        Balances,
+        XYK,
+        TokenRegistry,
+      });
+      appChain.configurePartial({
+        Runtime: config,
+      });
+      await appChain.start();
+      appChain.setSigner(alicePrivateKey);
+
+      const xyk = appChain.runtime.resolve("XYK");
+      const tx = await appChain.transaction(
+        alice,
+        async () => {
+          await xyk.whitelistUser(alice, poolKey);
+        },
+        {
+          nonce: 0,
+        }
+      );
+      await tx.sign();
+      await tx.send();
+      await appChain.produceBlock();
+
+      const isWhitelisted = await appChain.query.runtime.XYK.poolWhitelist.get({
+        user: alice,
+        poolKey,
+      });
+
+      expect(isWhitelisted?.toBoolean()).toBe(true);
     });
   });
 });

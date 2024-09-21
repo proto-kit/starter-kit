@@ -44,7 +44,6 @@ const formSchema = z.object({
 
 export default function PoolsPage() {
   const { pools } = usePoolsStore();
-  const { balances } = useBalancesStore();
   const { wallet } = useWalletStore();
   const { toast } = useToast();
   const { mutate, isPending } = useCreatePool();
@@ -53,8 +52,8 @@ export default function PoolsPage() {
     values: {
       tokenA: 0,
       tokenB: 1,
-      tokenAAmount: 0,
-      tokenBAmount: 0,
+      tokenAAmount: 1,
+      tokenBAmount: 1,
     },
   });
 
@@ -147,35 +146,32 @@ export default function PoolsPage() {
       <div>
         <h2 className="mb-4 text-2xl font-bold">Pools</h2>
         <div className="grid grid-cols-1 gap-4">
-          {Object.entries(pools).map(([poolKey, tokens]) => {
-            console.log({ poolKey, tokens });
-            return (
-              <Card
-                className="bg-background p-4 px-6 text-card-foreground"
-                key={poolKey}
-              >
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="text-sm font-medium">
-                    Pool {poolKey.toString()}
-                  </span>
-                  <div>
-                    <Button variant="ghost" className="h-auto p-2">
-                      <Link
-                        href={`/?tokenA=${tokens.tokenIn}&tokenB=${tokens.tokenOut}`}
-                        className="text-sm text-primary hover:text-primary/70"
-                      >
-                        <EyeIcon className="h-4 w-4" />
-                      </Link>
-                    </Button>
-                    <WhitelistAddress poolKey={poolKey} />
-                  </div>
+          {Object.entries(pools).map(([poolKey, tokens]) => (
+            <Card
+              className="bg-background p-4 px-6 text-card-foreground"
+              key={poolKey}
+            >
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-sm font-medium">
+                  Pool {poolKey.toString()}
+                </span>
+                <div>
+                  <Button variant="ghost" className="h-auto p-2">
+                    <Link
+                      href={`/?tokenA=${tokens.tokenIn}&tokenB=${tokens.tokenOut}`}
+                      className="text-sm text-primary hover:text-primary/70"
+                    >
+                      <EyeIcon className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                  <WhitelistAddress poolKey={poolKey} />
                 </div>
-                <p className="truncate text-sm text-muted-foreground">
-                  {poolKey}
-                </p>
-              </Card>
-            );
-          })}
+              </div>
+              <p className="truncate text-sm text-muted-foreground">
+                {poolKey}
+              </p>
+            </Card>
+          ))}
         </div>
       </div>
     </div>

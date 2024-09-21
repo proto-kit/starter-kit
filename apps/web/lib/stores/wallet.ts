@@ -6,7 +6,7 @@ import { Field, PublicKey, Signature, UInt64 } from "o1js";
 import { useCallback, useEffect, useMemo } from "react";
 import truncateMiddle from "truncate-middle";
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
 import { useChainStore } from "./chain";
 import { useClientStore } from "./client";
 
@@ -25,67 +25,60 @@ export interface WalletState {
 }
 
 export const useWalletStore = create<WalletState>()(
-  persist(
-    (set, get) => ({
-      async initializeWallet() {
-        if (typeof mina === "undefined") {
-          throw new Error("Auro wallet not installed");
-        }
+  immer((set, get) => ({
+    async initializeWallet() {
+      if (typeof mina === "undefined") {
+        throw new Error("Auro wallet not installed");
+      }
 
-        const [wallet] = await mina.getAccounts();
+      const [wallet] = await mina.getAccounts();
 
-        set((state) => {
-          state.wallet = wallet;
-          return state;
-        });
-      },
-      async connectWallet() {
-        if (typeof mina === "undefined") {
-          throw new Error("Auro wallet not installed");
-        }
-
-        const [wallet] = await mina.requestAccounts();
-
-        set((state) => {
-          state.wallet = wallet;
-          return state;
-        });
-      },
-      observeWalletChange() {
-        if (typeof mina === "undefined") {
-          throw new Error("Auro wallet not installed");
-        }
-
-        mina.on("accountsChanged", ([wallet]) => {
-          set((state) => {
-            state.wallet = wallet;
-            return state;
-          });
-        });
-      },
-
-      pendingTransactions: [] as PendingTransaction[],
-      addPendingTransaction(pendingTransaction) {
-        set((state) => {
-          state.pendingTransactions.push(pendingTransaction);
-          return state;
-        });
-      },
-      removePendingTransaction(pendingTransaction) {
-        set((state) => {
-          state.pendingTransactions = state.pendingTransactions.filter((tx) => {
-            return (
-              tx.hash().toString() !== pendingTransaction.hash().toString()
-            );
-          });
-          return state;
-        });
-      },
-    }),
-    {
-      name: "wallet",
+      set((state) => {
+        state.wallet = wallet;
+        return state;
+      });
     },
-  ),
+    async connectWallet() {
+      if (typeof mina === "undefined") {
+        throw new Error("Auro wallet not installed");
+      }
+
+      const [wallet] = await mina.requestAccounts();
+
+      set((state) => {
+        state.wallet = wallet;
+        return state;
+      });
+    },
+    observeWalletChange() {
+      if (typeof mina === "undefined") {
+        throw new Error("Auro wallet not installed");
+      }
+
+      mina.on("accountsChanged", ([wallet]) => {
+        set((state) => {
+          state.wallet = wallet;
+          return state;
+        });
+      });
+    },
+
+    pendingTransactions: [] as PendingTransaction[],
+    addPendingTransaction(pendingTransaction) {
+      set((state) => {
+        state.pendingTransactions.push(pendingTransaction as any);
+        return state;
+      });
+    },
+    removePendingTransaction(pendingTransaction) {
+      set((state) => {
+        state.pendingTransactions = state.pendingTransactions.filter((tx) => {
+          return tx.hash().toString() !== pendingTransaction.hash().toString();
+        });
+        return state;
+      });
+    },
+  })),
 );
 
 export const useNotifyTransactions = () => {
@@ -115,8 +108,12 @@ export const useNotifyTransactions = () => {
         MethodIdResolver,
       );
 
+      const transactionMethodId =
+        typeof transaction.methodId === "string"
+          ? Field(transaction.methodId)
+          : transaction.methodId;
       const resolvedMethodDetails = methodIdResolver.getMethodNameFromId(
-        transaction.methodId.toBigInt(),
+        transactionMethodId.toBigInt(),
       );
 
       if (!resolvedMethodDetails)
@@ -153,39 +150,45 @@ export const useNotifyTransactions = () => {
 
   // notify about transaction success or failure
   useEffect(() => {
-    const confirmedTransactions = chain.block?.txs?.map(
-      ({ tx, status, statusMessage }) => {
-        return {
-          tx: new PendingTransaction({
-            methodId: Field(tx.methodId),
-            nonce: UInt64.from(tx.nonce),
-            isMessage: false,
-            sender: PublicKey.fromBase58(tx.sender),
-            argsFields: tx.argsFields.map((arg) => Field(arg)),
-            auxiliaryData: [],
-            signature: Signature.fromJSON({
-              r: tx.signature.r,
-              s: tx.signature.s,
+    try {
+      const confirmedTransactions = chain.block?.txs?.map(
+        ({ tx, status, statusMessage }) => {
+          return {
+            tx: new PendingTransaction({
+              methodId: Field(tx.methodId),
+              nonce: UInt64.from(tx.nonce),
+              isMessage: false,
+              sender: PublicKey.fromBase58(tx.sender),
+              argsFields: tx.argsFields.map((arg) => Field(arg)),
+              auxiliaryData: [],
+              signature: Signature.fromJSON({
+                r: tx.signature.r,
+                s: tx.signature.s,
+              }),
             }),
-          }),
-          status,
-          statusMessage,
-        };
-      },
-    );
+            status,
+            statusMessage,
+          };
+        },
+      );
 
-    const confirmedPendingTransactions = confirmedTransactions?.filter(
-      ({ tx }) => {
-        return wallet.pendingTransactions?.find((pendingTransaction) => {
-          return pendingTransaction.hash().toString() === tx.hash().toString();
-        });
-      },
-    );
+      const confirmedPendingTransactions = confirmedTransactions?.filter(
+        ({ tx }) => {
+          return wallet.pendingTransactions?.find((pendingTransaction) => {
+            return (
+              pendingTransaction.hash().toString() === tx.hash().toString()
+            );
+          });
+        },
+      );
 
-    confirmedPendingTransactions?.forEach(({ tx, status, statusMessage }) => {
-      wallet.removePendingTransaction(tx);
-      notifyTransaction(status ? "SUCCESS" : "FAILURE", tx, statusMessage);
-    });
+      confirmedPendingTransactions?.forEach(({ tx, status, statusMessage }) => {
+        wallet.removePendingTransaction(tx);
+        notifyTransaction(status ? "SUCCESS" : "FAILURE", tx, statusMessage);
+      });
+    } catch (err) {
+      console.warn("Error parsing transactions", err);
+    }
   }, [
     chain.block,
     wallet.pendingTransactions,

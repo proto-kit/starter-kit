@@ -36,6 +36,10 @@ export function Faucet({
 }: FaucetProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    values: {
+      tokenId: 0,
+      amount: 100,
+    },
   });
 
   function onSubmit(data: z.infer<typeof formSchema>) {
@@ -43,11 +47,11 @@ export function Faucet({
   }
 
   return (
-    <Card className="w-full p-4">
+    <Card className="w-full p-6">
       <div className="mb-2">
         <h2 className="text-xl font-bold">Faucet</h2>
         <p className="mt-1 text-sm text-zinc-500">
-          Get testing (L2) MINA tokens for your wallet
+          Get testing tokens for your wallet
         </p>
       </div>
       <Form {...form}>
@@ -64,30 +68,33 @@ export function Faucet({
                   <Input
                     disabled
                     placeholder={wallet ?? "Please connect a wallet first"}
+                    value={wallet}
                   />
                 </FormControl>
               </FormItem>
             )}
           />
           <FormField
+            control={form.control}
             name="tokenId"
             render={({ field }) => (
-              <FormItem>
+              <>
                 <FormLabel>Token ID</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="Enter token ID" />
+                  <Input placeholder="Enter token ID" {...field} />
                 </FormControl>
                 <FormMessage />
-              </FormItem>
+              </>
             )}
           />
           <FormField
+            control={form.control}
             name="amount"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Amount</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="Enter amount" />
+                  <Input placeholder="Enter amount" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -103,7 +110,7 @@ export function Faucet({
               wallet ?? onConnectWallet();
             }}
           >
-            {wallet ? "Drip 💦" : "Connect wallet"}
+            {wallet ? "Drip Faucet" : "Connect wallet"}
           </Button>
         </form>
       </Form>

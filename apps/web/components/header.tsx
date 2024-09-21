@@ -16,11 +16,14 @@ import { usePathname } from "next/navigation";
 import truncateMiddle from "truncate-middle";
 import { Chain } from "./chain";
 import { Separator } from "./ui/separator";
+import { ColourModeToggle } from "@/components/colour-mode-toggle";
+import { DropletIcon } from "lucide-react";
 
 export interface HeaderProps {
   loading: boolean;
   wallet?: string;
   onConnectWallet: () => void;
+  onCopyToClipboard: () => void;
   blockHeight?: string;
 }
 
@@ -28,15 +31,16 @@ export default function Header({
   loading,
   wallet,
   onConnectWallet,
+  onCopyToClipboard,
   blockHeight,
 }: HeaderProps) {
   const pathname = usePathname();
   return (
-    <header className="sticky top-0 flex items-center justify-between border-b p-2 shadow-sm">
+    <header className="sticky top-0 flex items-center justify-between border-b p-2 shadow-sm dark:bg-zinc-900">
       <div className="container flex">
         <div className="flex basis-8/12 items-center justify-start">
           <Link href="/">
-            <Image className="h-8 w-8" src={protokit} alt={"Protokit logo"} />
+            <DropletIcon className="h-8 w-8 transition-opacity hover:opacity-80" />
           </Link>
           <Separator className="mx-4 h-8" orientation={"vertical"} />
           <div className="flex">
@@ -45,6 +49,15 @@ export default function Header({
           <Separator className="mx-4 h-8" orientation={"vertical"} />
           <div className="flex grow space-x-4">
             <Link
+              href="/guide"
+              className={cn(
+                "hover:underline",
+                pathname === "/guide" && "font-semibold",
+              )}
+            >
+              Guide
+            </Link>
+            <Link
               href="/"
               className={cn(
                 "hover:underline",
@@ -52,6 +65,15 @@ export default function Header({
               )}
             >
               Swap
+            </Link>
+            <Link
+              href="/lend"
+              className={cn(
+                "hover:underline",
+                pathname === "/lend" && "font-semibold",
+              )}
+            >
+              Lend
             </Link>
             <Link
               href="/pools"
@@ -84,7 +106,16 @@ export default function Header({
               </div>
             </div>
           )}
-          <Button loading={loading} onClick={onConnectWallet}>
+          <Button
+            loading={loading}
+            onClick={() => {
+              if (wallet) {
+                onCopyToClipboard();
+              } else {
+                onConnectWallet();
+              }
+            }}
+          >
             {wallet ? truncateMiddle(wallet, 7, 7, "...") : "Connect wallet"}
           </Button>
         </div>

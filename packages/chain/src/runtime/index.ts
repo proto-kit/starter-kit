@@ -4,7 +4,7 @@ import { Balance, UInt64, VanillaRuntimeModules } from "@proto-kit/library";
 import { Balances } from "./modules/balances";
 import { DarkPool } from "./modules/dark-pool";
 import { Faucet } from "./modules/faucet";
-import { TokenRegistry } from "./modules/tokens";
+import { TokenRegistry } from "./modules/token-registry";
 
 export const modules = VanillaRuntimeModules.with({
   Balances,
@@ -23,7 +23,7 @@ export const config: ModulesConfig<typeof modules> = {
   DarkPool: {
     feeDivider: 1000n,
     fee: 3n,
-    minimumLiquidity: Balance.from(0),
+    minimumLiquidity: Balance.from(1),
   },
   Faucet: {},
 };

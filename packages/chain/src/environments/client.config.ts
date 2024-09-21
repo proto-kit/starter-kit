@@ -1,10 +1,12 @@
 import { AuroSigner, ClientAppChain } from "@proto-kit/sdk";
+import protocol from "../protocol";
 import runtime from "../runtime";
 
 const appChain = ClientAppChain.fromRuntime(runtime.modules, AuroSigner);
 
 appChain.configurePartial({
   Runtime: runtime.config,
+  Protocol: protocol.config,
 });
 
 appChain.configurePartial({

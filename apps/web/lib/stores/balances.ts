@@ -21,7 +21,7 @@ export interface BalancesState {
     address: string,
   ) => Promise<void>;
   loadAllBalances: (client: Client, address: string) => Promise<void>;
-  addBalance: (
+  drip: (
     client: Client,
     tokenId: TokenId,
     sender: PublicKey,
@@ -35,7 +35,7 @@ export const useBalancesStore = create<BalancesState>()(
       loading: Boolean(false),
       balances: {},
       totalSupply: {},
-      lastTokenId: TokenId.from(1).toString(),
+      lastTokenId: "4",
       async loadBalance(client: Client, tokenId: TokenId, address: string) {
         set((state) => {
           state.loading = true;
@@ -58,8 +58,9 @@ export const useBalancesStore = create<BalancesState>()(
         });
         const lastTokenId =
           (await client.query.runtime.TokenRegistry.lastTokenIdId.get()) ??
-          TokenId.from(1);
+          this.lastTokenId;
         const lastTokenIdNumber = +lastTokenId.toString();
+        console.log({ lastTokenIdNumber });
 
         const balances: Record<string, string> = {};
         for (let i = 0; i < lastTokenIdNumber; i++) {
@@ -67,8 +68,11 @@ export const useBalancesStore = create<BalancesState>()(
           //   TokenIdId.from(i),
           // );
           const tokenId = TokenId.from(i);
-          const key = BalancesKey.from(tokenId, PublicKey.fromBase58(address));
-          const balance = await client.query.runtime.Balances.balances.get(key);
+          const balance = await client.query.runtime.Balances.balances.get({
+            address: PublicKey.fromBase58(address),
+            tokenId,
+          });
+          console.log({ tokenId: i, balance });
           if (balance !== undefined) {
             balances[tokenId.toString()] = balance.toString();
           }
@@ -79,16 +83,16 @@ export const useBalancesStore = create<BalancesState>()(
           return state;
         });
       },
-      async addBalance(
+      async drip(
         client: Client,
         tokenId: TokenId,
         sender: PublicKey,
         amount: Balance,
       ) {
-        const balances = client.runtime.resolve("Balances");
+        const faucet = client.runtime.resolve("Faucet");
 
         const tx = await client.transaction(sender, async () => {
-          await balances.addBalance(tokenId, sender, amount);
+          await faucet.dripSigned(tokenId, amount);
         });
 
         await tx.sign();
@@ -104,7 +108,7 @@ export const useBalancesStore = create<BalancesState>()(
   ),
 );
 
-export const useAddBalance = () => {
+export const useDrip = () => {
   const client = useClientStore();
   const balances = useBalancesStore();
   const wallet = useWalletStore();
@@ -119,7 +123,7 @@ export const useAddBalance = () => {
     }) => {
       if (!client.client || !wallet.wallet) return;
 
-      const pendingTransaction = await balances.addBalance(
+      const pendingTransaction = await balances.drip(
         client.client,
         tokenId,
         PublicKey.fromBase58(wallet.wallet),

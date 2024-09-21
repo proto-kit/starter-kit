@@ -7,10 +7,13 @@
   - [x] With specific address
   - [ ] With zk proof
 - [ ] Execute trades with private values
-  - [ ] Optionally, make the trade public
+  - [x] Optionally, make the trade public
 - [ ] Anyone can lend to dark pools
 - [ ] See last price on pool (average of latest bid and ask)
 - [ ] Provide hooks for before and after trades (expose some address field for IHook function)
+
+- add liquidity functions
+- custom timestamp for calling match order
 
 ## Architecture
 
