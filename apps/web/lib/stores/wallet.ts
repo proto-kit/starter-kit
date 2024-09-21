@@ -4,7 +4,6 @@ import { MethodIdResolver } from "@proto-kit/module";
 import { useCallback, useEffect, useMemo } from "react";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-// @ts-ignore
 import truncateMiddle from "truncate-middle";
 import { usePrevious } from "@uidotdev/usehooks";
 import { useClientStore } from "./client";

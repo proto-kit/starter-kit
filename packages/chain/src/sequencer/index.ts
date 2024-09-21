@@ -1,15 +1,15 @@
 import {
-  VanillaGraphqlModules,
   GraphqlSequencerModule,
   GraphqlServer,
+  VanillaGraphqlModules,
 } from "@proto-kit/api";
+import { ModulesConfig } from "@proto-kit/common";
 import {
-  PrivateMempool,
+  BlockProducerModule,
   SequencerModulesRecord,
   TimedBlockTrigger,
-  BlockProducerModule,
 } from "@proto-kit/sequencer";
-import { ModulesConfig } from "@proto-kit/common";
+import { DarkPoolMempool } from "./modules/dark-pool-mempool";
 
 export const apiSequencerModules = {
   GraphqlServer,
@@ -29,7 +29,7 @@ export const apiSequencerModulesConfig = {
 
 export const baseSequencerModules = {
   ...apiSequencerModules,
-  Mempool: PrivateMempool,
+  Mempool: DarkPoolMempool,
   BlockProducerModule: BlockProducerModule,
   BlockTrigger: TimedBlockTrigger,
 } satisfies SequencerModulesRecord;

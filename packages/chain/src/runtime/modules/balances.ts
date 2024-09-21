@@ -1,12 +1,12 @@
-import { runtimeModule, state, runtimeMethod } from "@proto-kit/module";
-import { StateMap, assert } from "@proto-kit/protocol";
 import {
   Balance,
   BalancesKey,
   Balances as BaseBalances,
   TokenId,
 } from "@proto-kit/library";
-import { Provable, PublicKey } from "o1js";
+import { runtimeMethod, runtimeModule, state } from "@proto-kit/module";
+import { StateMap, assert } from "@proto-kit/protocol";
+import { PublicKey } from "o1js";
 
 interface BalancesConfig {
   totalSupply: Balance;

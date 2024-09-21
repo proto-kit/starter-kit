@@ -7,7 +7,7 @@ import {
   type PendingTransaction,
   type TransactionStorage,
 } from "@proto-kit/sequencer";
-import type { TransactionValidator } from "@proto-kit/sequencer/dist/mempool/verification/TransactionValidator";
+import { TransactionValidator } from "@proto-kit/sequencer/dist/mempool/verification/TransactionValidator";
 import { inject } from "tsyringe";
 
 @sequencerModule()
@@ -53,7 +53,7 @@ export class DarkPoolMempool extends SequencerModule implements Mempool {
   public async getTxs(): Promise<PendingTransaction[]> {
     const txs = await this.transactionStorage.getPendingUserTransactions();
     txs.forEach((tx) => {
-      console.log(tx.methodId);
+      console.log("Method", tx.methodId.toString());
     });
     return txs;
   }

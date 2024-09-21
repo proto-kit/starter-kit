@@ -14,7 +14,17 @@ export interface BalancesState {
     // address - balance
     [key: string]: string;
   };
+  totalSupply: {
+    // TokenId - balance
+    [key: string]: string;
+  };
   loadBalance: (client: Client, address: string) => Promise<void>;
+  addBalance: (
+    client: Client,
+    tokenId: TokenId,
+    sender: PublicKey,
+    amount: Balance,
+  ) => Promise<void>;
   faucet: (client: Client, address: string) => Promise<PendingTransaction>;
 }
 
@@ -34,6 +44,7 @@ export const useBalancesStore = create<
   immer((set) => ({
     loading: Boolean(false),
     balances: {},
+    totalSupply: {},
     async loadBalance(client: Client, address: string) {
       set((state) => {
         state.loading = true;
@@ -61,6 +72,23 @@ export const useBalancesStore = create<
 
       isPendingTransaction(tx.transaction);
       return tx.transaction;
+    },
+    async addBalance(
+      client: Client,
+      tokenId: TokenId,
+      sender: PublicKey,
+      amount: Balance,
+    ) {
+      const balances = client.runtime.resolve("Balances");
+
+      const tx = await client.transaction(sender, async () => {
+        await balances.addBalance(tokenId, sender, amount);
+      });
+
+      await tx.sign();
+      await tx.send();
+
+      isPendingTransaction(tx.transaction);
     },
   })),
 );
