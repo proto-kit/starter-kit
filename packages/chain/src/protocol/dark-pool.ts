@@ -8,6 +8,7 @@ import { inject } from "tsyringe";
 import { DarkPool } from "../runtime/modules/dark-pool/index";
 import "reflect-metadata";
 
+// Unused
 export class DarkPoolStateModule extends ProvableTransactionHook {
   private darkPool: DarkPool;
 

@@ -66,6 +66,8 @@ describe("DarkPool", () => {
           amountOut: UInt64.from(50),
           tokenIn: tokenAId,
           tokenOut: tokenBId,
+          minBlockHeight: UInt64.from(0),
+          maxBlockHeight: UInt64.from(100),
         });
 
         // Drip to user & Whitelist the user
@@ -78,7 +80,7 @@ describe("DarkPool", () => {
 
         // Act
         tx = await appChain.transaction(alice, async () => {
-          await darkPool.submitOrder(order, Bool(true));
+          await darkPool.submitOrder(order);
         });
         await tx.sign();
         await tx.send();
@@ -119,11 +121,13 @@ describe("DarkPool", () => {
           amountOut: UInt64.from(50),
           tokenIn: tokenAId,
           tokenOut: tokenBId,
+          minBlockHeight: UInt64.from(0),
+          maxBlockHeight: UInt64.from(100),
         });
 
         // Act & Assert
         const tx = await appChain.transaction(alice, async () => {
-          await darkPool.submitOrder(order, Bool(true));
+          await darkPool.submitOrder(order);
         });
         await tx.sign();
         await tx.send();
@@ -150,6 +154,8 @@ describe("DarkPool", () => {
           amountOut: UInt64.from(50),
           tokenIn: tokenAId,
           tokenOut: tokenBId,
+          minBlockHeight: UInt64.from(0),
+          maxBlockHeight: UInt64.from(100),
         });
         const appChain = await startAppChain();
         appChain.setSigner(alicePrivateKey);
@@ -163,7 +169,7 @@ describe("DarkPool", () => {
         await appChain.produceBlock();
 
         tx = await appChain.transaction(alice, async () => {
-          await darkPool.submitOrder(order, Bool(true));
+          await darkPool.submitOrder(order);
         });
         await tx.sign();
         await tx.send();
@@ -277,6 +283,8 @@ describe("DarkPool", () => {
           amountOut: UInt64.from(50),
           tokenIn: tokenAId,
           tokenOut: tokenBId,
+          minBlockHeight: UInt64.from(0),
+          maxBlockHeight: UInt64.from(100),
         });
         let tx = await appChain.transaction(alice, async () => {
           await darkPool.whitelistUser(alice, poolKey);
@@ -286,7 +294,7 @@ describe("DarkPool", () => {
         await appChain.produceBlock();
 
         tx = await appChain.transaction(alice, async () => {
-          await darkPool.submitOrder(order, Bool(true));
+          await darkPool.submitOrder(order);
         });
         await tx.sign();
         await tx.send();

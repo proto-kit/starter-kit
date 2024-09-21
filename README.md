@@ -11,9 +11,7 @@
 - [ ] Anyone can lend to dark pools
 - [ ] See last price on pool (average of latest bid and ask)
 - [ ] Provide hooks for before and after trades (expose some address field for IHook function)
-
-- add liquidity functions
-- custom timestamp for calling match order
+  - [x] custom timestamp for calling match order
 
 ## Architecture
 

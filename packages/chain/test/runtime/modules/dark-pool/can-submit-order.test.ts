@@ -31,6 +31,8 @@ describe("DarkPool can submit order", () => {
     amountOut: UInt64.from(900),
     tokenIn: tokenA,
     tokenOut: tokenB,
+    minBlockHeight: UInt64.from(0),
+    maxBlockHeight: UInt64.from(100),
   });
 
   it("should submit order if in merkle tree", async () => {

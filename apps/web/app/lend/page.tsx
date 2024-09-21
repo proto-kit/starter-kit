@@ -86,7 +86,7 @@ export default function LendingPage() {
           <div className="flex space-x-2">
             <div className="flex items-center space-x-2">
               <Label htmlFor="private">Private</Label>
-              <Switch id="private" checked />
+              <Switch id="private" defaultChecked />
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

@@ -16,13 +16,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useToast } from "@/components/ui/use-toast";
 import { useBalancesStore } from "@/lib/stores/balances";
 import { useClientStore } from "@/lib/stores/client";
 import { usePoolsStore } from "@/lib/stores/pools";
 import { useWalletStore } from "@/lib/stores/wallet";
-import { Balance, TokenId } from "@proto-kit/library";
+import { Balance, TokenId, UInt64 } from "@proto-kit/library";
 import type { PendingTransaction } from "@proto-kit/sequencer";
 import { useMutation } from "@tanstack/react-query";
 import { Order } from "chain/dist/runtime/modules/dark-pool";
@@ -30,8 +37,10 @@ import { PoolKey } from "chain/dist/runtime/modules/xyk/pool-key";
 import { TokenPair } from "chain/dist/runtime/modules/xyk/token-pair";
 import {
   ChevronDownIcon,
+  ChevronUpIcon,
+  InfoIcon,
   PlusIcon,
-  SettingsIcon
+  SettingsIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -55,6 +64,8 @@ export default function Home() {
     ).toBase58(),
   );
   const [slippage, setSlippage] = useState<number>(0.5); // in %
+  const [isBuy, setIsBuy] = useState<boolean>(true);
+  const [blockDelays, setBlockDelays] = useState<number[]>([0, 10]);
 
   const client = useClientStore();
   const balances = useBalancesStore();
@@ -81,8 +92,9 @@ export default function Home() {
               tokenIn: TokenId.from(inToken),
               tokenOut: TokenId.from(outToken),
               user: PublicKey.fromBase58(wallet.wallet!),
+              minBlockHeight: UInt64.from(0),
+              maxBlockHeight: UInt64.from(100),
             }),
-            Bool(true),
           );
         },
       );
@@ -124,7 +136,7 @@ export default function Home() {
           <div className="flex space-x-2">
             <div className="flex items-center space-x-2">
               <Label htmlFor="private">Private</Label>
-              <Switch id="private" checked />
+              <Switch id="private" defaultChecked />
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -185,9 +197,16 @@ export default function Home() {
             />
           </div>
           <div className="text-center">
-            {/* TODO: maybe let user switch tokens */}
-            <Button variant="ghost" className="h-auto px-1 py-1" disabled>
-              <ChevronDownIcon className={"h-4 w-4 transition-all"} />
+            <Button
+              variant="ghost"
+              className="h-auto px-1 py-1"
+              onClick={() => setIsBuy((prev) => !prev)}
+            >
+              {isBuy ? (
+                <ChevronDownIcon className={"h-4 w-4 transition-all"} />
+              ) : (
+                <ChevronUpIcon className={"h-4 w-4 transition-all"} />
+              )}
             </Button>
           </div>
           <div className="flex items-center justify-between">
@@ -225,6 +244,55 @@ export default function Home() {
         </Button>
       </div>
       <div className="grid gap-2">
+        <Slider
+          defaultValue={blockDelays}
+          minStepsBetweenThumbs={1}
+          max={100}
+          min={0}
+          step={1}
+          onValueChange={(value) => {
+            setBlockDelays(value);
+          }}
+          className={"w-full"}
+        />
+        <div className="mt-4 flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <span className="text-muted-foreground">Min. Block Delay</span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <InfoIcon className="h-4 w-4" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>
+                    The order will only be matched after this many blocks have
+                    been processed.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+          <span>{blockDelays[0]}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <span className="text-muted-foreground">Max. Block Delay</span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <InfoIcon className="h-4 w-4" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>
+                    The order will only be matched before this many blocks have
+                    been processed.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+          <span>{blockDelays[1]}</span>
+        </div>
         <div className="flex items-center justify-between">
           <span className="text-muted-foreground">
             Price (#{inToken.toString()} = #{outToken.toString()})
@@ -241,12 +309,12 @@ export default function Home() {
           <span className="text-muted-foreground">Slippage Tolerance</span>
           <span>{slippage}%</span>
         </div>
-        <div className="flex items-center justify-between">
+        {/* <div className="flex items-center justify-between">
           <span className="text-muted-foreground">Minimum Received</span>
           <span>
-            {/* {outTokenAmount * (1 - slippage / 100)} {outTokenSymbol} */}
+            {outTokenAmount * (1 - slippage / 100)} {outTokenSymbol}
           </span>
-        </div>
+        </div> */}
       </div>
     </div>
   );

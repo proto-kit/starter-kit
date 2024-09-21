@@ -15,6 +15,8 @@ export class Order extends Struct({
   tokenOut: TokenId,
   amountIn: UInt64,
   amountOut: UInt64,
+  minBlockHeight: UInt64,
+  maxBlockHeight: UInt64,
 }) {
   hash() {
     return Poseidon.hash([
@@ -23,6 +25,8 @@ export class Order extends Struct({
       Field.from(this.tokenOut.toBigInt()),
       Field.from(this.amountIn.toBigInt()),
       Field.from(this.amountOut.toBigInt()),
+      Field.from(this.minBlockHeight.toBigInt()),
+      Field.from(this.maxBlockHeight.toBigInt()),
     ]);
   }
 
@@ -33,6 +37,8 @@ export class Order extends Struct({
       tokenOut: TokenId.empty(),
       amountIn: UInt64.from(0),
       amountOut: UInt64.from(0),
+      minBlockHeight: UInt64.from(0),
+      maxBlockHeight: UInt64.from(0),
     });
   }
 }
@@ -97,8 +103,9 @@ export class DarkPool extends XYK {
   @state() public lastSellOrderId = State.from<OrderId>(OrderId);
 
   @runtimeMethod()
-  public async submitOrder(order: Order, isBuy: Bool) {
+  public async submitOrder(order: Order) {
     const sender = this.transaction.sender.value;
+    const isBuy = order.tokenIn.lessThanOrEqual(order.tokenOut);
     const poolKey = PoolKey.fromTokenPair(
       TokenPair.from(order.tokenIn, order.tokenOut)
     );
@@ -109,13 +116,23 @@ export class DarkPool extends XYK {
     assert(isWhitelisted.value, "User is not whitelisted for this pool");
 
     // Transfer tokens from sender to pool
-    await this.balances.transfer(
-      order.tokenIn,
-      sender,
-      this.transaction.sender.value,
-      order.amountIn
-    );
+    if (isBuy.equals(Bool(true))) {
+      await this.balances.transfer(
+        order.tokenIn,
+        sender,
+        this.transaction.sender.value,
+        order.amountIn
+      );
+    } else {
+      await this.balances.transfer(
+        order.tokenOut,
+        sender,
+        this.transaction.sender.value,
+        order.amountOut
+      );
+    }
 
+    // Update order book with order data
     const orderId = isBuy.equals(Bool(true))
       ? await this.buyOrderCounter.get()
       : await this.sellOrderCounter.get();
@@ -125,18 +142,21 @@ export class DarkPool extends XYK {
       : this.sellOrderBook;
     await orderBook.set(newOrderId, order);
 
+    // Update user order counter
     const userOrderCount = await this.userOrderCounter.get(sender);
     const newUserOrderCount = userOrderCount
       .orElse(UInt64.from(0))
       .add(UInt64.from(1));
     await this.userOrderCounter.set(sender, newUserOrderCount);
 
+    // Update user order id by index
     await this.userOrderIdByIndex.set(
       { orderId: newOrderId, user: sender },
       newOrderId
     );
     await this.orderIdToNextOrderId.set(newOrderId, newOrderId);
 
+    // Update first and last order ids
     const firstOrderId = isBuy.equals(Bool(true))
       ? await this.firstBuyOrderId.get()
       : await this.firstSellOrderId.get();
@@ -151,6 +171,7 @@ export class DarkPool extends XYK {
       await this.orderIdToNextOrderId.set(lastOrderId.value, newOrderId);
     }
 
+    // Update counters
     if (isBuy.equals(Bool(true))) {
       await this.lastBuyOrderId.set(newOrderId);
       await this.buyOrderCounter.set(newUserOrderCount);
@@ -205,6 +226,8 @@ export class DarkPool extends XYK {
     // make sure sender is 0 address
     assert(sender.equals(PublicKey.empty()), "Sender is not 0 address");
 
+    const currentBlockHeight = this.network.block.height;
+
     let buyOrderId = await this.firstBuyOrderId.get();
     let sellOrderId = await this.firstSellOrderId.get();
     // Iterate through order book
@@ -214,13 +237,46 @@ export class DarkPool extends XYK {
       if (buyOrder.isSome.equals(Bool(false))) {
         break;
       }
+      // If the buy order is not active, skip it
+      if (
+        buyOrder.value.minBlockHeight.value.greaterThan(
+          currentBlockHeight.value
+        )
+      ) {
+        buyOrderId = await this.orderIdToNextOrderId.get(buyOrderId.value);
+        continue;
+      }
+      // If the buy order is expired, remove it and continue
+      if (
+        buyOrder.value.maxBlockHeight.value.lessThan(currentBlockHeight.value)
+      ) {
+        await this.removeOrder(buyOrderId.value);
+        buyOrderId = await this.orderIdToNextOrderId.get(buyOrderId.value);
+        continue;
+      }
 
       const sellOrder = await this.sellOrderBook.get(sellOrderId.value);
       if (sellOrder.isSome.equals(Bool(false))) {
         break;
       }
+      // If the sell order is not active, skip it
+      if (
+        sellOrder.value.minBlockHeight.value.greaterThan(
+          currentBlockHeight.value
+        )
+      ) {
+        sellOrderId = await this.orderIdToNextOrderId.get(sellOrderId.value);
+        continue;
+      }
+      // If the sell order is expired, remove it and continue
+      if (
+        sellOrder.value.maxBlockHeight.value.lessThan(currentBlockHeight.value)
+      ) {
+        await this.removeOrder(sellOrderId.value);
+        sellOrderId = await this.orderIdToNextOrderId.get(sellOrderId.value);
+        continue;
+      }
 
-      // TODO: Sort by optimal price ratios
       const buyOrderRatio = buyOrder.value.amountOut.div(
         buyOrder.value.amountIn
       );
@@ -228,8 +284,8 @@ export class DarkPool extends XYK {
         sellOrder.value.amountOut
       );
 
+      // No match, move to next order
       if (buyOrderRatio.greaterThan(sellOrderRatio)) {
-        // No match, move to next order
         sellOrderId = await this.orderIdToNextOrderId.get(sellOrderId.value);
         continue;
       }
@@ -242,11 +298,11 @@ export class DarkPool extends XYK {
         buyOrder.value.amountOut
       );
 
+      // If it is possible to execute the trade, continue
       if (
         executedAmountIn.greaterThan(UInt64.from(0)) &&
         executedAmountOut.greaterThan(UInt64.from(0))
       ) {
-        // Execute the trade
         await this.balances.transfer(
           buyOrder.value.tokenIn,
           buyOrder.value.user,
@@ -267,6 +323,8 @@ export class DarkPool extends XYK {
           tokenOut: buyOrder.value.tokenOut,
           amountIn: buyOrder.value.amountIn.sub(executedAmountIn),
           amountOut: buyOrder.value.amountOut.sub(executedAmountOut),
+          minBlockHeight: buyOrder.value.minBlockHeight,
+          maxBlockHeight: buyOrder.value.maxBlockHeight,
         });
 
         const updatedSellOrder = new Order({
@@ -275,6 +333,8 @@ export class DarkPool extends XYK {
           tokenOut: sellOrder.value.tokenOut,
           amountIn: sellOrder.value.amountIn.sub(executedAmountOut),
           amountOut: sellOrder.value.amountOut.sub(executedAmountIn),
+          minBlockHeight: sellOrder.value.minBlockHeight,
+          maxBlockHeight: sellOrder.value.maxBlockHeight,
         });
 
         // Remove or update orders
