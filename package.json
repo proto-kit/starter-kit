@@ -5,6 +5,7 @@
     "dev": "turbo run dev --env-mode=loose",
     "sequencer:dev": "turbo run sequencer:dev --env-mode=loose",
     "indexer:dev": "turbo run indexer:dev --env-mode=loose",
+    "processor:dev": "turbo run processor:dev --env-mode=loose",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "test": "turbo run test",
@@ -14,6 +15,9 @@
     "sequencer:prisma:generate": "turbo run sequencer:prisma:generate",
     "indexer:prisma:migrate": "turbo run indexer:prisma:migrate --env-mode=loose",
     "indexer:prisma:generate": "turbo run indexer:prisma:generate",
+    "processor:prisma:migrate:dev": "turbo run processor:prisma:migrate:dev --env-mode=loose",
+    "processor:prisma:migrate": "turbo run processor:prisma:migrate --env-mode=loose",
+    "processor:prisma:generate": "turbo run processor:prisma:generate",
     "start": "turbo run start --env-mode=loose",
     "sequencer:start": "turbo run sequencer:start --env-mode=loose",
     "indexer:start": "turbo run indexer:start --env-mode=loose",
@@ -28,7 +32,7 @@
     "eslint": "^8.53.0",
     "prettier": "^3.1.0",
     "tsconfig": "workspace:*",
-    "turbo": "latest"
+    "turbo": "^2.1.2"
   },
   "dependencies": {
     "dotenv-cli": "^7.4.2"

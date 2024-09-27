@@ -33,8 +33,7 @@
     "tailwindcss-animate": "^1.0.7",
     "truncate-middle": "^1.0.6",
     "zod": "^3.22.4",
-    "zustand": "^4.4.6",
-    "o1js": "1.6.0"
+    "zustand": "^4.4.6"
   },
   "devDependencies": {
     "@types/node": "^20",

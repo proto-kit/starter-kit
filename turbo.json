@@ -1,6 +1,8 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*local"],
+  "ui": "tui",
+  "envMode": "loose",
   "tasks": {
     "build": {
       "cache": false,
@@ -16,6 +18,9 @@
       "cache": false
     },
     "indexer:dev": {
+      "cache": false
+    },
+    "processor:dev": {
       "cache": false
     },
     "test": {},
@@ -44,6 +49,16 @@
       "cache": false
     },
     "indexer:prisma:migrate": {
+      "cache": false
+    },
+    "processor:prisma:migrate:dev": {
+      "cache": false,
+      "interactive": true
+    },
+    "processor:prisma:generate": {
+      "cache": false
+    },
+    "processor:prisma:migrate": {
       "cache": false
     },
     "start:headless": {}

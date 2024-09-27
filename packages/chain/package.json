@@ -25,14 +25,19 @@
     "dev": "pnpm run sequencer:dev",
     "sequencer:dev:run": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./src/start.ts start \"./environments/$PROTOKIT_ENV_FOLDER/chain.config.ts\" $1",
     "indexer:dev:run": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./src/start.ts start \"./environments/$PROTOKIT_ENV_FOLDER/indexer.config.ts\" $1",
+    "processor:dev:run": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./src/start.ts start \"./environments/$PROTOKIT_ENV_FOLDER/processor.config.ts\" $1",
     "sequencer:dev": "nodemon --watch src -e ts --exec \"pnpm sequencer:dev:run\"",
     "indexer:dev": "nodemon --watch src -e ts --exec \"pnpm indexer:dev:run\"",
+    "processor:dev": "nodemon --watch src -e ts --exec \"pnpm processor:dev:run\"",
     "prisma:generate": "pnpm run sequencer:prisma:generate && pnpm run indexer:prisma:generate",
     "prisma:migrate": "pnpm run sequencer:prisma:migrate && pnpm run indexer:prisma:migrate",
     "sequencer:prisma:migrate": "prisma migrate deploy --schema ./node_modules/@proto-kit/persistance/prisma/schema.prisma",
     "sequencer:prisma:generate": "prisma generate --schema ./node_modules/@proto-kit/persistance/prisma/schema.prisma",
     "indexer:prisma:migrate": "prisma migrate deploy --schema ./node_modules/@proto-kit/indexer/prisma/schema.prisma",
-    "indexer:prisma:generate": "prisma generate --schema ./node_modules/@proto-kit/indexer/prisma/schema.prisma"
+    "indexer:prisma:generate": "prisma generate --schema ./node_modules/@proto-kit/indexer/prisma/schema.prisma",
+    "processor:prisma:migrate:dev": "prisma migrate dev  --schema ./src/processor/prisma/schema.prisma",
+    "processor:prisma:migrate": "prisma migrate deploy --schema ./src/processor/prisma/schema.prisma",
+    "processor:prisma:generate": "prisma generate --schema ./src/processor/prisma/schema.prisma"
   },
   "peerDependencies": {
     "@proto-kit/api": "file:./../../../framework/packages/api",
@@ -45,6 +50,7 @@
     "@proto-kit/sdk": "file:./../../../framework/packages/sdk",
     "@proto-kit/sequencer": "file:./../../../framework/packages/sequencer",
     "@proto-kit/indexer": "file:./../../../framework/packages/indexer",
+    "@proto-kit/processor": "file:./../../../framework/packages/processor",
     "o1js": "file:./../../../framework/node_modules/o1js/",
     "tsyringe": "file:./../../../framework/node_modules/tsyringe"
   },

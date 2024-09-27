@@ -5,3 +5,4 @@ include:
   - ./proxy/docker-compose.yml
   - ./indexer-persistence/docker-compose.yml
   - ./indexer/docker-compose.yml
+  - ./processor-persistence/docker-compose.yml
