@@ -1,6 +1,6 @@
 import * as TypeGraphQL from "type-graphql";
 import * as GraphQLScalars from "graphql-scalars";
-import { Prisma } from "../../../../../../../node_modules/@prisma/client-indexer";
+import { Prisma } from "../../../../../../../node_modules/@prisma/client-processor";
 import { DecimalJSScalar } from "../../scalars";
 import { BalanceAvgOrderByAggregateInput } from "../inputs/BalanceAvgOrderByAggregateInput";
 import { BalanceCountOrderByAggregateInput } from "../inputs/BalanceCountOrderByAggregateInput";

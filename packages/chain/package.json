@@ -29,8 +29,8 @@
     "sequencer:dev": "nodemon --watch src -e ts --exec \"pnpm sequencer:dev:run\"",
     "indexer:dev": "nodemon --watch src -e ts --exec \"pnpm indexer:dev:run\"",
     "processor:dev": "nodemon --watch src -e ts --exec \"pnpm processor:dev:run\"",
-    "prisma:generate": "pnpm run sequencer:prisma:generate && pnpm run indexer:prisma:generate",
-    "prisma:migrate": "pnpm run sequencer:prisma:migrate && pnpm run indexer:prisma:migrate",
+    "prisma:generate": "pnpm run sequencer:prisma:generate && pnpm run indexer:prisma:generate && pnpm run processor:prisma:generate",
+    "prisma:migrate": "pnpm run sequencer:prisma:migrate && pnpm run indexer:prisma:migrate && pnpm run processor:prisma:migrate",
     "sequencer:prisma:migrate": "prisma migrate deploy --schema ./node_modules/@proto-kit/persistance/prisma/schema.prisma",
     "sequencer:prisma:generate": "prisma generate --schema ./node_modules/@proto-kit/persistance/prisma/schema.prisma",
     "indexer:prisma:migrate": "prisma migrate deploy --schema ./node_modules/@proto-kit/indexer/prisma/schema.prisma",
@@ -87,6 +87,8 @@
     "@prisma/client": "^5.18.0"
   },
   "dependencies": {
-    "reflect-metadata": "^0.1.13"
+    "reflect-metadata": "^0.1.13",
+    "graphql-scalars": "^1.22.4",
+    "graphql-fields": "^2.0.3"
   }
 }

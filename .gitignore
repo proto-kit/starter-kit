@@ -43,3 +43,5 @@ yarn-error.log*
 starter-kit.iml
 
 docker/data
+
+packages/chain/src/processor/api/generated/

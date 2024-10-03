@@ -35,7 +35,11 @@
     "turbo": "^2.1.2"
   },
   "dependencies": {
-    "dotenv-cli": "^7.4.2"
+    "@types/graphql-fields": "^1.3.9",
+    "chain": "^0.4.0",
+    "dotenv-cli": "^7.4.2",
+    "tslib": "^2.7.0",
+    "type-graphql": "2.0.0-rc.2"
   },
   "packageManager": "pnpm@9.8.0+sha256.56a9e76b51796ca7f73b85e44cf83712862091f4d498c0ce4d5b7ecdc6ba18f7",
   "name": "starter-kit"
