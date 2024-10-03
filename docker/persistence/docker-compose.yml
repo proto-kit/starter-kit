@@ -4,8 +4,8 @@ services:
     container_name: starterkit-postgres
     profiles:
       - db
-    ports:
-      - 5432:5432
+#    ports:
+#      - 5432:5432
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB" ]
       interval: 5s
@@ -30,8 +30,8 @@ services:
     restart: unless-stopped
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
-    ports:
-      - '6379:6379'
+#    ports:
+#      - '6379:6379'
     command: redis-server /redis.conf --requirepass ${REDIS_PASSWORD}
     volumes:
       - ../data/redis:/data
