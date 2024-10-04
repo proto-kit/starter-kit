@@ -10,9 +10,6 @@ export const indexer = Indexer.from({
 export default async (args: Arguments): Promise<Startable> => {
   indexer.configurePartial({
     ...config,
-    DatabasePruneModule: {
-      pruneOnStartup: args.pruneOnStartup,
-    },
   });
   return indexer;
 };

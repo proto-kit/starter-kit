@@ -25,12 +25,11 @@ COPY ./apps/web/tsconfig.json ./apps/web/tsconfig.json
 
 RUN pnpm install --frozen-lockfile
 
-RUN apt update && apt install dos2unix && apt clean
+RUN apt update && apt install dos2unix && apt install -y iputils-ping && apt clean
 
 COPY ./packages ./packages
 
 RUN pnpm prisma:generate --filter=chain
-RUN pnpm indexer:prisma:generate --filter=chain
 RUN pnpm build --filter=chain
 
 COPY ./docker/base/entry.sh ./entry.sh

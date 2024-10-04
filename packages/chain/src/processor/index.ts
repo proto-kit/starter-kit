@@ -31,7 +31,7 @@ export const modules = {
 export const config: ModulesConfig<typeof modules> = {
   HandlersExecutor: {},
   BlockFetching: {
-    url: `http://${process.env.PROTOKIT_INDEXER_GRAPHQL_HOST!}:${process.env.PROTOKIT_INDEXER_GRAPHQL_PORT!}`,
+    url: `http://${process.env.PROTOKIT_PROCESSOR_INDEXER_GRAPHQL_HOST!}:${process.env.PROTOKIT_INDEXER_GRAPHQL_PORT!}`,
   },
   Trigger: {
     interval: Number(process.env.PROTOKIT_BLOCK_INTERVAL!) + 500,

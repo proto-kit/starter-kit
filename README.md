@@ -49,6 +49,7 @@ The starter kit contains the following files and folders:
         │   ├── app-chain // app-chain modules (signers, queries, ...)
         │   ├── environments // app-chain environments (inmemory, development, ...)
         │   ├── indexer // indexer configuration (graphql server, storage services, ...)
+            ├── processor // processor configuration (handlers, graphql resolvers, graphql server, ...)
         │   ├── protocol // protocol modules (transaction fees, ...)
         │   ├── runtime // runtime modules (your app-chain's business logic, such as balances)
         │   │   └── modules 
@@ -142,6 +143,7 @@ pnpm env:development dev --filter=web
 
 > You can also build & start the UI as well, instead of using `dev` command with live-reload.
 
+
 ### Running the indexer
 
 ⚠️ Indexer only runs with docker-enabled environments, therefore it is not available with the `inmemory` environment
@@ -152,6 +154,16 @@ pnpm env:development indexer:dev --filter=chain
 
 Indexer's graphql is available at `http://localhost:8081/graphql`, unless your environment configuraton specifies otherwise.
 
+### Running the processor
+
+⚠️ Processor only runs with docker-enabled environments, therefore it is not available with the `inmemory` environment
+
+```zsh
+pnpm env:development processor:dev --filter=chain
+```
+
+Processor's graphql is available at `http://localhost:8082/graphql`, unless your environment configuraton specifies otherwise.
+
 ### CLI Options
 
 - `logLevel`: Overrides the loglevel used. Also configurable via the `PROTOKIT_LOG_LEVEL` environment variable.
@@ -161,17 +173,41 @@ In order to pass in those CLI option, add it at the end of your command like thi
 
 `pnpm env:inmemory dev --filter chain -- --logLevel DEBUG --pruneOnStartup`
 
+## Historical data processing (processor)
+
+Starter-kit ships with a preconfigured historical data processor using `@proto-kit/processor`. Example block & transactions handlers are available in `chain/src/processor/handlers/*`. Once the sequencer produces a block, it flows to the indexer for historical storage, and it's picked up by the processor via the indexer graphql API. The processor then runs the specified handlers in order to process the available block & transaction data into the user specified schema. Additionally the processor serves the processed data via a set of auto-generated graphql resolvers.
+
+### Handling transactions
+
+1. Define your database schema at `chain/src/processor/prisma/schema.prisma`
+2. Generate the prisma client using `pnpm env:<your_environment_name> run processor:prisma:generate`
+3. Generate your database migrations using `pnpm env:<your_environment_name> run processor:prisma:migrate:dev`
+4. Write your handlers as shows in `chain/src/processor/handlers/**`
+5. Run the processor using `pnpm env:<your_environment_name> run processor:dev` (sequencer & indexer should be running beforehand)
+
+> Processor relies on the sequencer to produce blocks, and the indexer to access them
+
+Once the processor starts, you can observe it query the indexer for blocks from the last processed block (starting at #0) and running the defined onBlock handler for each block.
+
+Finally, you can query the processed data at the indexer's graphql API available at `http://localhost:8082/graphql` (depending on your environment configuration).
+
+### GraphQL API
+
+You can define which resolvers are available in `chain/src/processor/api/resolvers.ts`. By default all available resolvers generated based on your database schema file are used. You must configure additional middlewares, validations etc. yourself. The example configures a simple validation for the `take` argument for resolvers returning multiple entities at once.
+
 ## Deployments (sovereign environment)
 
 When deploying to a server, you should push your code along with your forked starter-kit to some repository, 
 then clone it on your remote server and execute it.
+
+> Don't forget to run `pnpm env:sovereign docker:build` to build the required images.
 
 ```zsh
 # start every component with docker
 pnpm env:sovereign docker:up -d
 ```
 
-UI will be accessible at `https://localhost` and GQL inspector will be available at `https://localhost/graphql` (sequencer) and at `https://localhost/indexer/graphql` (indexer).
+UI will be accessible at `https://localhost` and GQL inspector will be available at `https://localhost/graphql` (sequencer), `https://localhost/indexer/graphql` (indexer) and `https://localhost/processor/graphql` (processor)
 
 ### Configuration
 

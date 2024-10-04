@@ -14,7 +14,6 @@ import { IndexBlockTask } from "@proto-kit/indexer";
 
 export const modules = {
   Database: PrismaRedisDatabase,
-  DatabasePruneModule,
   TaskQueue: BullQueue,
   TaskWorker: LocalTaskWorkerModule.from({
     IndexBlockTask: IndexBlockTask,
@@ -37,9 +36,6 @@ export const config: ModulesConfig<typeof modules> = {
     prisma: {
       connection: process.env.INDEXER_DATABASE_URL!,
     },
-  },
-  DatabasePruneModule: {
-    pruneOnStartup: false,
   },
   TaskQueue: {
     redis: {
