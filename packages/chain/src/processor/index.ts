@@ -34,7 +34,7 @@ export const config: ModulesConfig<typeof modules> = {
     url: `http://${process.env.PROTOKIT_PROCESSOR_INDEXER_GRAPHQL_HOST!}:${process.env.PROTOKIT_INDEXER_GRAPHQL_PORT!}`,
   },
   Trigger: {
-    interval: Number(process.env.PROTOKIT_BLOCK_INTERVAL!) + 500,
+    interval: Number(process.env.PROTOKIT_BLOCK_INTERVAL) / 5,
   },
   GraphqlServer: {
     host: process.env.PROTOKIT_PROCESSOR_GRAPHQL_HOST!,

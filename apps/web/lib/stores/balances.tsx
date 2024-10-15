@@ -41,9 +41,6 @@ export const useBalancesStore = create<
 
       const key = BalancesKey.from(tokenId, PublicKey.fromBase58(address));
 
-      console.log("key", BalancesKey.toFields(key));
-      Provable.log("balancesKey", key);
-
       const balance = await client.query.runtime.Balances.balances.get(key);
 
       set((state) => {

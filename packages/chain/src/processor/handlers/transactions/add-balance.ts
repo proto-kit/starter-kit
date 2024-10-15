@@ -29,8 +29,6 @@ export const handleBalancesAddBalance = async (
     },
   });
 
-  console.log("currentAddressBalance", currentAddressBalance);
-
   const newFromBalance =
     (currentAddressBalance?.amount != null
       ? BigInt(currentAddressBalance.amount)
