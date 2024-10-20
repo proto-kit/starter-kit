@@ -33,6 +33,9 @@
     "indexer:start": {
       "cache": false
     },
+    "processor:start": {
+      "cache": false
+    },
     "prisma:generate": {
       "cache": false
     },

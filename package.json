@@ -21,6 +21,7 @@
     "start": "turbo run start --env-mode=loose",
     "sequencer:start": "turbo run sequencer:start --env-mode=loose",
     "indexer:start": "turbo run indexer:start --env-mode=loose",
+    "processor:start": "turbo run processor:start --env-mode=loose",
     "docker:build": "docker compose -f docker/docker-compose.yml build",
     "docker:up": "docker compose -f docker/docker-compose.yml up",
     "docker:down": "docker compose -f docker/docker-compose.yml down",

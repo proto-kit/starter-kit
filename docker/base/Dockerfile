@@ -1,9 +1,9 @@
 # For regular deployment
-# FROM node:18
+FROM node:18
 
 # For locally built and imported framework references
 # Make sure you build the base-image first
-FROM protokit-base:latest
+# FROM protokit-base:latest
 
 WORKDIR /app
 

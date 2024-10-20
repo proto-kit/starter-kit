@@ -7,7 +7,7 @@ You can learn more about the Protokit framework at the [official documentation](
 
 **Prerequisites:**
 
-- Node.js `v18` (we recommend using NVM)
+- Node.js `v18.18` (we recommend using NVM)
 - pnpm `v9.8.0`
 - nvm
 - (optional) For running with persistance / deploying on a server
@@ -123,6 +123,7 @@ Ensure you've successfully started the dockerized dependencies, generated and mi
 #### With live reload
 
 > ⚠️ Be aware, the dev command will automatically restart your application when your sources change. 
+> Please keep in mind that running the components below in `dev` mode (with live reload / watchersr) is advisable only when you're working on that specific component. In case you're experiencing issues with watches cross-triggering reload of different components, you can use the `start` command instead.
 
 ```zsh
 pnpm env:development sequencer:dev --filter=chain
@@ -141,7 +142,7 @@ pnpm env:development sequencer:start --filter=chain
 pnpm env:development dev --filter=web
 ```
 
-> You can also build & start the UI as well, instead of using `dev` command with live-reload.
+> You can also build/start the UI as well, instead of using `dev` command with live-reload.
 
 
 ### Running the indexer
@@ -149,7 +150,7 @@ pnpm env:development dev --filter=web
 ⚠️ Indexer only runs with docker-enabled environments, therefore it is not available with the `inmemory` environment
 
 ```zsh
-pnpm env:development indexer:dev --filter=chain
+pnpm env:development indexer:start --filter=chain
 ```
 
 Indexer's graphql is available at `http://localhost:8081/graphql`, unless your environment configuraton specifies otherwise.

@@ -32,7 +32,7 @@ services:
         ]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 30
     networks:
       - indexer-db-net
       - routing-net

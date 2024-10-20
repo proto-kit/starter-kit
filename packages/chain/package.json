@@ -22,6 +22,7 @@
     "start": "pnpm run sequencer:start",
     "sequencer:start": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./dist/start.js start \"./environments/$PROTOKIT_ENV_FOLDER/chain.config.js\" $1",
     "indexer:start": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./dist/start.js start \"./environments/$PROTOKIT_ENV_FOLDER/indexer.config.js\" $1",
+    "processor:start": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./dist/start.js start \"./environments/$PROTOKIT_ENV_FOLDER/processor.config.js\" $1",
     "dev": "pnpm run sequencer:dev",
     "sequencer:dev:run": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./src/start.ts start \"./environments/$PROTOKIT_ENV_FOLDER/chain.config.ts\" $1",
     "indexer:dev:run": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./src/start.ts start \"./environments/$PROTOKIT_ENV_FOLDER/indexer.config.ts\" $1",
@@ -40,19 +41,19 @@
     "processor:prisma:generate": "prisma generate --schema ./src/processor/prisma/schema.prisma"
   },
   "peerDependencies": {
-    "@proto-kit/api": "file:./../../../framework/packages/api",
-    "@proto-kit/common": "file:./../../../framework/packages/common",
-    "@proto-kit/deployment": "file:./../../../framework/packages/deployment",
-    "@proto-kit/library": "file:./../../../framework/packages/library",
-    "@proto-kit/module": "file:./../../../framework/packages/module",
-    "@proto-kit/persistance": "file:./../../../framework/packages/persistance",
-    "@proto-kit/protocol": "file:./../../../framework/packages/protocol",
-    "@proto-kit/sdk": "file:./../../../framework/packages/sdk",
-    "@proto-kit/sequencer": "file:./../../../framework/packages/sequencer",
-    "@proto-kit/indexer": "file:./../../../framework/packages/indexer",
-    "@proto-kit/processor": "file:./../../../framework/packages/processor",
-    "o1js": "file:./../../../framework/node_modules/o1js/",
-    "tsyringe": "file:./../../../framework/node_modules/tsyringe"
+    "@proto-kit/api": "*",
+    "@proto-kit/common": "*",
+    "@proto-kit/deployment": "*",
+    "@proto-kit/library": "*",
+    "@proto-kit/module": "*",
+    "@proto-kit/persistance": "*",
+    "@proto-kit/protocol": "*",
+    "@proto-kit/sdk": "*",
+    "@proto-kit/sequencer": "*",
+    "@proto-kit/indexer": "*",
+    "@proto-kit/processor": "*",
+    "o1js": "1.6.0",
+    "tsyringe": "^4.7.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.6.1",
@@ -84,11 +85,14 @@
     "yargs": "^17.7.2",
     "typegraphql-prisma": "^0.28",
     "graphql": "^16.8.1",
-    "@prisma/client": "^5.18.0"
+    "@prisma/client": "5.18"
   },
   "dependencies": {
     "reflect-metadata": "^0.1.13",
     "graphql-scalars": "^1.22.4",
     "graphql-fields": "^2.0.3"
+  },
+  "nodemonConfig": {
+    "delay": 1000
   }
 }

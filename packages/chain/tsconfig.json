@@ -16,9 +16,14 @@
     "strict": true,
     "alwaysStrict": true,
     "declarationMap": true,
-    "strictFunctionTypes": true
+    "strictFunctionTypes": true,
+    "skipLibCheck": true
   },
   "files": ["node_modules/jest-expect-message/types/index.d.ts"],
   "include": ["./src/**/*"],
-  "exclude": ["jest.config.cjs"]
+  "exclude": ["jest.config.cjs"],
+  "ts-node": {
+    "experimentalResolver": true,
+    "esm": true
+  }
 }
