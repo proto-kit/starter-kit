@@ -33,8 +33,7 @@
     "tailwindcss-animate": "^1.0.7",
     "truncate-middle": "^1.0.6",
     "zod": "^3.22.4",
-    "zustand": "^4.4.6",
-    "o1js": "1.6.0"
+    "zustand": "^4.4.6"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -51,12 +50,17 @@
     "typescript": "^5.4.5"
   },
   "peerDependencies": {
+    "@proto-kit/api": "*",
     "@proto-kit/common": "*",
-    "@proto-kit/protocol": "*",
+    "@proto-kit/deployment": "*",
+    "@proto-kit/library": "*",
     "@proto-kit/module": "*",
+    "@proto-kit/persistance": "*",
+    "@proto-kit/protocol": "*",
     "@proto-kit/sdk": "*",
     "@proto-kit/sequencer": "*",
-    "@proto-kit/library": "*",
+    "@proto-kit/indexer": "*",
+    "o1js": "1.6.0",
     "tsyringe": "^4.7.0"
   }
 }

@@ -1,0 +1,32 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator typegraphql {
+  provider               = "typegraphql-prisma"
+  emitTranspiledCode     = false
+  // since the output directory is custom, this path must be relative to it in order to find the client-indexer
+  customPrismaImportPath = "../../../../../node_modules/@prisma/client-processor"
+  output                 = "./../api/generated/type-graphql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./../../../node_modules/@prisma/client-processor"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("PROCESSOR_DATABASE_URL")
+}
+
+model Block {
+  height Int @id
+}
+
+model Balance {
+  height  Int
+  address String
+  amount  String
+
+  @@id([height, address])
+}

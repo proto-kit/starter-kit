@@ -3,12 +3,25 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --env-mode=loose",
+    "sequencer:dev": "turbo run sequencer:dev --env-mode=loose",
+    "indexer:dev": "turbo run indexer:dev --env-mode=loose",
+    "processor:dev": "turbo run processor:dev --env-mode=loose",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "test": "turbo run test",
     "prisma:migrate": "turbo run prisma:migrate --env-mode=loose",
     "prisma:generate": "turbo run prisma:generate",
+    "sequencer:prisma:migrate": "turbo run sequencer:prisma:migrate --env-mode=loose",
+    "sequencer:prisma:generate": "turbo run sequencer:prisma:generate",
+    "indexer:prisma:migrate": "turbo run indexer:prisma:migrate --env-mode=loose",
+    "indexer:prisma:generate": "turbo run indexer:prisma:generate",
+    "processor:prisma:migrate:dev": "turbo run processor:prisma:migrate:dev --env-mode=loose",
+    "processor:prisma:migrate": "turbo run processor:prisma:migrate --env-mode=loose",
+    "processor:prisma:generate": "turbo run processor:prisma:generate",
     "start": "turbo run start --env-mode=loose",
+    "sequencer:start": "turbo run sequencer:start --env-mode=loose",
+    "indexer:start": "turbo run indexer:start --env-mode=loose",
+    "processor:start": "turbo run processor:start --env-mode=loose",
     "docker:build": "docker compose -f docker/docker-compose.yml build",
     "docker:up": "docker compose -f docker/docker-compose.yml up",
     "docker:down": "docker compose -f docker/docker-compose.yml down",
@@ -20,10 +33,14 @@
     "eslint": "^8.53.0",
     "prettier": "^3.1.0",
     "tsconfig": "workspace:*",
-    "turbo": "latest"
+    "turbo": "^2.1.2"
   },
   "dependencies": {
-    "dotenv-cli": "^7.4.2"
+    "@types/graphql-fields": "^1.3.9",
+    "chain": "^0.4.0",
+    "dotenv-cli": "^7.4.2",
+    "tslib": "^2.7.0",
+    "type-graphql": "2.0.0-rc.2"
   },
   "packageManager": "pnpm@9.8.0+sha256.56a9e76b51796ca7f73b85e44cf83712862091f4d498c0ce4d5b7ecdc6ba18f7",
   "name": "starter-kit"

@@ -1,0 +1,35 @@
+services:
+  processor:
+    image: starterkit-chain-base
+    build:
+      dockerfile: ./docker/base/Dockerfile
+      context: ../..
+    container_name: starterkit-processor
+    environment:
+      - PROCESSOR_DATABASE_URL=${PROCESSOR_DATABASE_URL}
+      - PROTOKIT_SHOULD_ATTEMPT_PROCESSOR_DB_MIGRATION=${PROTOKIT_SHOULD_ATTEMPT_PROCESSOR_DB_MIGRATION}
+      - PROTOKIT_LOG_LEVEL=${PROTOKIT_LOG_LEVEL}
+      - PROTOKIT_PROCESSOR_GRAPHQL_HOST=${PROTOKIT_PROCESSOR_GRAPHQL_HOST}
+      - PROTOKIT_PROCESSOR_GRAPHQL_PORT=${PROTOKIT_PROCESSOR_GRAPHQL_PORT}
+      - PROTOKIT_PROCESSOR_GRAPHIQL_ENABLED=${PROTOKIT_PROCESSOR_GRAPHIQL_ENABLED}
+      - PROTOKIT_PROCESSOR_INDEXER_GRAPHQL_HOST=${PROTOKIT_PROCESSOR_INDEXER_GRAPHQL_HOST}
+      - PROTOKIT_INDEXER_GRAPHQL_PORT=${PROTOKIT_INDEXER_GRAPHQL_PORT}
+      - PROTOKIT_BLOCK_INTERVAL=${PROTOKIT_BLOCK_INTERVAL}
+    profiles:
+      - monolithic-processor
+    depends_on:
+      processor-postgres:
+        condition: service_healthy
+      indexer:
+        condition: service_healthy
+    networks:
+      - processor-db-net
+      - indexer-net
+      - routing-net
+    ports:
+      - 8082:8080
+    working_dir: /app
+    command: ["./packages/chain/dist/start.js start ./environments/${PROTOKIT_ENV_FOLDER}/processor.config.js",]
+
+networks:
+  processor-net:

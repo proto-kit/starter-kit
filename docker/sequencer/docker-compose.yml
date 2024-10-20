@@ -1,6 +1,6 @@
 services:
   sequencer:
-    image: starterkit-sequencer
+    image: starterkit-chain-base
     build:
       dockerfile: ./docker/base/Dockerfile
       context: ../..

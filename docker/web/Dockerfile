@@ -1,10 +1,10 @@
-FROM node:18-alpine AS base
+# FROM node:18-alpine AS base
 ## Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
 #RUN apk add --no-cache libc6-compat
 
 # For locally built and imported framework references
 # Make sure you build the base-image first
-# FROM protokit-base:latest AS base
+FROM protokit-base:latest AS base
 
 # Install dependencies only when needed
 FROM base AS builder
@@ -12,6 +12,8 @@ WORKDIR /app
 
 ARG NEXT_PUBLIC_PROTOKIT_GRAPHQL_URL
 ENV NEXT_PUBLIC_PROTOKIT_GRAPHQL_URL=$NEXT_PUBLIC_PROTOKIT_GRAPHQL_URL
+ARG NEXT_PUBLIC_PROTOKIT_INDEXER_GRAPHQL_URL
+ENV NEXT_PUBLIC_PROTOKIT_INDEXER_GRAPHQL_URL=$NEXT_PUBLIC_PROTOKIT_INDEXER_GRAPHQL_URL
 
 # Install dependencies based on the preferred package manager
 

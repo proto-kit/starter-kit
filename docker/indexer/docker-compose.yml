@@ -1,0 +1,48 @@
+services:
+  indexer:
+    image: starterkit-chain-base
+    build:
+      dockerfile: ./docker/base/Dockerfile
+      context: ../..
+    container_name: starterkit-indexer
+    environment:
+      - INDEXER_DATABASE_URL=${INDEXER_DATABASE_URL}
+
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+
+      - PROTOKIT_SHOULD_ATTEMPT_INDEXER_DB_MIGRATION=${PROTOKIT_SHOULD_ATTEMPT_INDEXER_DB_MIGRATION}
+      - PROTOKIT_LOG_LEVEL=${PROTOKIT_LOG_LEVEL}
+      - PROTOKIT_INDEXER_GRAPHQL_HOST=${PROTOKIT_INDEXER_GRAPHQL_HOST}
+      - PROTOKIT_INDEXER_GRAPHQL_PORT=${PROTOKIT_INDEXER_GRAPHQL_PORT}
+      - PROTOKIT_INDEXER_GRAPHIQL_ENABLED=${PROTOKIT_INDEXER_GRAPHIQL_ENABLED}
+    profiles:
+      - monolithic-indexer
+    depends_on:
+      indexer-postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget http://${PROTOKIT_INDEXER_GRAPHQL_HOST}:${PROTOKIT_INDEXER_GRAPHQL_PORT}/graphql",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    networks:
+      - indexer-db-net
+      - routing-net
+      - queue-net
+    ports:
+      - 8081:8080
+    command:
+      [
+        "./packages/chain/dist/start.js start ./environments/${PROTOKIT_ENV_FOLDER}/indexer.config.js",
+      ]
+
+networks:
+  indexer-net:

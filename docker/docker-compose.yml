@@ -3,3 +3,7 @@ include:
   - ./sequencer/docker-compose.yml
   - ./web/docker-compose.yml
   - ./proxy/docker-compose.yml
+  - ./indexer-persistence/docker-compose.yml
+  - ./indexer/docker-compose.yml
+  - ./processor-persistence/docker-compose.yml
+  - ./processor/docker-compose.yml

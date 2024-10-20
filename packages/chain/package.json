@@ -18,12 +18,27 @@
     "lint": "eslint .",
     "test": "node --experimental-vm-modules --experimental-wasm-modules --experimental-wasm-threads ./node_modules/jest/bin/jest.js",
     "test:watch": "npm run test --watchAll",
-    "build": " tsc -p tsconfig.json",
-    "start": "node --experimental-vm-modules --experimental-wasm-modules --experimental-wasm-threads --es-module-specifier-resolution=node ./dist/start.js start \"./environments/$PROTOKIT_ENV_FOLDER/chain.config.js\" $1",
-    "dev:run": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-threads --experimental-wasm-modules --es-module-specifier-resolution=node ./src/start.ts start \"./environments/$PROTOKIT_ENV_FOLDER/chain.config.ts\" $1",
-    "dev": "nodemon --watch src -e ts --exec \"pnpm dev:run\"",
-    "prisma:migrate": "prisma migrate deploy --schema ./node_modules/@proto-kit/persistance/prisma/schema.prisma",
-    "prisma:generate": "prisma generate --schema ./node_modules/@proto-kit/persistance/prisma/schema.prisma"
+    "build": "pnpm run prisma:generate && tsc -p tsconfig.json",
+    "start": "pnpm run sequencer:start",
+    "sequencer:start": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./dist/start.js start \"./environments/$PROTOKIT_ENV_FOLDER/chain.config.js\" $1",
+    "indexer:start": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./dist/start.js start \"./environments/$PROTOKIT_ENV_FOLDER/indexer.config.js\" $1",
+    "processor:start": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./dist/start.js start \"./environments/$PROTOKIT_ENV_FOLDER/processor.config.js\" $1",
+    "dev": "pnpm run sequencer:dev",
+    "sequencer:dev:run": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./src/start.ts start \"./environments/$PROTOKIT_ENV_FOLDER/chain.config.ts\" $1",
+    "indexer:dev:run": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./src/start.ts start \"./environments/$PROTOKIT_ENV_FOLDER/indexer.config.ts\" $1",
+    "processor:dev:run": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./src/start.ts start \"./environments/$PROTOKIT_ENV_FOLDER/processor.config.ts\" $1",
+    "sequencer:dev": "nodemon --watch src -e ts --exec \"pnpm sequencer:dev:run\"",
+    "indexer:dev": "nodemon --watch src -e ts --exec \"pnpm indexer:dev:run\"",
+    "processor:dev": "nodemon --watch src -e ts --exec \"pnpm processor:dev:run\"",
+    "prisma:generate": "pnpm run sequencer:prisma:generate && pnpm run indexer:prisma:generate && pnpm run processor:prisma:generate",
+    "prisma:migrate": "pnpm run sequencer:prisma:migrate && pnpm run indexer:prisma:migrate && pnpm run processor:prisma:migrate",
+    "sequencer:prisma:migrate": "prisma migrate deploy --schema ./node_modules/@proto-kit/persistance/prisma/schema.prisma",
+    "sequencer:prisma:generate": "prisma generate --schema ./node_modules/@proto-kit/persistance/prisma/schema.prisma",
+    "indexer:prisma:migrate": "prisma migrate deploy --schema ./node_modules/@proto-kit/indexer/prisma/schema.prisma",
+    "indexer:prisma:generate": "prisma generate --schema ./node_modules/@proto-kit/indexer/prisma/schema.prisma",
+    "processor:prisma:migrate:dev": "prisma migrate dev  --schema ./src/processor/prisma/schema.prisma",
+    "processor:prisma:migrate": "prisma migrate deploy --schema ./src/processor/prisma/schema.prisma",
+    "processor:prisma:generate": "prisma generate --schema ./src/processor/prisma/schema.prisma"
   },
   "peerDependencies": {
     "@proto-kit/api": "*",
@@ -35,12 +50,13 @@
     "@proto-kit/protocol": "*",
     "@proto-kit/sdk": "*",
     "@proto-kit/sequencer": "*",
+    "@proto-kit/indexer": "*",
+    "@proto-kit/processor": "*",
     "o1js": "1.6.0",
     "tsyringe": "^4.7.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.6.1",
-    "@prisma/client": "^5.7.1",
     "@types/jest": "^29.5.7",
     "@types/node": "^20.8.10",
     "@types/react-dom": "^18.2.7",
@@ -56,7 +72,7 @@
     "nodemon": "^3.1.4",
     "npm-watch": "^0.11.0",
     "path-browserify": "^1.0.1",
-    "prisma": "^5.7.1",
+    "prisma": "^5.18.0",
     "process": "^0.11.10",
     "stream-browserify": "^3.0.0",
     "string_decoder": "^1.3.0",
@@ -66,9 +82,17 @@
     "typescript": "5.4.5",
     "url": "^0.11.1",
     "util": "^0.12.5",
-    "yargs": "^17.7.2"
+    "yargs": "^17.7.2",
+    "typegraphql-prisma": "^0.28",
+    "graphql": "^16.8.1",
+    "@prisma/client": "5.18"
   },
   "dependencies": {
-    "reflect-metadata": "^0.1.13"
+    "reflect-metadata": "^0.1.13",
+    "graphql-scalars": "^1.22.4",
+    "graphql-fields": "^2.0.3"
+  },
+  "nodemonConfig": {
+    "delay": 1000
   }
 }

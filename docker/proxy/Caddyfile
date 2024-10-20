@@ -1,5 +1,7 @@
 * {
     reverse_proxy /graphql sequencer:8080
+    reverse_proxy /indexer/graphql indexer:8081
+    reverse_proxy /processor/graphql processor:8082
     reverse_proxy web:3000
     encode gzip
 }

@@ -10,6 +10,7 @@ import {
   BlockProducerModule,
 } from "@proto-kit/sequencer";
 import { ModulesConfig } from "@proto-kit/common";
+import { IndexerNotifier } from "@proto-kit/indexer";
 
 export const apiSequencerModules = {
   GraphqlServer,
@@ -43,3 +44,11 @@ export const baseSequencerModulesConfig = {
     produceEmptyBlocks: true,
   },
 } satisfies ModulesConfig<typeof baseSequencerModules>;
+
+export const indexerSequencerModules = {
+  IndexerNotifier: IndexerNotifier,
+} satisfies SequencerModulesRecord;
+
+export const indexerSequencerModulesConfig = {
+  IndexerNotifier: {},
+} satisfies ModulesConfig<typeof indexerSequencerModules>;
