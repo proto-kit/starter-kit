@@ -150,7 +150,7 @@ pnpm env:development dev --filter=web
 ⚠️ Indexer only runs with docker-enabled environments, therefore it is not available with the `inmemory` environment
 
 ```zsh
-pnpm env:development indexer:start --filter=chain
+pnpm env:development indexer:dev --filter=chain
 ```
 
 Indexer's graphql is available at `http://localhost:8081/graphql`, unless your environment configuraton specifies otherwise.
