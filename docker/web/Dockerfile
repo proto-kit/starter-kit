@@ -3,7 +3,7 @@
 #RUN apk add --no-cache libc6-compat
 
 # For locally built and imported framework references
-# Make sure you build the base-image first
+# Make sure you build the base-image first 
 FROM protokit-base:latest AS base
 
 # Install dependencies only when needed

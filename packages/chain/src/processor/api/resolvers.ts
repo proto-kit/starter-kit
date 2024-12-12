@@ -1,4 +1,5 @@
 import { cleanResolvers, ValidateTakeArg } from "@proto-kit/processor";
+import { NonEmptyArray } from "type-graphql";
 import {
   applyResolversEnhanceMap,
   resolvers as generatedResolvers,
@@ -22,4 +23,5 @@ const resolversEnchanceMap: ResolversEnhanceMap = {
 applyResolversEnhanceMap(resolversEnchanceMap);
 
 // remove non read only generated resolvers and their methods
-export const resolvers = cleanResolvers(generatedResolvers);
+export const resolvers: NonEmptyArray<Function> =
+  cleanResolvers(generatedResolvers);

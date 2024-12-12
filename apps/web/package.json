@@ -50,17 +50,17 @@
     "typescript": "^5.4.5"
   },
   "peerDependencies": {
-    "@proto-kit/api": "*",
-    "@proto-kit/common": "*",
-    "@proto-kit/deployment": "*",
-    "@proto-kit/library": "*",
-    "@proto-kit/module": "*",
-    "@proto-kit/persistance": "*",
-    "@proto-kit/protocol": "*",
-    "@proto-kit/sdk": "*",
-    "@proto-kit/sequencer": "*",
-    "@proto-kit/indexer": "*",
-    "o1js": "1.6.0",
-    "tsyringe": "^4.7.0"
+    "@proto-kit/api": "../../../framework/packages/api",
+    "@proto-kit/common": "../../../framework/packages/common",
+    "@proto-kit/deployment": "../../../framework/packages/deployment",
+    "@proto-kit/library": "../../../framework/packages/library",
+    "@proto-kit/module": "../../../framework/packages/module",
+    "@proto-kit/persistance": "../../../framework/packages/persistance",
+    "@proto-kit/protocol": "../../../framework/packages/protocol",
+    "@proto-kit/sdk": "../../../framework/packages/sdk",
+    "@proto-kit/sequencer": "../../../framework/packages/sequencer",
+    "@proto-kit/indexer": "../../../framework/packages/indexer",
+    "o1js": "../../../framework/node_modules/o1js",
+    "tsyringe": "../../../framework/node_modules/tsyringe"
   }
 }

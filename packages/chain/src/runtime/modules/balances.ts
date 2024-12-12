@@ -1,6 +1,16 @@
-import { runtimeModule, state, runtimeMethod } from "@proto-kit/module";
-import { State, assert } from "@proto-kit/protocol";
-import { Balance, Balances as BaseBalances, TokenId } from "@proto-kit/library";
+import {
+  runtimeModule,
+  state,
+  runtimeMethod,
+  runtimeMessage,
+} from "@proto-kit/module";
+import { Deposit, State, assert } from "@proto-kit/protocol";
+import {
+  Balance,
+  BalancesKey,
+  Balances as BaseBalances,
+  TokenId,
+} from "@proto-kit/library";
 import { PublicKey } from "o1js";
 
 interface BalancesConfig {
@@ -27,5 +37,18 @@ export class Balances extends BaseBalances<BalancesConfig> {
     );
     await this.circulatingSupply.set(newCirculatingSupply);
     await this.mint(tokenId, address, amount);
+  }
+
+  @runtimeMessage()
+  public async deposit(deposit: Deposit) {
+    const key = new BalancesKey({
+      tokenId: TokenId.from(0),
+      address: deposit.address,
+    });
+    const balance = await this.balances.get(key);
+    await this.balances.set(
+      key,
+      balance.value.add(Balance.Unsafe.fromField(deposit.amount.value))
+    );
   }
 }

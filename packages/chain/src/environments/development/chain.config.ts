@@ -4,14 +4,16 @@ import { Protocol } from "@proto-kit/protocol";
 import { DatabasePruneModule, Sequencer } from "@proto-kit/sequencer";
 import { PrismaRedisDatabase } from "@proto-kit/persistance";
 import runtime from "../../runtime";
-import protocol from "../../protocol";
+import * as protocol from "../../protocol";
 import {
   baseSequencerModules,
   baseSequencerModulesConfig,
   indexerSequencerModules,
   indexerSequencerModulesConfig,
+  settlementSequencerModules,
+  settlementSequencerModulesConfig,
 } from "../../sequencer";
-import { BullQueue, Startable } from "@proto-kit/deployment";
+import { BullQueue } from "@proto-kit/deployment";
 import { Arguments } from "../../start";
 import {
   baseAppChainModules,
@@ -23,7 +25,12 @@ export const appChain = AppChain.from({
     modules: runtime.modules,
   }),
   Protocol: Protocol.from({
-    modules: protocol.modules,
+    modules: {
+      ...protocol.modules,
+      ...(process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true"
+        ? protocol.settlementModules
+        : {}),
+    },
   }),
   Sequencer: Sequencer.from({
     modules: {
@@ -33,18 +40,29 @@ export const appChain = AppChain.from({
       ...indexerSequencerModules,
       TaskQueue: BullQueue,
       DatabasePruneModule,
+      ...(process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true"
+        ? settlementSequencerModules
+        : {}),
     },
   }),
   modules: baseAppChainModules,
 });
 
-export default async (args: Arguments): Promise<Startable> => {
+export default async (args: Arguments) => {
   appChain.configurePartial({
     Runtime: runtime.config,
-    Protocol: protocol.config,
+    Protocol: {
+      ...protocol.config,
+      ...(process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true"
+        ? protocol.settlementModulesConfig
+        : {}),
+    },
     Sequencer: {
       ...baseSequencerModulesConfig,
       ...indexerSequencerModulesConfig,
+      ...(process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true"
+        ? settlementSequencerModulesConfig
+        : {}),
       DatabasePruneModule: {
         pruneOnStartup: args.pruneOnStartup,
       },

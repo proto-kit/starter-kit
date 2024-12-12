@@ -6,6 +6,7 @@
     "sequencer:dev": "turbo run sequencer:dev --env-mode=loose",
     "indexer:dev": "turbo run indexer:dev --env-mode=loose",
     "processor:dev": "turbo run processor:dev --env-mode=loose",
+    "worker:dev": "turbo run worker:dev --env-mode=loose",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "test": "turbo run test",
@@ -27,7 +28,12 @@
     "docker:down": "docker compose -f docker/docker-compose.yml down",
     "env:development": "dotenv -e ./packages/chain/src/environments/development/.env -- pnpm",
     "env:inmemory": "dotenv -e ./packages/chain/src/environments/inmemory/.env -- pnpm",
-    "env:sovereign": "dotenv -e ./packages/chain/src/environments/sovereign/.env -- pnpm"
+    "env:sovereign": "dotenv -e ./packages/chain/src/environments/sovereign/.env -- pnpm",
+    "generate-keys": "turbo run generate-keys --env-mode=loose --",
+    "lightnet:faucet": "turbo run lightnet:faucet --env-mode=loose --",
+    "settlement:deploy": "turbo run settlement:deploy --env-mode=loose --",
+    "mina-explorer:start": "turbo run mina-explorer:start --env-mode=loose --",
+    "bridge:deposit": "turbo run bridge:deposit --env-mode=loose --"
   },
   "devDependencies": {
     "eslint": "^8.53.0",

@@ -8,9 +8,16 @@ import {
   SequencerModulesRecord,
   TimedBlockTrigger,
   BlockProducerModule,
+  MinaBaseLayer,
+  SettlementModule,
+  WithdrawalQueue,
+  ConstantFeeStrategy,
+  BatchProducerModule,
+  SequencerStartupModule,
 } from "@proto-kit/sequencer";
 import { ModulesConfig } from "@proto-kit/common";
 import { IndexerNotifier } from "@proto-kit/indexer";
+import { PrivateKey, PublicKey } from "o1js";
 
 export const apiSequencerModules = {
   GraphqlServer,
@@ -42,6 +49,7 @@ export const baseSequencerModulesConfig = {
   BlockTrigger: {
     blockInterval: Number(process.env.PROTOKIT_BLOCK_INTERVAL!),
     produceEmptyBlocks: true,
+    settlementInterval: Number(process.env.PROTOKIT_SETTLEMENT_INTERVAL!),
   },
 } satisfies ModulesConfig<typeof baseSequencerModules>;
 
@@ -52,3 +60,51 @@ export const indexerSequencerModules = {
 export const indexerSequencerModulesConfig = {
   IndexerNotifier: {},
 } satisfies ModulesConfig<typeof indexerSequencerModules>;
+
+export const settlementSequencerModules = {
+  BaseLayer: MinaBaseLayer,
+  SettlementModule: SettlementModule,
+  OutgoingMessageQueue: WithdrawalQueue,
+  FeeStrategy: ConstantFeeStrategy,
+  BatchProducerModule,
+  SequencerStartupModule,
+} satisfies SequencerModulesRecord;
+
+export const settlementSequencerModulesConfig = {
+  BaseLayer: {
+    network: {
+      type: "lightnet",
+      graphql: `${process.env.MINA_NODE_GRAPHQL_HOST!}:${process.env.MINA_NODE_GRAPHQL_PORT!}/graphql`,
+      archive: `${process.env.MINA_ARCHIVE_GRAPHQL_HOST!}:${process.env.MINA_ARCHIVE_GRAPHQL_PORT!}`,
+      accountManager: `${process.env.MINA_ACCOUNT_MANAGER_HOST!}:${process.env.MINA_ACCOUNT_MANAGER_PORT!}`,
+    },
+  },
+  SettlementModule: {
+    feepayer: PrivateKey.fromBase58(
+      process.env.PROTOKIT_SEQUENCER_PRIVATE_KEY!
+    ),
+    addresses: {
+      settlement: PublicKey.fromBase58(
+        process.env.PROTOKIT_SETTLEMENT_CONTRACT_PUBLIC_KEY!
+      ),
+      dispatch: PublicKey.fromBase58(
+        process.env.PROTOKIT_DISPATCHER_CONTRACT_PUBLIC_KEY!
+      ),
+    },
+    keys: {
+      settlement: PrivateKey.fromBase58(
+        process.env.PROTOKIT_SETTLEMENT_CONTRACT_PRIVATE_KEY!
+      ),
+      dispatch: PrivateKey.fromBase58(
+        process.env.PROTOKIT_DISPATCHER_CONTRACT_PRIVATE_KEY!
+      ),
+      minaBridge: PrivateKey.fromBase58(
+        process.env.PROTOKIT_MINA_BRIDGE_CONTRACT_PRIVATE_KEY!
+      ),
+    },
+  },
+  OutgoingMessageQueue: {},
+  FeeStrategy: {},
+  BatchProducerModule: {},
+  SequencerStartupModule: {},
+} satisfies ModulesConfig<typeof settlementSequencerModules>;
