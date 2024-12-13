@@ -29,20 +29,20 @@ export const apiSequencerModulesConfig = {
 } satisfies ModulesConfig<typeof apiSequencerModules>;
 
 export const baseSequencerModules = {
-  ...apiSequencerModules,
   Mempool: PrivateMempool,
   BlockProducerModule: BlockProducerModule,
   BlockTrigger: TimedBlockTrigger,
+  ...apiSequencerModules,
 } satisfies SequencerModulesRecord;
 
 export const baseSequencerModulesConfig = {
-  ...apiSequencerModulesConfig,
   Mempool: {},
   BlockProducerModule: {},
   BlockTrigger: {
     blockInterval: Number(process.env.PROTOKIT_BLOCK_INTERVAL!),
     produceEmptyBlocks: true,
   },
+  ...apiSequencerModulesConfig,
 } satisfies ModulesConfig<typeof baseSequencerModules>;
 
 export const indexerSequencerModules = {
