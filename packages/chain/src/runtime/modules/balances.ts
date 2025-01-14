@@ -11,7 +11,7 @@ import {
   Balances as BaseBalances,
   TokenId,
 } from "@proto-kit/library";
-import { PublicKey } from "o1js";
+import { Provable, PublicKey } from "o1js";
 
 interface BalancesConfig {
   totalSupply: Balance;
@@ -42,10 +42,11 @@ export class Balances extends BaseBalances<BalancesConfig> {
   @runtimeMessage()
   public async deposit(deposit: Deposit) {
     const key = new BalancesKey({
-      tokenId: TokenId.from(0),
+      tokenId: TokenId.from(deposit.tokenId),
       address: deposit.address,
     });
     const balance = await this.balances.get(key);
+    Provable.log("deposited", deposit);
     await this.balances.set(
       key,
       balance.value.add(Balance.Unsafe.fromField(deposit.amount.value))

@@ -196,6 +196,43 @@ Finally, you can query the processed data at the indexer's graphql API available
 
 You can define which resolvers are available in `chain/src/processor/api/resolvers.ts`. By default all available resolvers generated based on your database schema file are used. You must configure additional middlewares, validations etc. yourself. The example configures a simple validation for the `take` argument for resolvers returning multiple entities at once.
 
+## Lightnet Settlement & Bridging
+
+At this point in time, the starter-kit offers settlement & bridging integration with lightnet (local mina network). You can enable these features by setting the `PROTOKIT_SETTLEMENT_ENABLED` environment variable to `true` in development .env file.
+
+Follow these steps to get the sequencer to settle & bridge:
+- Fund the sequencer operator key by running:
+    ```
+    pnpm env:development lightnet:faucet B62qizW6aroTxQorJz4ywVNZom4jA6W4QPPCK3wLeyhnJHtVStUNniL
+    ```
+- Fund a testing account on lightnet (defined in the .env file)
+    ```
+    pnpm env:development lightnet:faucet B62qkVfEwyfkm5yucHEqrRjxbyx98pgdWz82pHv7LYq9Qigs812iWZ8
+    ```
+
+- Deploy the settlement, dispatch and bridge contracts
+    ```
+    pnpm env:development settlement:deploy
+    ```
+
+- Run a worker, alongside with the sequencer in separate shell instances
+    ```
+    pnpm env:development worker:dev
+    pnpm env:development sequencer:dev
+    ```
+
+- Bridge the L1 $MINA to your app-chain, and observe your app-chain $MINA balance change after the next settlement lifecycle has been completed by the sequencer
+
+    > Token ID of MINA is `1` on both the L1 and app-chain
+    ```
+    pnpm env:development bridge:deposit 1 TEST_ACCOUNT_1_PRIVATE_KEY TEST_ACCOUNT_1_PUBLIC_KEY 100
+    ```
+
+- Withdraw your app-chain $MINA tokens back to the L1
+    ```
+    pnpm env:development bridge:withdraw 1 TEST_ACCOUNT_1_PRIVATE_KEY 100
+    ```
+
 ## Deployments (sovereign environment)
 
 When deploying to a server, you should push your code along with your forked starter-kit to some repository, 

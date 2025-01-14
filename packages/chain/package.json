@@ -43,9 +43,11 @@
     "processor:prisma:generate": "prisma generate --schema ./src/processor/prisma/schema.prisma",
     "generate-keys": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./src/scripts/generate-keys.ts $1",
     "lightnet:faucet": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./src/scripts/lightnet/faucet.ts $1",
+    "lightnet:wait-for-network": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./src/scripts/lightnet/wait-for-network.ts $1",
     "settlement:deploy": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./src/scripts/settlement/deploy.ts $1",
     "mina-explorer:start": "node ./node_modules/mina-lightweight-explorer/server.js",
-    "bridge:deposit": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./src/scripts/bridge/deposit.ts $1"
+    "bridge:deposit": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./src/scripts/bridge/deposit.ts $1",
+    "bridge:withdraw": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./src/scripts/bridge/withdraw.ts $1"
   },
   "peerDependencies": {
     "@proto-kit/api": "../../../framework/packages/api",

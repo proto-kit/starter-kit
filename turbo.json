@@ -71,6 +71,9 @@
     "lightnet:faucet": {
       "cache": false
     },
+    "lightnet:wait-for-network": {
+      "cache": false
+    },
     "settlement:deploy": {
       "cache": false
     },
@@ -81,6 +84,9 @@
       "cache": false
     },
     "bridge:deposit": {
+      "cache": false
+    },
+    "bridge:withdraw": {
       "cache": false
     }
   }

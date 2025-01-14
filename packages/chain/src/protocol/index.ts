@@ -25,9 +25,7 @@ export const settlementModulesConfig = {
       withdrawalEventName: "withdraw",
       withdrawalStatePath: "Withdrawals.withdrawals",
     },
-    SettlementContract: {
-      // withdrawalMethodPath: "Withdrawals.withdraw",
-    },
+    SettlementContract: {},
     DispatchContract: {
       incomingMessagesMethods: {
         deposit: "Balances.deposit",

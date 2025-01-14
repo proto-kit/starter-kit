@@ -1,8 +1,18 @@
 import { AppChain } from "@proto-kit/sdk";
 import { Runtime } from "@proto-kit/module";
 import { Protocol } from "@proto-kit/protocol";
-import { DatabasePruneModule, Sequencer } from "@proto-kit/sequencer";
-import { PrismaRedisDatabase } from "@proto-kit/persistance";
+import {
+  DatabasePruneModule,
+  PendingTransaction,
+  Sequencer,
+  sequencerModule,
+} from "@proto-kit/sequencer";
+import type { PrismaConnection } from "@proto-kit/persistance";
+import {
+  PrismaRedisDatabase,
+  PrismaTransactionStorage,
+  TransactionMapper,
+} from "@proto-kit/persistance";
 import runtime from "../../runtime";
 import * as protocol from "../../protocol";
 import {

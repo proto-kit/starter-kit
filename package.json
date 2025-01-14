@@ -31,9 +31,12 @@
     "env:sovereign": "dotenv -e ./packages/chain/src/environments/sovereign/.env -- pnpm",
     "generate-keys": "turbo run generate-keys --env-mode=loose --",
     "lightnet:faucet": "turbo run lightnet:faucet --env-mode=loose --",
+    "lightnet:wait-for-network": "turbo run lightnet:wait-for-network --env-mode=loose --",
     "settlement:deploy": "turbo run settlement:deploy --env-mode=loose --",
     "mina-explorer:start": "turbo run mina-explorer:start --env-mode=loose --",
-    "bridge:deposit": "turbo run bridge:deposit --env-mode=loose --"
+    "bridge:deposit": "turbo run bridge:deposit --env-mode=loose --",
+    "bridge:withdraw": "turbo run bridge:withdraw --env-mode=loose --",
+    "docker:prune": "rm -rf ./docker/data/*"
   },
   "devDependencies": {
     "eslint": "^8.53.0",

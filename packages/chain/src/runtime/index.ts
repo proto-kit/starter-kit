@@ -1,11 +1,8 @@
-import {
-  Balance,
-  VanillaRuntimeModules,
-  Withdrawals,
-} from "@proto-kit/library";
+import { Balance, VanillaRuntimeModules } from "@proto-kit/library";
 import { ModulesConfig } from "@proto-kit/common";
 
 import { Balances } from "./modules/balances";
+import { Withdrawals } from "./modules/withdrawals";
 
 export const modules = VanillaRuntimeModules.with({
   Balances,
@@ -14,7 +11,7 @@ export const modules = VanillaRuntimeModules.with({
 
 export const config: ModulesConfig<typeof modules> = {
   Balances: {
-    totalSupply: Balance.from(10_000),
+    totalSupply: Balance.from(10_000 * 1e9),
   },
   Withdrawals: {},
 };
