@@ -7,4 +7,3 @@ include:
   - ./indexer/docker-compose.yml
   - ./processor-persistence/docker-compose.yml
   - ./processor/docker-compose.yml
-  - ./lightnet/docker-compose.yml

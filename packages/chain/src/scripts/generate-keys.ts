@@ -1,4 +1,4 @@
-import { PrivateKey, Provable, PublicKey } from "o1js";
+import { PrivateKey } from "o1js";
 
 const numberOFKeysToGenerate = Number(process.argv[2]) || 1;
 console.log(

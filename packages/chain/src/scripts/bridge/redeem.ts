@@ -1,6 +1,7 @@
 // const { settlement, dispatch } = settlementModule.getContracts();
 
 import {
+  BridgingModule,
   InMemoryDatabase,
   LocalTaskQueue,
   Sequencer,
@@ -36,19 +37,15 @@ import { Authorization } from "../../../node_modules/o1js/dist/node/lib/mina/acc
 
 export default async function () {
   const tokenId = Field(process.argv[3]);
-  const fromPrivateKey = PrivateKey.fromBase58(
+  const toPrivateKey = PrivateKey.fromBase58(
     process.env[process.argv[4]] || process.argv[4]
   );
-  const toPublicKey = PublicKey.fromBase58(
-    process.env[process.argv[5]] || process.argv[5]!
-  );
-  const amount = Number(process.argv[6]) * 1e9;
+  const amount = Number(process.argv[5]) * 1e9;
   const fee = 0.1 * 1e9;
 
-  Provable.log("Preparing to deposit", {
+  Provable.log("Preparing to redeem", {
     tokenId,
-    fromPrivateKey,
-    toPublicKey,
+    to: toPrivateKey.toPublicKey(),
     amount,
     fee,
   });
@@ -94,44 +91,31 @@ export default async function () {
 
   await appChain.start();
 
-  const settlementModule = appChain.sequencer.resolveOrFail(
-    "SettlementModule",
-    SettlementModule
+  const bridgingModule = appChain.sequencer.resolveOrFail(
+    "BridgingModule",
+    BridgingModule
   );
 
-  const { settlement, dispatch } = settlementModule.getContracts();
+  const bridgeContract = await bridgingModule.getBridgeContract(tokenId);
 
-  await fetchAccount({ publicKey: fromPrivateKey.toPublicKey() });
-  await fetchAccount({ publicKey: settlement.address });
-  await fetchAccount({ publicKey: dispatch.address });
-
-  const tree = await TokenBridgeTree.buildTreeFromEvents(dispatch);
-  const index = tree.getIndex(tokenId);
-  const witness = tree.getWitness(index);
-  const attestation = new TokenBridgeAttestation({
-    index: Field(index),
-    witness,
+  const customAcc = await fetchAccount({
+    publicKey: toPrivateKey.toPublicKey(),
+    tokenId: bridgeContract.deriveTokenId(),
   });
+
+  Provable.log("Custom account", customAcc.account?.balance);
 
   console.log("Forging transaction...");
   const tx = await Mina.transaction(
     {
-      sender: fromPrivateKey.toPublicKey(),
+      sender: toPrivateKey.toPublicKey(),
       fee,
     },
     async () => {
-      const au = AccountUpdate.createSigned(fromPrivateKey.toPublicKey());
-      au.balance.subInPlace(UInt64.from(amount));
+      const au = AccountUpdate.createSigned(toPrivateKey.toPublicKey());
+      au.balance.addInPlace(UInt64.from(amount));
 
-      await dispatch.deposit(
-        UInt64.from(amount),
-        tokenId,
-        PublicKey.fromBase58(
-          process.env.PROTOKIT_MINA_BRIDGE_CONTRACT_PUBLIC_KEY!
-        ),
-        attestation,
-        toPublicKey
-      );
+      await bridgeContract.redeem(au);
     }
   );
 
@@ -141,19 +125,20 @@ export default async function () {
       [
         process.env.PROTOKIT_SETTLEMENT_CONTRACT_PUBLIC_KEY,
         process.env.PROTOKIT_DISPATCHER_CONTRACT_PUBLIC_KEY,
+        process.env.PROTOKIT_MINA_BRIDGE_CONTRACT_PUBLIC_KEY,
       ].includes(au.body.publicKey.toBase58())
     ) {
       Authorization.setLazyNone(au);
     }
   });
 
-  tx.sign([fromPrivateKey]);
+  tx.sign([toPrivateKey]);
 
   console.log("Sending...");
   const sentTx = await tx.send();
-  console.log("Waiting for inclusion...");
+  console.log("Waiting for inclusion...", sentTx.toPretty());
   const includedTx = await sentTx.wait();
 
-  console.log("Deposit transaction included in a block:");
+  console.log("Redeem transaction included in a block:");
   console.log(includedTx.toPretty());
 }

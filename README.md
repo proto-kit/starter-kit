@@ -201,24 +201,21 @@ You can define which resolvers are available in `chain/src/processor/api/resolve
 At this point in time, the starter-kit offers settlement & bridging integration with lightnet (local mina network). You can enable these features by setting the `PROTOKIT_SETTLEMENT_ENABLED` environment variable to `true` in development .env file.
 
 Follow these steps to get the sequencer to settle & bridge:
-- Fund the sequencer operator key by running:
+- Initialize the lightnet process, fund the sequencer operator & deploy settlement+bridging contracts:
     ```
-    pnpm env:development lightnet:faucet B62qizW6aroTxQorJz4ywVNZom4jA6W4QPPCK3wLeyhnJHtVStUNniL
-    ```
-- Fund a testing account on lightnet (defined in the .env file)
-    ```
-    pnpm env:development lightnet:faucet B62qkVfEwyfkm5yucHEqrRjxbyx98pgdWz82pHv7LYq9Qigs812iWZ8
-    ```
-
-- Deploy the settlement, dispatch and bridge contracts
-    ```
-    pnpm env:development settlement:deploy
+    pnpm env:development lightnet:start -d
+    pnpm env:development lightnet:initialize
     ```
 
 - Run a worker, alongside with the sequencer in separate shell instances
     ```
     pnpm env:development worker:dev
     pnpm env:development sequencer:dev
+    ```
+
+- Fund a testing account on lightnet (defined in the .env file)
+    ```
+    pnpm env:development lightnet:faucet B62qkVfEwyfkm5yucHEqrRjxbyx98pgdWz82pHv7LYq9Qigs812iWZ8
     ```
 
 - Bridge the L1 $MINA to your app-chain, and observe your app-chain $MINA balance change after the next settlement lifecycle has been completed by the sequencer

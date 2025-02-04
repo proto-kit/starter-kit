@@ -88,6 +88,9 @@
     },
     "bridge:withdraw": {
       "cache": false
+    },
+    "bridge:redeem": {
+      "cache": false
     }
   }
 }
