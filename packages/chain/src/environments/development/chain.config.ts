@@ -67,9 +67,9 @@ export default async (args: Arguments): Promise<Startable> => {
       },
       OpenTelemetryServer: {
         tracing: {
-          enabled: process.env.OPEN_TELEMETRY_SERVER_URL,
+          enabled: process.env.OPEN_TELEMETRY_SERVER_ENABLED
           otlp: {
-            url: process.env.OPEN_TELEMETRY_SERVER_ENABLED
+            url: process.env.OPEN_TELEMETRY_SERVER_URL
           },
         },
       },
