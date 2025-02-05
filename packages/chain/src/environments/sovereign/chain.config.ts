@@ -65,6 +65,14 @@ export default async (args: Arguments): Promise<Startable> => {
           connection: process.env.DATABASE_URL!,
         },
       },
+      OpenTelemetryServer: {
+        tracing: {
+          enabled: process.env.OPEN_TELEMETRY_SERVER_URL,
+          otlp: {
+            url: process.env.OPEN_TELEMETRY_SERVER_ENABLED
+          },
+        },
+      },
     },
     ...baseAppChainModulesConfig,
   });
