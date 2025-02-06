@@ -136,6 +136,20 @@ pnpm env:development build --filter=chain
 pnpm env:development sequencer:start --filter=chain
 ```
 
+### Observability
+
+Protokit has the ability to report metrics, logs and traces to a Grafana instance for visualisation.
+These can be configured by the following environment variables
+```zsh
+OPEN_TELEMETRY_TRACING_URL=
+OPEN_TELEMETRY_TRACING_ENABLED=
+
+OPEN_TELEMETRY_METRICS_URL=
+OPEN_TELEMETRY_METRICS_ENABLED=
+OPEN_TELEMETRY_METRICS_SCRAPING_FREQUENCY=
+````
+Note that the functionality is not configured for the `in-memory` mode.
+
 ### Running the UI
 
 ```zsh
