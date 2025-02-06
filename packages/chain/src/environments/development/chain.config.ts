@@ -17,6 +17,7 @@ import {
   baseAppChainModules,
   baseAppChainModulesConfig,
 } from "../../app-chain";
+import {OpenTelemetryServer} from "../../../../../../framework/packages/api";
 
 export const appChain = AppChain.from({
   Runtime: Runtime.from({
@@ -33,6 +34,7 @@ export const appChain = AppChain.from({
       ...indexerSequencerModules,
       TaskQueue: BullQueue,
       DatabasePruneModule,
+      OpenTelemetryServer: OpenTelemetryServer
     },
   }),
   modules: baseAppChainModules,
@@ -67,12 +69,16 @@ export default async (args: Arguments): Promise<Startable> => {
       },
       OpenTelemetryServer: {
         metrics: {
-          enabled: process.env.OPEN_TELEMETRY_METRICS_ENABLED,
-          prometheus: process.env.OPEN_TELEMETRY_METRICS_URL ,
-          nodeScrapeInterval: process.env.OPEN_TELEMETRY_METRICS_SCRAPING_FREQUENCY,
+          enabled: Boolean(process.env.OPEN_TELEMETRY_METRICS_ENABLED ?? false),
+          prometheus: { host: undefined,
+            port: Number(process.env.OPEN_TELEMETRY_METRICS_PORT),
+            endpoint: process.env.OPEN_TELEMETRY_METRICS_ENDPOINT,
+            prefix: "",
+            appendTimestamp: true},
+          nodeScrapeInterval: Number(process.env.OPEN_TELEMETRY_METRICS_SCRAPING_FREQUENCY ?? 10),
         },
         tracing: {
-          enabled: process.env.OPEN_TELEMETRY_TRACING_ENABLED,
+          enabled: Boolean(process.env.OPEN_TELEMETRY_TRACING_ENABLED ?? false),
           otlp: {
             url: process.env.OPEN_TELEMETRY_TRACING_URL,
           },
