@@ -66,10 +66,15 @@ export default async (args: Arguments): Promise<Startable> => {
         },
       },
       OpenTelemetryServer: {
+        metrics: {
+          enabled: process.env.OPEN_TELEMETRY_METRICS_ENABLED,
+          prometheus: process.env.OPEN_TELEMETRY_METRICS_URL ,
+          nodeScrapeInterval: process.env.OPEN_TELEMETRY_METRICS_SCRAPING_FREQUENCY,
+        },
         tracing: {
-          enabled: process.env.OPEN_TELEMETRY_SERVER_ENABLED,
+          enabled: process.env.OPEN_TELEMETRY_TRACING_ENABLED,
           otlp: {
-            url: process.env.OPEN_TELEMETRY_SERVER_URL
+            url: process.env.OPEN_TELEMETRY_TRACING_URL,
           },
         },
       },
