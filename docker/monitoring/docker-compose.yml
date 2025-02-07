@@ -7,7 +7,7 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     ports:
-      - 9090:9090
+      - "9090:9090"
     restart: unless-stopped
     volumes:
       - ./prometheus:/etc/prometheus
@@ -56,8 +56,8 @@ services:
       - ./tempo/tempo.yaml:/etc/tempo.yaml
       - ../data/tempo:/var/tempo
     ports:
-      - "3200" # tempo
-      - "4317" # otlp grpc
+      - "3200:3200" # tempo
+      - "4317:4317" # otlp grpc
 
   grafana:
     image: grafana/grafana:11.0.1
@@ -66,10 +66,10 @@ services:
       - monitoring
     restart: unless-stopped
     ports:
-      - 3000:3000
+      - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=grafana
+      - GF_SECURITY_ADMIN_USER=${OPEN_TELEMETRY_GF_SECURITY_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${OPEN_TELEMETRY_GF_SECURITY_ADMIN_PASSWORD}
       - GF_SECURITY_ALLOW_EMBEDDING=true
     volumes:
       - ./grafana:/etc/grafana/provisioning/datasources
