@@ -74,7 +74,8 @@ export default async (args: Arguments): Promise<Startable> => {
             port: Number(process.env.OPEN_TELEMETRY_METRICS_PORT),
             endpoint: process.env.OPEN_TELEMETRY_METRICS_ENDPOINT,
             prefix: "",
-            appendTimestamp: true},          nodeScrapeInterval: Number(process.env.OPEN_TELEMETRY_METRICS_SCRAPING_FREQUENCY ?? 10),
+            appendTimestamp: true},
+          nodeScrapeInterval: Number(process.env.OPEN_TELEMETRY_METRICS_SCRAPING_FREQUENCY ?? 10),
         },
         tracing: {
           enabled: Boolean(process.env.OPEN_TELEMETRY_TRACING_ENABLED ?? false),
