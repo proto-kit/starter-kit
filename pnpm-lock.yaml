@@ -43,34 +43,34 @@ importers:
         specifier: ^3.3.2
         version: 3.9.0(react-hook-form@7.53.0(react@18.3.1))
       '@proto-kit/api':
-        specifier: '*'
+        specifier: 0.1.1-develop.1088
         version: 0.1.1-develop.1088(dul2sxfsuce4wi7o6jzj2llasm)
       '@proto-kit/common':
-        specifier: '*'
+        specifier: 0.1.1-develop.1088
         version: 0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0)
       '@proto-kit/deployment':
-        specifier: '*'
+        specifier: 0.1.1-develop.1088
         version: 0.1.1-develop.1088(@proto-kit/common@0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0))(@proto-kit/persistance@0.1.1-develop.1088(dul2sxfsuce4wi7o6jzj2llasm))(@proto-kit/sdk@0.1.1-develop.1088(kz4qtaab634eddmuun3qxhomby))(@proto-kit/sequencer@0.1.1-develop.1088(@proto-kit/common@0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0))(@proto-kit/module@0.1.1-develop.1088(@proto-kit/common@0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0))(@proto-kit/protocol@0.1.1-develop.1088(@proto-kit/common@0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0))(o1js@1.6.0)(ts-pattern@4.3.0)(tsyringe@4.8.0))(o1js@1.6.0)(tsyringe@4.8.0))(@proto-kit/protocol@0.1.1-develop.1088(@proto-kit/common@0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0))(o1js@1.6.0)(ts-pattern@4.3.0)(tsyringe@4.8.0))(o1js@1.6.0)(tsyringe@4.8.0))(bullmq@3.15.8)(o1js@1.6.0)(tsyringe@4.8.0)
       '@proto-kit/indexer':
-        specifier: '*'
+        specifier: 0.1.1-develop.1088
         version: 0.1.1-develop.1088(hocwyjk2rt53lj4ewlpy6renly)
       '@proto-kit/library':
-        specifier: '*'
+        specifier: 0.1.1-develop.1088
         version: 0.1.1-develop.1088(dul2sxfsuce4wi7o6jzj2llasm)
       '@proto-kit/module':
-        specifier: '*'
+        specifier: 0.1.1-develop.1088
         version: 0.1.1-develop.1088(@proto-kit/common@0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0))(@proto-kit/protocol@0.1.1-develop.1088(@proto-kit/common@0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0))(o1js@1.6.0)(ts-pattern@4.3.0)(tsyringe@4.8.0))(o1js@1.6.0)(tsyringe@4.8.0)
       '@proto-kit/persistance':
-        specifier: '*'
+        specifier: 0.1.1-develop.1088
         version: 0.1.1-develop.1088(dul2sxfsuce4wi7o6jzj2llasm)
       '@proto-kit/protocol':
-        specifier: '*'
+        specifier: 0.1.1-develop.1088
         version: 0.1.1-develop.1088(@proto-kit/common@0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0))(o1js@1.6.0)(ts-pattern@4.3.0)(tsyringe@4.8.0)
       '@proto-kit/sdk':
-        specifier: '*'
+        specifier: 0.1.1-develop.1088
         version: 0.1.1-develop.1088(kz4qtaab634eddmuun3qxhomby)
       '@proto-kit/sequencer':
-        specifier: '*'
+        specifier: 0.1.1-develop.1088
         version: 0.1.1-develop.1088(@proto-kit/common@0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0))(@proto-kit/module@0.1.1-develop.1088(@proto-kit/common@0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0))(@proto-kit/protocol@0.1.1-develop.1088(@proto-kit/common@0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0))(o1js@1.6.0)(ts-pattern@4.3.0)(tsyringe@4.8.0))(o1js@1.6.0)(tsyringe@4.8.0))(@proto-kit/protocol@0.1.1-develop.1088(@proto-kit/common@0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0))(o1js@1.6.0)(ts-pattern@4.3.0)(tsyringe@4.8.0))(o1js@1.6.0)(tsyringe@4.8.0)
       '@radix-ui/react-label':
         specifier: ^2.0.2
@@ -188,37 +188,37 @@ importers:
   packages/chain:
     dependencies:
       '@proto-kit/api':
-        specifier: '*'
+        specifier: 0.1.1-develop.1088
         version: 0.1.1-develop.1088(dul2sxfsuce4wi7o6jzj2llasm)
       '@proto-kit/common':
-        specifier: '*'
+        specifier: 0.1.1-develop.1088
         version: 0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0)
       '@proto-kit/deployment':
-        specifier: '*'
+        specifier: 0.1.1-develop.1088
         version: 0.1.1-develop.1088(@proto-kit/common@0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0))(@proto-kit/persistance@0.1.1-develop.1088(dul2sxfsuce4wi7o6jzj2llasm))(@proto-kit/sdk@0.1.1-develop.1088(kz4qtaab634eddmuun3qxhomby))(@proto-kit/sequencer@0.1.1-develop.1088(@proto-kit/common@0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0))(@proto-kit/module@0.1.1-develop.1088(@proto-kit/common@0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0))(@proto-kit/protocol@0.1.1-develop.1088(@proto-kit/common@0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0))(o1js@1.6.0)(ts-pattern@4.3.0)(tsyringe@4.8.0))(o1js@1.6.0)(tsyringe@4.8.0))(@proto-kit/protocol@0.1.1-develop.1088(@proto-kit/common@0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0))(o1js@1.6.0)(ts-pattern@4.3.0)(tsyringe@4.8.0))(o1js@1.6.0)(tsyringe@4.8.0))(bullmq@3.15.8)(o1js@1.6.0)(tsyringe@4.8.0)
       '@proto-kit/indexer':
-        specifier: '*'
+        specifier: 0.1.1-develop.1088
         version: 0.1.1-develop.1088(74ec4zaiazx4kzm54ghtfrdgfu)
       '@proto-kit/library':
-        specifier: '*'
+        specifier: 0.1.1-develop.1088
         version: 0.1.1-develop.1088(dul2sxfsuce4wi7o6jzj2llasm)
       '@proto-kit/module':
-        specifier: '*'
+        specifier: 0.1.1-develop.1088
         version: 0.1.1-develop.1088(@proto-kit/common@0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0))(@proto-kit/protocol@0.1.1-develop.1088(@proto-kit/common@0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0))(o1js@1.6.0)(ts-pattern@4.3.0)(tsyringe@4.8.0))(o1js@1.6.0)(tsyringe@4.8.0)
       '@proto-kit/persistance':
-        specifier: '*'
+        specifier: 0.1.1-develop.1088
         version: 0.1.1-develop.1088(dul2sxfsuce4wi7o6jzj2llasm)
       '@proto-kit/processor':
-        specifier: '*'
+        specifier: 0.1.1-develop.1088
         version: 0.1.1-develop.1088(ln4evwhsdfdpimgiv3gq4x5og4)
       '@proto-kit/protocol':
-        specifier: '*'
+        specifier: 0.1.1-develop.1088
         version: 0.1.1-develop.1088(@proto-kit/common@0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0))(o1js@1.6.0)(ts-pattern@4.3.0)(tsyringe@4.8.0)
       '@proto-kit/sdk':
-        specifier: '*'
+        specifier: 0.1.1-develop.1088
         version: 0.1.1-develop.1088(kz4qtaab634eddmuun3qxhomby)
       '@proto-kit/sequencer':
-        specifier: '*'
+        specifier: 0.1.1-develop.1088
         version: 0.1.1-develop.1088(@proto-kit/common@0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0))(@proto-kit/module@0.1.1-develop.1088(@proto-kit/common@0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0))(@proto-kit/protocol@0.1.1-develop.1088(@proto-kit/common@0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0))(o1js@1.6.0)(ts-pattern@4.3.0)(tsyringe@4.8.0))(o1js@1.6.0)(tsyringe@4.8.0))(@proto-kit/protocol@0.1.1-develop.1088(@proto-kit/common@0.1.1-develop.1088(o1js@1.6.0)(tsyringe@4.8.0))(o1js@1.6.0)(ts-pattern@4.3.0)(tsyringe@4.8.0))(o1js@1.6.0)(tsyringe@4.8.0)
       graphql-fields:
         specifier: ^2.0.3
@@ -8817,7 +8817,7 @@ snapshots:
       eslint: 8.57.0
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(eslint@8.57.0))(eslint@8.57.0)
-      eslint-plugin-import: 2.30.0(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0)
+      eslint-plugin-import: 2.30.0(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0)
       eslint-plugin-jsx-a11y: 6.10.0(eslint@8.57.0)
       eslint-plugin-react: 7.35.2(eslint@8.57.0)
       eslint-plugin-react-hooks: 4.6.2(eslint@8.57.0)
@@ -8880,7 +8880,7 @@ snapshots:
       is-bun-module: 1.1.0
       is-glob: 4.0.3
     optionalDependencies:
-      eslint-plugin-import: 2.30.0(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0)
+      eslint-plugin-import: 2.30.0(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0)
     transitivePeerDependencies:
       - '@typescript-eslint/parser'
       - eslint-import-resolver-node
@@ -8943,7 +8943,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-plugin-import@2.30.0(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0):
+  eslint-plugin-import@2.30.0(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.8

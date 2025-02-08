@@ -24,6 +24,8 @@ cd my-chain
 nvm use
 # install dependencies
 pnpm install
+# generate prisma clients (indexer, ...)
+pnpm env:development prisma:generate
 # starts both the UI and the sequencer (file watcher / live reload enabled)
 pnpm env:inmemory dev
 ```

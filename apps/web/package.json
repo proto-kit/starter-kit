@@ -50,16 +50,16 @@
     "typescript": "^5.4.5"
   },
   "peerDependencies": {
-    "@proto-kit/api": "*",
-    "@proto-kit/common": "*",
-    "@proto-kit/deployment": "*",
-    "@proto-kit/library": "*",
-    "@proto-kit/module": "*",
-    "@proto-kit/persistance": "*",
-    "@proto-kit/protocol": "*",
-    "@proto-kit/sdk": "*",
-    "@proto-kit/sequencer": "*",
-    "@proto-kit/indexer": "*",
+    "@proto-kit/api": "0.1.1-develop.1088",
+    "@proto-kit/common": "0.1.1-develop.1088",
+    "@proto-kit/deployment": "0.1.1-develop.1088",
+    "@proto-kit/library": "0.1.1-develop.1088",
+    "@proto-kit/module": "0.1.1-develop.1088",
+    "@proto-kit/persistance": "0.1.1-develop.1088",
+    "@proto-kit/protocol": "0.1.1-develop.1088",
+    "@proto-kit/sdk": "0.1.1-develop.1088",
+    "@proto-kit/sequencer": "0.1.1-develop.1088",
+    "@proto-kit/indexer": "0.1.1-develop.1088",
     "o1js": "1.6.0",
     "tsyringe": "^4.7.0"
   }
