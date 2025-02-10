@@ -251,4 +251,4 @@ The caddy reverse-proxy automatically uses https for all connections, use this g
 2. Adapt your starter-kit's package.json to use the file:// references to framework
 3. Go into the framework folder, and build a docker image containing the sources with `docker build -f ./packages/deployment/docker/development-base/Dockerfile -t protokit-base .`
 
-4. Comment out the first line of docker/base/Dockerfile to use protokit-base
+4. Replace the first line of docker/base/Dockerfile to use `FROM protokit-base`
