@@ -17,7 +17,6 @@ import {
   baseAppChainModules,
   baseAppChainModulesConfig,
 } from "../../app-chain";
-import {OpenTelemetryServer} from "@proto-kit/api";
 
 export const appChain = AppChain.from({
   Runtime: Runtime.from({
