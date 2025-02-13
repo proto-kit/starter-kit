@@ -1,7 +1,7 @@
 import { AppChain } from "@proto-kit/sdk";
 import { Runtime } from "@proto-kit/module";
 import { Protocol } from "@proto-kit/protocol";
-import { DatabasePruneModule, Sequencer } from "@proto-kit/sequencer";
+import { DatabasePruneModule, LocalTaskWorkerModule, Sequencer, VanillaTaskWorkerModules } from "@proto-kit/sequencer";
 import { PrismaRedisDatabase } from "@proto-kit/persistance";
 import runtime from "../../runtime";
 import protocol from "../../protocol";
@@ -9,7 +9,7 @@ import {
   baseSequencerModules,
   baseSequencerModulesConfig,
   indexerSequencerModules,
-  indexerSequencerModulesConfig,
+  indexerSequencerModulesConfig, metricsSequencerModules, metricsSequencerModulesConfig,
 } from "../../sequencer";
 import { BullQueue, Startable } from "@proto-kit/deployment";
 import { Arguments } from "../../start";
@@ -30,11 +30,12 @@ export const appChain = AppChain.from({
     modules: {
       // ordering of the modules matters due to dependency resolution
       Database: PrismaRedisDatabase,
+      ...metricsSequencerModules,
+      TaskQueue: BullQueue,
+      LocalTaskWorkerModule: LocalTaskWorkerModule.from(VanillaTaskWorkerModules.withoutSettlement()),
       ...baseSequencerModules,
       ...indexerSequencerModules,
-      TaskQueue: BullQueue,
       DatabasePruneModule,
-      OpenTelemetryServer: OpenTelemetryServer
     },
   }),
   modules: baseAppChainModules,
@@ -47,6 +48,7 @@ export default async (args: Arguments): Promise<Startable> => {
     Sequencer: {
       ...baseSequencerModulesConfig,
       ...indexerSequencerModulesConfig,
+      ...metricsSequencerModulesConfig,
       DatabasePruneModule: {
         pruneOnStartup: args.pruneOnStartup,
       },
@@ -67,23 +69,7 @@ export default async (args: Arguments): Promise<Startable> => {
           connection: process.env.DATABASE_URL!,
         },
       },
-      OpenTelemetryServer: {
-        metrics: {
-          enabled: Boolean(process.env.OPEN_TELEMETRY_METRICS_ENABLED ?? false),
-          prometheus: { host: undefined,
-            port: Number(process.env.OPEN_TELEMETRY_METRICS_PORT),
-            endpoint: process.env.OPEN_TELEMETRY_METRICS_ENDPOINT,
-            prefix: "",
-            appendTimestamp: true},
-          nodeScrapeInterval: Number(process.env.OPEN_TELEMETRY_METRICS_SCRAPING_FREQUENCY ?? 10),
-        },
-        tracing: {
-          enabled: Boolean(process.env.OPEN_TELEMETRY_TRACING_ENABLED ?? false),
-          otlp: {
-            url: process.env.OPEN_TELEMETRY_TRACING_URL,
-          },
-        },
-      },
+      LocalTaskWorkerModule: VanillaTaskWorkerModules.defaultConfig()
 
     },
     ...baseAppChainModulesConfig,
