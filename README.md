@@ -244,11 +244,43 @@ The caddy reverse-proxy automatically uses https for all connections, use this g
 
 <https://caddyserver.com/docs/running#local-https-with-docker>
 
+### Monitoring
+
+Protokit offers monitoring via three different kinds of data and a collection of preconfigured services: 
+- Logs via Promtail and Loki
+- Metrics via OpenTelemetry and Prometheus
+- Traces via OpenTelemetry, OTel Collector and Tempo
+- Dashboard via Grafana
+
+#### Development
+
+In Development mode, monitoring is disabled by default.
+
+To enabled, edit the `development/.env` file in the following way:
+1. Add the monitoring profile to `COMPOSE_PROFILES`
+2. Uncomment `...metricsSequencerModules` in the sequencer's module definition. 
+Important: This has to be in front of all other modules (i.e. has to be first in the modules record)
+3. Uncomment `...metricsSequencerModulesConfig` in the configuration call.
+
+Then, run `pnpm env:development docker:up` like usual. This should start all the services needed for monitoring.
+Grafana is available at `localhost:3000`.
+
+Note: Logs are currently not available without docker, since promtail is only configured to pick up container logs
+
+#### Sovereign
+
+In Sovereign mode, monitoring is configured by default.
+
+Grafana is reachable under `localhost/grafana`.
+
+If you want to remove the monitoring services, remove the docker profile `monitoring` from the `.env` file and remove the `OpenTelemetryServer` configuration
+
+More information about monitoring can be found [here](https://github.com/proto-kit/framework/pull/272).
 
 ## Building the framework from source
 
 1. Make sure the framework is located under ../framework from the starter-kit's location
 2. Adapt your starter-kit's `packages/chain` and `apps/web` package.json to use the file:// references to framework, including
-references to `o1js` and `tsyringe`.
+references to `o1js` and `tsyringe`. Important: Make sure to update references in both chain and web, otherwise the location of the node_modules will be different and lead to errors
 3. Go into the framework folder, and build a docker image containing the sources with `docker build -f ./packages/deployment/docker/development-base/Dockerfile -t protokit-base .`
 4. Replace the first line of `docker/base/Dockerfile` and `docker/web/Dockerfile` to use `FROM protokit-base:latest`
