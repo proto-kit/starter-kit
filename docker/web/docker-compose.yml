@@ -22,3 +22,6 @@ services:
       - chain-net
     ports:
       - 3000:3000
+    labels:
+      logging: "promtail"
+      logging_jobname: "grafana"

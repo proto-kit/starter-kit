@@ -23,6 +23,14 @@ services:
       - PROTOKIT_GRAPHQL_HOST=${PROTOKIT_GRAPHQL_HOST}
       - PROTOKIT_GRAPHQL_PORT=${PROTOKIT_GRAPHQL_PORT}
       - PROTOKIT_GRAPHIQL_ENABLED=${PROTOKIT_GRAPHIQL_ENABLED}
+
+      - OPEN_TELEMETRY_TRACING_ENABLED=${OPEN_TELEMETRY_TRACING_ENABLED}
+      - OPEN_TELEMETRY_TRACING_URL=${OPEN_TELEMETRY_TRACING_URL}
+
+      - OPEN_TELEMETRY_METRICS_ENABLED=${OPEN_TELEMETRY_METRICS_ENABLED}
+      - OPEN_TELEMETRY_METRICS_PORT=${OPEN_TELEMETRY_METRICS_PORT}
+      - OPEN_TELEMETRY_METRICS_HOST=${OPEN_TELEMETRY_METRICS_HOST}
+      - OPEN_TELEMETRY_METRICS_SCRAPING_FREQUENCY=${OPEN_TELEMETRY_METRICS_SCRAPING_FREQUENCY}
     profiles:
       - monolithic-sequencer
     depends_on:
@@ -37,6 +45,9 @@ services:
     ports:
       - 8080:8080
     command: ["./packages/chain/dist/start.js start ./environments/${PROTOKIT_ENV_FOLDER}/chain.config.js"]
+    labels:
+      logging: "promtail"
+      logging_jobname: "sequencer"
 
 networks:
   chain-net:
