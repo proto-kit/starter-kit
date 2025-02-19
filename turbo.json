@@ -4,14 +4,18 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "lint": {
       "dependsOn": ["^lint"]
     },
-    "check-types": {
-      "dependsOn": ["^check-types"]
+    "test": {
+      "dependsOn": ["^test"],
+      "env": ["PROOFS_ENABLED"]
+    },
+    "test:proofs-enabled": {
+      "dependsOn": ["^test:proofs-enabled"],
+      "env": ["PROOFS_ENABLED"]
     },
     "dev": {
       "cache": false,
