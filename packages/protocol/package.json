@@ -1,5 +1,5 @@
 {
-  "name": "@repo/runtime",
+  "name": "@repo/protocol",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -24,9 +24,9 @@
     "ts-node": "^10.9.2"
   },
   "peerDependencies": {
+    "@repo/runtime": "workspace:*",
     "@proto-kit/common": "../../../framework/packages/common",
     "@proto-kit/library": "../../../framework/packages/library",
-    "@proto-kit/module": "../../../framework/packages/module",
     "@proto-kit/protocol": "../../../framework/packages/protocol",
     "o1js": "../../../framework/node_modules/o1js",
     "tsyringe": "../../../framework/node_modules/tsyringe"

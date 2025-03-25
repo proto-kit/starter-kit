@@ -1,7 +1,7 @@
 import { runtimeMethod, runtimeModule } from "@proto-kit/module";
 import { TokenId, UInt64, Balances as BaseBalances } from "@proto-kit/library";
 import { assert, State, state } from "@proto-kit/protocol";
-import { PublicKey } from "o1js";
+import { Field, PublicKey } from "o1js";
 
 /**
  * Balances module implementation providing a multi-token ledger with
@@ -10,15 +10,19 @@ import { PublicKey } from "o1js";
  */
 @runtimeModule()
 export class Balances extends BaseBalances {
-  @state()
-  public admin = State.from<PublicKey>(PublicKey);
+  public static defaultConfig = {};
+
+  @state() public admin = State.from<PublicKey>(PublicKey);
+
+  @state() public root = State.from<Field>(Field);
 
   @runtimeMethod()
   public async setAdmin(admin: PublicKey) {
     const currentAdmin = await this.admin.get();
     const isAdmin = this.transaction.sender.value
       .equals(currentAdmin.value)
-      .or(currentAdmin.isSome.not());
+      .or(currentAdmin.isSome.not())
+      .or(this.transaction.sender.value.equals(currentAdmin.value));
 
     assert(
       isAdmin,

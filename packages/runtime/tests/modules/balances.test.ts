@@ -1,11 +1,10 @@
 import "reflect-metadata";
-import { modules } from "../../src/index";
 import { TokenId, BalancesKey, UInt64 } from "@proto-kit/library";
-import { PrivateKey, PublicKey } from "o1js";
+import { PrivateKey, Provable, PublicKey } from "o1js";
 import setup from "../setup";
-import { PublicKeyOption } from "@proto-kit/protocol";
-
-const proofsEnabled = process.env.PROOFS_ENABLED === "true";
+import { PublicKeyOption, StateServiceProvider } from "@proto-kit/protocol";
+import { Balances } from "./../../src/modules/balances";
+import { container } from "tsyringe";
 
 describe("balances", () => {
   const {
@@ -16,9 +15,11 @@ describe("balances", () => {
     compile,
     prove,
     clearContext,
-  } = setup(modules, proofsEnabled);
+  } = setup({
+    Balances,
+  });
 
-  let balances: InstanceType<(typeof modules)["Balances"]>;
+  let balances: Balances;
 
   // test data
   const alice = PrivateKey.random().toPublicKey();
@@ -39,7 +40,7 @@ describe("balances", () => {
 
   describe("transferSigned", () => {
     // function to reset the pre-transaction state & context
-    function clearAndHydrate() {
+    async function clearAndHydrate() {
       clearContext();
       clearState();
 
@@ -47,7 +48,7 @@ describe("balances", () => {
       context.input!.transaction.sender = PublicKeyOption.fromSome(alice);
 
       // hydrate the state
-      stateService.set(
+      await stateService.set(
         balances.balances.getPath(
           new BalancesKey({
             tokenId,
@@ -58,8 +59,8 @@ describe("balances", () => {
       );
     }
 
-    beforeEach(() => {
-      clearAndHydrate();
+    beforeEach(async () => {
+      await clearAndHydrate();
     });
 
     it("should transfer tokens from alice to bob", async () => {
@@ -69,6 +70,7 @@ describe("balances", () => {
       const aliceBalance = await balances.balances.get(
         new BalancesKey({ tokenId, address: alice })
       );
+
       const bobBalance = await balances.balances.get(
         new BalancesKey({ tokenId, address: bob })
       );
@@ -81,7 +83,7 @@ describe("balances", () => {
       expect(aliceBalance.value.toString()).toBe("0");
       expect(bobBalance.value.toString()).toBe(amount.value.toString());
 
-      clearAndHydrate();
+      await clearAndHydrate();
 
       // generate the proof
       const proof = await prove();
@@ -114,15 +116,15 @@ describe("balances", () => {
 
   describe("setAdmin", () => {
     describe("when the admin is not set", () => {
-      function clearAndHydrate() {
+      async function clearAndHydrate() {
         clearContext();
         clearState();
 
         context.input!.transaction.sender = PublicKeyOption.fromSome(alice);
       }
 
-      beforeEach(() => {
-        clearAndHydrate();
+      beforeEach(async () => {
+        await clearAndHydrate();
       });
 
       it("should set the admin", async () => {
@@ -134,7 +136,7 @@ describe("balances", () => {
         expect(context.result.statusMessage).toBeUndefined();
         expect(admin.value.toBase58()).toBe(alice.toBase58());
 
-        clearAndHydrate();
+        await clearAndHydrate();
 
         const proof = await prove();
 
@@ -143,7 +145,7 @@ describe("balances", () => {
     });
 
     describe("when the admin is set", () => {
-      function clearAndHydrate(sender: PublicKey) {
+      async function clearAndHydrate(sender: PublicKey) {
         clearContext();
         clearState();
 
@@ -156,8 +158,8 @@ describe("balances", () => {
       }
 
       describe("when the sender is not the admin", () => {
-        beforeEach(() => {
-          clearAndHydrate(alice);
+        beforeEach(async () => {
+          await clearAndHydrate(alice);
         });
 
         it("should not set the admin", async () => {
@@ -168,7 +170,7 @@ describe("balances", () => {
             "Only the admin can set the admin, unless the admin has not been set yet"
           );
 
-          clearAndHydrate(alice);
+          await clearAndHydrate(alice);
 
           const proof = await prove();
 
@@ -177,8 +179,8 @@ describe("balances", () => {
       });
 
       describe("when the sender is the admin", () => {
-        beforeEach(() => {
-          clearAndHydrate(bob);
+        beforeEach(async () => {
+          await clearAndHydrate(bob);
         });
 
         it("should set the admin", async () => {
@@ -190,7 +192,7 @@ describe("balances", () => {
           expect(context.result.statusMessage).toBeUndefined();
           expect(admin.value.toBase58()).toBe(alice.toBase58());
 
-          clearAndHydrate(bob);
+          await clearAndHydrate(bob);
 
           const proof = await prove();
 
@@ -202,7 +204,7 @@ describe("balances", () => {
 
   describe("mint", () => {
     // function to reset the pre-mint state & context
-    function clearAndHydrate(sender: PublicKey) {
+    async function clearAndHydrate(sender: PublicKey) {
       clearContext();
       clearState();
 
@@ -217,8 +219,8 @@ describe("balances", () => {
     }
 
     describe("when the sender is the admin", () => {
-      beforeEach(() => {
-        clearAndHydrate(alice);
+      beforeEach(async () => {
+        await clearAndHydrate(alice);
       });
 
       it("should mint tokens to alice", async () => {
@@ -232,7 +234,7 @@ describe("balances", () => {
         expect(context.result.statusMessage).toBeUndefined();
         expect(aliceBalance.value.toString()).toBe(amount.value.toString());
 
-        clearAndHydrate(alice);
+        await clearAndHydrate(alice);
 
         const proof = await prove();
 
@@ -241,8 +243,8 @@ describe("balances", () => {
     });
 
     describe("when the sender is not the admin", () => {
-      beforeEach(() => {
-        clearAndHydrate(bob);
+      beforeEach(async () => {
+        await clearAndHydrate(bob);
       });
 
       it("should not mint tokens to alice", async () => {
@@ -251,7 +253,7 @@ describe("balances", () => {
         expect(context.result.status.toBoolean()).toBe(false);
         expect(context.result.statusMessage).toBe("Only the admin can mint");
 
-        clearAndHydrate(bob);
+        await clearAndHydrate(bob);
 
         const proof = await prove();
 

@@ -1,28 +1,39 @@
-# Turborepo starter
+# Protokit starter-kit
 
-This Turborepo starter is maintained by the Turborepo core team.
+This is a starter-kit for building a Protokit application chains.
 
-## Using this example
+## Quick start
 
-Run the following command:
+### Create a new application chain
 
 ```sh
-npx create-turbo@latest
+git clone https://github.com/proto-kit/starter-kit your-application-chain
+cd your-application-chain
+```
+
+### Install dependencies
+
+```sh
+pnpm install
+```
+
+### Run the Sequencer and UI
+
+```sh
+pnpm dev
 ```
 
 ## What's inside?
 
-This Turborepo includes the following packages/apps:
+This starter-kit is a [Turborepo](https://turbo.build) that includes the following packages/apps:
 
 ### Apps and Packages
 
 - `docs`: a [Next.js](https://nextjs.org/) app
 - `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
+- [`@repo/runtime`](./packages/runtime/README.md): Business logic of your application chain
 - `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
 - `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 
 ### Utilities
 

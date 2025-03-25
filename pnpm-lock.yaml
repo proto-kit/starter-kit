@@ -134,6 +134,64 @@ importers:
         specifier: ^0.1.13
         version: 0.1.14
 
+  packages/protocol:
+    dependencies:
+      '@proto-kit/common':
+        specifier: ../../../framework/packages/common
+        version: link:../../../framework/packages/common
+      '@proto-kit/library':
+        specifier: ../../../framework/packages/library
+        version: link:../../../framework/packages/library
+      '@proto-kit/protocol':
+        specifier: ../../../framework/packages/protocol
+        version: link:../../../framework/packages/protocol
+      '@repo/runtime':
+        specifier: workspace:*
+        version: link:../runtime
+      o1js:
+        specifier: ../../../framework/node_modules/o1js
+        version: link:../../../framework/node_modules/o1js
+      tsyringe:
+        specifier: ../../../framework/node_modules/tsyringe
+        version: link:../../../framework/node_modules/tsyringe
+    devDependencies:
+      '@dotenvx/dotenvx':
+        specifier: ^1.36.0
+        version: 1.36.0
+      '@jest/globals':
+        specifier: ^29.7.0
+        version: 29.7.0
+      '@jest/types':
+        specifier: ^29.6.3
+        version: 29.6.3
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/jest-config':
+        specifier: workspace:*
+        version: link:../jest-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/jest':
+        specifier: ^29.5.14
+        version: 29.5.14
+      '@types/node':
+        specifier: ^22.13.4
+        version: 22.13.4
+      jest:
+        specifier: ^29.6.1
+        version: 29.7.0(@types/node@22.13.4)(ts-node@10.9.2(@types/node@22.13.4)(typescript@5.7.3))
+      reflect-metadata:
+        specifier: ^0.1.13
+        version: 0.1.14
+      ts-jest:
+        specifier: ^29.1.1
+        version: 29.2.5(@babel/core@7.26.9)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.9))(jest@29.7.0(@types/node@22.13.4)(ts-node@10.9.2(@types/node@22.13.4)(typescript@5.7.3)))(typescript@5.7.3)
+      ts-node:
+        specifier: ^10.9.2
+        version: 10.9.2(@types/node@22.13.4)(typescript@5.7.3)
+
   packages/runtime:
     dependencies:
       '@proto-kit/common':
@@ -3775,7 +3833,7 @@ snapshots:
   '@types/glob@7.2.0':
     dependencies:
       '@types/minimatch': 5.1.2
-      '@types/node': 22.13.0
+      '@types/node': 22.13.4
 
   '@types/graceful-fs@4.1.9':
     dependencies:
@@ -3825,7 +3883,7 @@ snapshots:
 
   '@types/through@0.0.33':
     dependencies:
-      '@types/node': 22.13.0
+      '@types/node': 22.13.4
 
   '@types/tinycolor2@1.4.6': {}
 

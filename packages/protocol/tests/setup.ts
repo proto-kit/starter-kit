@@ -1,20 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 import "reflect-metadata";
-import { container, Lifecycle } from "tsyringe";
+import { container } from "tsyringe";
 import {
   InMemoryStateService,
   MethodIdResolver,
   MethodParameterEncoder,
   Runtime,
 } from "@proto-kit/module";
-import {
-  Field,
-  UInt64 as O1UInt64,
-  Poseidon,
-  Proof,
-  Provable,
-  PublicKey,
-} from "o1js";
+import { Field, UInt64 as O1UInt64, Poseidon, Proof, PublicKey } from "o1js";
 import {
   MethodPublicOutput,
   NetworkState,
@@ -35,9 +27,9 @@ import { CompileRegistry } from "@proto-kit/common";
  */
 export default function setup<RuntimeModules extends RuntimeModulesRecord>(
   modules: RuntimeModules,
-  areProofsEnabled = process.env.PROTOKIT_PROOFS_ENABLED === "true"
+  areProofsEnabled = process.env.PROOFS_ENABLED === "true"
 ) {
-  if (areProofsEnabled) {
+  if (process.env.PROOFS_ENABLED === "true") {
     console.log(
       "You're running with proofs enabled, please be patient this may take a while"
     );
@@ -71,11 +63,9 @@ export default function setup<RuntimeModules extends RuntimeModulesRecord>(
    */
   async function compile() {
     const compileRegistry = container.resolve(CompileRegistry);
-    clearState();
-    clearContext();
-    areProofsEnabled ? console.time("compile") : {};
+    console.time("compile");
     await runtime.compile(compileRegistry);
-    areProofsEnabled ? console.timeEnd("compile") : {};
+    console.timeEnd("compile");
   }
 
   // state service & state service provider setup
@@ -126,8 +116,7 @@ export default function setup<RuntimeModules extends RuntimeModulesRecord>(
    * @returns The proof of the runtime method execution.
    */
   async function prove() {
-    areProofsEnabled ? console.time("prove") : {};
-
+    console.time("prove");
     const { moduleName, methodName, args } = context.current().result;
     // TODO: extract Appchain.transaction logic so it can be reused here
     context.input!.transaction.methodId = getMethodId(moduleName!, methodName!);
@@ -141,8 +130,8 @@ export default function setup<RuntimeModules extends RuntimeModulesRecord>(
     const proof = (await context.result.prover!()) as unknown as Promise<
       Proof<undefined, MethodPublicOutput>
     >;
+    console.timeEnd("prove");
 
-    areProofsEnabled ? console.timeEnd("prove") : {};
     return proof;
   }
 

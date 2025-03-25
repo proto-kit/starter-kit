@@ -1,0 +1,12 @@
+{
+  "extends": "@repo/typescript-config/protokit.json",
+  "compilerOptions": {
+    "outDir": "dist"
+  },
+  "include": ["src/**/*"],
+  "exclude": [],
+  "ts-node": {
+    "experimentalResolver": true,
+    "esm": true
+  }
+}

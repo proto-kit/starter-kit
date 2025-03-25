@@ -11,11 +11,11 @@
     },
     "test": {
       "dependsOn": ["^test"],
-      "env": ["PROOFS_ENABLED"]
+      "env": ["PROTOKIT_*"]
     },
     "test:proofs-enabled": {
       "dependsOn": ["^test:proofs-enabled"],
-      "env": ["PROOFS_ENABLED"]
+      "env": ["PROTOKIT_*"]
     },
     "dev": {
       "cache": false,
