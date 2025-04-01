@@ -28,6 +28,7 @@ export class TransactionFeeHook extends BaseTransactionFeeHook {
   }
 
   public async transferFee(from: PublicKeyOption, fee: UInt64) {
+    Provable.log("transferFee", from, fee);
     await this.balances.transfer(
       new TokenId(this.config.tokenId),
       from.value,

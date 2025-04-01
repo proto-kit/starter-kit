@@ -5,8 +5,8 @@
   "type": "module",
   "main": "./src/index.ts",
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "test:proofs-enabled": "dotenvx run -f .env.proofs-enabled -- node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test": "dotenvx run -f .env.test -- node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:proofs-enabled": "dotenvx run -f .env.test -f .env.proofs-enabled -- node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "lint": "eslint ."
   },
   "devDependencies": {
