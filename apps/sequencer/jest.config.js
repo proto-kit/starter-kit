@@ -1,3 +1,4 @@
+/** @type {import('ts-jest').JestConfigWithTsJest} */
 export default {
   // because we run tests from within ./packages/<package_name>/
   rootDir: "./",
