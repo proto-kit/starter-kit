@@ -1,12 +1,10 @@
 {
-  "name": "@repo/runtime",
+  "name": "@repo/utils",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "main": "./src/index.ts",
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "test:proofs-enabled": "dotenvx run -f .env.proofs-enabled -- node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "lint": "eslint ."
   },
   "devDependencies": {
@@ -24,12 +22,10 @@
     "ts-node": "^10.9.2"
   },
   "peerDependencies": {
-    "@repo/utils": "workspace:*",
     "@proto-kit/common": "../../../framework/packages/common",
-    "@proto-kit/library": "../../../framework/packages/library",
-    "@proto-kit/module": "../../../framework/packages/module",
-    "@proto-kit/protocol": "../../../framework/packages/protocol",
-    "o1js": "../../../framework/node_modules/o1js",
-    "tsyringe": "../../../framework/node_modules/tsyringe"
+    "@repo/runtime": "workspace:*",
+    "@repo/protocol": "workspace:*",
+    "@repo/sequencer": "workspace:*",
+    "@repo/app-chain": "workspace:*"
   }
 }

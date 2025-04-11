@@ -3,12 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "main": "./src/index.ts",
   "scripts": {
-    "test": "dotenvx run -f .env.test -- node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "test:proofs-enabled": "dotenvx run -f .env.test -f .env.proofs-enabled -- node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "lint": "eslint .",
-    "start": "./scripts/start.sh"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:proofs-enabled": "dotenvx run -f .env.proofs-enabled -- node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "lint": "eslint ."
   },
   "devDependencies": {
     "@dotenvx/dotenvx": "^1.36.0",
@@ -29,17 +27,9 @@
     "@proto-kit/library": "../../../framework/packages/library",
     "@proto-kit/module": "../../../framework/packages/module",
     "@proto-kit/protocol": "../../../framework/packages/protocol",
-    "@proto-kit/sdk": "../../../framework/packages/sdk",
     "@proto-kit/sequencer": "../../../framework/packages/sequencer",
-    "@repo/runtime": "workspace:*",
-    "@repo/utils": "workspace:*",
+    "@proto-kit/api": "../../../framework/packages/api",
     "o1js": "../../../framework/node_modules/o1js",
-    "specifier-resolution-node": "^1.1.4",
-    "tsyringe": "../../../framework/node_modules/tsyringe",
-    "loglevel": "^1.8.1"
-  },
-  "dependencies": {
-    "@types/yargs": "^17.0.33",
-    "yargs": "^17.7.2"
+    "tsyringe": "../../../framework/node_modules/tsyringe"
   }
 }

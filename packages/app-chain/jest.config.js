@@ -1,3 +1,2 @@
 import jestConfig from "@repo/jest-config/protokit";
-/** @type {import('ts-jest').JestConfigWithTsJest} */
 export default jestConfig;

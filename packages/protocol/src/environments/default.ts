@@ -1,13 +1,14 @@
-import { TransactionFeeHook } from "./modules/transaction-fee-hook";
-import * as Vanilla from "./modules/vanilla";
+import { TransactionFeeHook } from "./../modules/transaction-fee-hook";
+import * as Vanilla from "./../modules/vanilla";
 import { ModulesConfig } from "@proto-kit/common";
 import { Protocol } from "@proto-kit/protocol";
+
 export const modules = {
   ...Vanilla.modules,
   TransactionFee: TransactionFeeHook,
 };
 
-export const defaultConfig: ModulesConfig<typeof modules> = {
+export const config: ModulesConfig<typeof modules> = {
   ...Vanilla.defaultConfig,
   TransactionFee: {
     tokenId: 0n,
@@ -19,4 +20,6 @@ export const defaultConfig: ModulesConfig<typeof modules> = {
   },
 };
 
-export default Protocol.from({ modules, config: defaultConfig });
+export default async () => {
+  return { modules, config };
+};
