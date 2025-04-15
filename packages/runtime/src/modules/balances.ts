@@ -1,5 +1,10 @@
 import { runtimeMethod, runtimeModule } from "@proto-kit/module";
-import { TokenId, UInt64, Balances as BaseBalances } from "@proto-kit/library";
+import {
+  TokenId,
+  UInt64,
+  Balances as BaseBalances,
+  Balance,
+} from "@proto-kit/library";
 import { assert, State, state } from "@proto-kit/protocol";
 import { Field, PublicKey } from "o1js";
 
@@ -33,7 +38,7 @@ export class Balances extends BaseBalances {
   }
 
   @runtimeMethod()
-  public async mint(tokenId: TokenId, address: PublicKey, amount: UInt64) {
+  public async mint(tokenId: TokenId, address: PublicKey, amount: Balance) {
     const admin = await this.admin.get();
 
     assert(

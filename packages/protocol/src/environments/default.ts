@@ -12,7 +12,7 @@ export const config: ModulesConfig<typeof modules> = {
   ...Vanilla.defaultConfig,
   TransactionFee: {
     tokenId: 0n,
-    baseFee: 1n,
+    baseFee: BigInt(process.env.PROTOKIT_TRANSACTION_FEE_BASE_FEE!),
     perWeightUnitFee: 0n,
     // Configures who receives the transaction fees collected by the protocol
     feeRecipient: process.env.PROTOKIT_TRANSACTION_FEE_RECIPIENT!,

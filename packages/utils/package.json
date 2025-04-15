@@ -5,7 +5,8 @@
   "type": "module",
   "main": "./src/index.ts",
   "scripts": {
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "script": "./scripts/run-script.sh $@"
   },
   "devDependencies": {
     "@dotenvx/dotenvx": "^1.36.0",
@@ -23,9 +24,12 @@
   },
   "peerDependencies": {
     "@proto-kit/common": "../../../framework/packages/common",
+    "@proto-kit/api": "../../../framework/packages/api",
     "@repo/runtime": "workspace:*",
     "@repo/protocol": "workspace:*",
     "@repo/sequencer": "workspace:*",
-    "@repo/app-chain": "workspace:*"
+    "@repo/app-chain": "workspace:*",
+    "@repo/client": "workspace:*",
+    "o1js": "../../../framework/node_modules/o1js"
   }
 }

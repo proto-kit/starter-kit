@@ -1,12 +1,8 @@
 #!/bin/bash
 
-# Check if first argument is provided
-if [ -z "$1" ]; then
-    echo "Error: First argument (env file) is required"
-    exit 1
-fi
+PROTOKIT_ENV=$2
 
-# Define array of packages
+# Define array of packages to load env files from
 PACKAGES=(
     "app-chain"
     "runtime"
@@ -17,8 +13,8 @@ PACKAGES=(
 # Build the dotenvx arguments
 DOTENV_ARGS=""
 
-if [ -f ".env.$1" ]; then
-    DOTENV_ARGS="-f .env.$1"
+if [ -f ".env.$2" ]; then
+    DOTENV_ARGS="-f .env.$2"
 fi
 
 for package in "${PACKAGES[@]}"; do
@@ -28,9 +24,11 @@ for package in "${PACKAGES[@]}"; do
     fi
 done
 
-echo "DOTENV_ARGS: $DOTENV_ARGS"
-
-echo "Starting the sequencer in ${PROTOKIT_ENV} mode"
+if [ -z "$PROTOKIT_ENV" ]; then
+    echo "Starting script $1 without a specified environment"
+else
+    echo "Starting script $1 in ${PROTOKIT_ENV} environment"
+fi
 
 dotenvx run ${DOTENV_ARGS} \
   -- node \
@@ -38,4 +36,5 @@ dotenvx run ${DOTENV_ARGS} \
     --experimental-vm-modules \
     --es-module-specifier-resolution=node \
     --experimental-wasm-modules \
-    ./scripts/start.ts start "$@"
+    $PWD/scripts/$1.ts $@
+
