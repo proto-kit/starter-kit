@@ -14,6 +14,8 @@ export async function importEnvironment<ModuleType extends ModulesRecord>(
   args: Record<string, unknown | undefined> = {},
   environment: string = process.env.PROTOKIT_ENV || "default"
 ): Promise<Environment<ModuleType>> {
+  console.log("Importing environment", packageName, environment);
+
   try {
     const environmentFile = `@repo/${packageName}/src/environments/${environment}`;
     const environmentModule = await import(environmentFile);

@@ -30,6 +30,7 @@
     "@repo/sequencer": "workspace:*",
     "@repo/app-chain": "workspace:*",
     "@repo/client": "workspace:*",
+    "@repo/lightnet": "workspace:*",
     "o1js": "../../../framework/node_modules/o1js"
   }
 }

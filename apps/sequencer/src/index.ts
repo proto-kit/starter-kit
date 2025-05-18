@@ -12,6 +12,7 @@ import {
 } from "@repo/utils/src/import-environment";
 
 export default async function start(args: ArgsRecord) {
+  console.log("Starting sequencer", args);
   const sequencer = await importEnvironment<SequencerModulesRecord>(
     "sequencer",
     args

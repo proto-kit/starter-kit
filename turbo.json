@@ -20,6 +20,10 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "docker-compose": {
+      "cache": false,
+      "persistent": true
     }
   }
 }

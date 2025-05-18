@@ -6,7 +6,9 @@
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "test:proofs-enabled": "dotenvx run -f .env.proofs-enabled -- node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "prisma:migrate": "bash -c 'env=$1; shift; dotenvx run -f .env.\"$env\" -- prisma migrate deploy --schema ./node_modules/@proto-kit/persistance/prisma/schema.prisma  \"$@\"' --",
+    "prisma:generate": "bash -c 'env=$1; shift; dotenvx run -f .env.\"$env\" -- prisma generate --schema ./node_modules/@proto-kit/persistance/prisma/schema.prisma \"$@\"' --"
   },
   "devDependencies": {
     "@dotenvx/dotenvx": "^1.36.0",
@@ -29,7 +31,10 @@
     "@proto-kit/protocol": "../../../framework/packages/protocol",
     "@proto-kit/sequencer": "../../../framework/packages/sequencer",
     "@proto-kit/api": "../../../framework/packages/api",
+    "@proto-kit/persistance": "../../../framework/packages/persistance",
     "o1js": "../../../framework/node_modules/o1js",
-    "tsyringe": "../../../framework/node_modules/tsyringe"
+    "tsyringe": "../../../framework/node_modules/tsyringe",
+    "@prisma/client": "5.18",
+    "prisma": "^5.18.0"
   }
 }

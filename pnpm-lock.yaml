@@ -99,6 +99,9 @@ importers:
       specifier-resolution-node:
         specifier: ^1.1.4
         version: 1.1.4
+      ts-node:
+        specifier: ^10.9.2
+        version: 10.9.2(@types/node@22.13.4)(typescript@5.7.3)
       tsyringe:
         specifier: ../../../framework/node_modules/tsyringe
         version: link:../../../framework/node_modules/tsyringe
@@ -139,9 +142,6 @@ importers:
       ts-jest:
         specifier: ^29.1.1
         version: 29.2.5(@babel/core@7.26.9)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.9))(jest@29.7.0(@types/node@22.13.4)(ts-node@10.9.2(@types/node@22.13.4)(typescript@5.7.3)))(typescript@5.7.3)
-      ts-node:
-        specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.13.4)(typescript@5.7.3)
 
   apps/web:
     dependencies:
@@ -362,6 +362,70 @@ importers:
         specifier: ^0.1.13
         version: 0.1.14
 
+  packages/lightnet:
+    dependencies:
+      '@proto-kit/api':
+        specifier: ../../../framework/packages/api
+        version: link:../../../framework/packages/api
+      '@proto-kit/common':
+        specifier: ../../../framework/packages/common
+        version: link:../../../framework/packages/common
+      '@proto-kit/library':
+        specifier: ../../../framework/packages/library
+        version: link:../../../framework/packages/library
+      '@proto-kit/module':
+        specifier: ../../../framework/packages/module
+        version: link:../../../framework/packages/module
+      '@proto-kit/persistance':
+        specifier: ../../../framework/packages/persistance
+        version: link:../../../framework/packages/persistance
+      '@proto-kit/protocol':
+        specifier: ../../../framework/packages/protocol
+        version: link:../../../framework/packages/protocol
+      '@proto-kit/sequencer':
+        specifier: ../../../framework/packages/sequencer
+        version: link:../../../framework/packages/sequencer
+      o1js:
+        specifier: ../../../framework/node_modules/o1js
+        version: link:../../../framework/node_modules/o1js
+    devDependencies:
+      '@dotenvx/dotenvx':
+        specifier: ^1.36.0
+        version: 1.36.0
+      '@jest/globals':
+        specifier: ^29.7.0
+        version: 29.7.0
+      '@jest/types':
+        specifier: ^29.6.3
+        version: 29.6.3
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/jest-config':
+        specifier: workspace:*
+        version: link:../jest-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/jest':
+        specifier: ^29.5.14
+        version: 29.5.14
+      '@types/node':
+        specifier: ^22.13.4
+        version: 22.13.4
+      jest:
+        specifier: ^29.6.1
+        version: 29.7.0(@types/node@22.13.4)(ts-node@10.9.2(@types/node@22.13.4)(typescript@5.7.3))
+      reflect-metadata:
+        specifier: ^0.1.13
+        version: 0.1.14
+      ts-jest:
+        specifier: ^29.1.1
+        version: 29.2.5(@babel/core@7.26.9)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.9))(jest@29.7.0(@types/node@22.13.4)(ts-node@10.9.2(@types/node@22.13.4)(typescript@5.7.3)))(typescript@5.7.3)
+      ts-node:
+        specifier: ^10.9.2
+        version: 10.9.2(@types/node@22.13.4)(typescript@5.7.3)
+
   packages/protocol:
     dependencies:
       '@proto-kit/common':
@@ -483,6 +547,9 @@ importers:
 
   packages/sequencer:
     dependencies:
+      '@prisma/client':
+        specifier: '5.18'
+        version: 5.18.0(prisma@5.22.0)
       '@proto-kit/api':
         specifier: ../../../framework/packages/api
         version: link:../../../framework/packages/api
@@ -495,6 +562,9 @@ importers:
       '@proto-kit/module':
         specifier: ../../../framework/packages/module
         version: link:../../../framework/packages/module
+      '@proto-kit/persistance':
+        specifier: ../../../framework/packages/persistance
+        version: link:../../../framework/packages/persistance
       '@proto-kit/protocol':
         specifier: ../../../framework/packages/protocol
         version: link:../../../framework/packages/protocol
@@ -504,6 +574,9 @@ importers:
       o1js:
         specifier: ../../../framework/node_modules/o1js
         version: link:../../../framework/node_modules/o1js
+      prisma:
+        specifier: ^5.18.0
+        version: 5.22.0
       tsyringe:
         specifier: ../../../framework/node_modules/tsyringe
         version: link:../../../framework/node_modules/tsyringe
@@ -595,6 +668,9 @@ importers:
       '@repo/client':
         specifier: workspace:*
         version: link:../client
+      '@repo/lightnet':
+        specifier: workspace:*
+        version: link:../lightnet
       '@repo/protocol':
         specifier: workspace:*
         version: link:../protocol
@@ -1168,6 +1244,30 @@ packages:
   '@nodelib/fs.walk@1.2.8':
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
+
+  '@prisma/client@5.18.0':
+    resolution: {integrity: sha512-BWivkLh+af1kqC89zCJYkHsRcyWsM8/JHpsDMM76DjP3ZdEquJhXa4IeX+HkWPnwJ5FanxEJFZZDTWiDs/Kvyw==}
+    engines: {node: '>=16.13'}
+    peerDependencies:
+      prisma: '*'
+    peerDependenciesMeta:
+      prisma:
+        optional: true
+
+  '@prisma/debug@5.22.0':
+    resolution: {integrity: sha512-AUt44v3YJeggO2ZU5BkXI7M4hu9BF2zzH2iF2V5pyXT/lRTyWiElZ7It+bRH1EshoMRxHgpYg4VB6rCM+mG5jQ==}
+
+  '@prisma/engines-version@5.22.0-44.605197351a3c8bdd595af2d2a9bc3025bca48ea2':
+    resolution: {integrity: sha512-2PTmxFR2yHW/eB3uqWtcgRcgAbG1rwG9ZriSvQw+nnb7c4uCr3RAcGMb6/zfE88SKlC1Nj2ziUvc96Z379mHgQ==}
+
+  '@prisma/engines@5.22.0':
+    resolution: {integrity: sha512-UNjfslWhAt06kVL3CjkuYpHAWSO6L4kDCVPegV6itt7nD1kSJavd3vhgAEhjglLJJKEdJ7oIqDJ+yHk6qO8gPA==}
+
+  '@prisma/fetch-engine@5.22.0':
+    resolution: {integrity: sha512-bkrD/Mc2fSvkQBV5EpoFcZ87AvOgDxbG99488a5cexp5Ccny+UM6MAe/UFkUC0wLYD9+9befNOqGiIJhhq+HbA==}
+
+  '@prisma/get-platform@5.22.0':
+    resolution: {integrity: sha512-pHhpQdr1UPFpt+zFfnPazhulaZYCUqeIcPpJViYoq9R+D/yw4fjE+CtnsnKzPYm0ddUbeXUzjGVGIRVgPDCk4Q==}
 
   '@sinclair/typebox@0.27.8':
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
@@ -2893,6 +2993,11 @@ packages:
     resolution: {integrity: sha512-Pdlw/oPxN+aXdmM9R00JVC9WVFoCLTKJvDVLgmJ+qAffBMxsV85l/Lu7sNx4zSzPyoL2euImuEwHhOXdEgNFZQ==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
 
+  prisma@5.22.0:
+    resolution: {integrity: sha512-vtpjW3XuYCSnMsNVBjLMNkTj6OZbudcPPTPYHqX0CJfpcdWciI1dM8uHETwmDxxiqEwCIE6WvXucWUetJgfu/A==}
+    engines: {node: '>=16.13'}
+    hasBin: true
+
   prompts@2.4.2:
     resolution: {integrity: sha512-NxNv/kLguCA7p3jE8oL2aEBsrJWgAakBpgmgK6lpPWV+WuOmY6r2/zbAVnP+T8bQlA0nzHXSJSJW0Hq7ylaD2Q==}
     engines: {node: '>= 6'}
@@ -4116,6 +4221,31 @@ snapshots:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.18.0
+
+  '@prisma/client@5.18.0(prisma@5.22.0)':
+    optionalDependencies:
+      prisma: 5.22.0
+
+  '@prisma/debug@5.22.0': {}
+
+  '@prisma/engines-version@5.22.0-44.605197351a3c8bdd595af2d2a9bc3025bca48ea2': {}
+
+  '@prisma/engines@5.22.0':
+    dependencies:
+      '@prisma/debug': 5.22.0
+      '@prisma/engines-version': 5.22.0-44.605197351a3c8bdd595af2d2a9bc3025bca48ea2
+      '@prisma/fetch-engine': 5.22.0
+      '@prisma/get-platform': 5.22.0
+
+  '@prisma/fetch-engine@5.22.0':
+    dependencies:
+      '@prisma/debug': 5.22.0
+      '@prisma/engines-version': 5.22.0-44.605197351a3c8bdd595af2d2a9bc3025bca48ea2
+      '@prisma/get-platform': 5.22.0
+
+  '@prisma/get-platform@5.22.0':
+    dependencies:
+      '@prisma/debug': 5.22.0
 
   '@sinclair/typebox@0.27.8': {}
 
@@ -6313,6 +6443,12 @@ snapshots:
       '@jest/schemas': 29.6.3
       ansi-styles: 5.2.0
       react-is: 18.3.1
+
+  prisma@5.22.0:
+    dependencies:
+      '@prisma/engines': 5.22.0
+    optionalDependencies:
+      fsevents: 2.3.3
 
   prompts@2.4.2:
     dependencies:
