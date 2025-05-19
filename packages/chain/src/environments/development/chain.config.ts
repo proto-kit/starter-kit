@@ -46,13 +46,13 @@ export const appChain = AppChain.from({
     modules: {
       // ordering of the modules matters due to dependency resolution
       Database: PrismaRedisDatabase,
+      ...(process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true"
+        ? settlementSequencerModules
+        : {}),
       ...baseSequencerModules,
       ...indexerSequencerModules,
       TaskQueue: BullQueue,
       DatabasePruneModule,
-      ...(process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true"
-        ? settlementSequencerModules
-        : {}),
     },
   }),
   modules: baseAppChainModules,

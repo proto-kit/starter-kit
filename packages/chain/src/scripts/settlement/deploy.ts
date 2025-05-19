@@ -39,7 +39,6 @@ export default async function () {
         Database: PrismaRedisDatabase,
         TaskQueue: BullQueue,
         ...settlementSequencerModules,
-        OutgoingMessageQueue: Noop,
         SequencerStartupModule: Noop,
       },
     }),

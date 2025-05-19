@@ -10,7 +10,6 @@ import {
   BlockProducerModule,
   MinaBaseLayer,
   SettlementModule,
-  WithdrawalQueue,
   ConstantFeeStrategy,
   BatchProducerModule,
   SequencerStartupModule,
@@ -50,6 +49,13 @@ export const baseSequencerModulesConfig = {
     blockInterval: Number(process.env.PROTOKIT_BLOCK_INTERVAL!),
     produceEmptyBlocks: true,
     settlementInterval: Number(process.env.PROTOKIT_SETTLEMENT_INTERVAL!),
+    settlementTokenConfig: {
+      "0": {
+        bridgingContractPrivateKey: PrivateKey.fromBase58(
+          process.env.PROTOKIT_MINA_BRIDGE_CONTRACT_PRIVATE_KEY!
+        ),
+      },
+    },
   },
 } satisfies ModulesConfig<typeof baseSequencerModules>;
 
@@ -64,7 +70,6 @@ export const indexerSequencerModulesConfig = {
 export const settlementSequencerModules = {
   BaseLayer: MinaBaseLayer,
   SettlementModule: SettlementModule,
-  OutgoingMessageQueue: WithdrawalQueue,
   FeeStrategy: ConstantFeeStrategy,
   BatchProducerModule,
   SequencerStartupModule,
@@ -103,7 +108,6 @@ export const settlementSequencerModulesConfig = {
       ),
     },
   },
-  OutgoingMessageQueue: {},
   FeeStrategy: {},
   BatchProducerModule: {},
   SequencerStartupModule: {},

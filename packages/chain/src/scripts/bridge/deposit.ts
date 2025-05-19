@@ -73,7 +73,6 @@ export default async function () {
         TaskQueue: LocalTaskQueue,
         ...settlementSequencerModules,
         SequencerStartupModule: Noop,
-        OutgoingMessageQueue: Noop,
       },
     }),
     modules: {},
@@ -135,7 +134,7 @@ export default async function () {
     }
   );
 
-  // TODO: remove if NONE authorization isnt used (outside of lightnet)
+  // TODO: remove if SIGNATURE authorization isnt used (outside of lightnet)
   tx.transaction.accountUpdates.forEach((au) => {
     if (
       [
@@ -143,13 +142,14 @@ export default async function () {
         process.env.PROTOKIT_DISPATCHER_CONTRACT_PUBLIC_KEY,
       ].includes(au.body.publicKey.toBase58())
     ) {
-      Authorization.setLazyNone(au);
+      Authorization.setLazySignature(au);
     }
   });
 
-  tx.sign([fromPrivateKey]);
+  tx.sign([fromPrivateKey, settlementModule.config.keys.dispatch]);
 
   console.log("Sending...");
+  Provable.log("AUs", tx.toPretty());
   const sentTx = await tx.send();
   console.log("Waiting for inclusion...");
   const includedTx = await sentTx.wait();

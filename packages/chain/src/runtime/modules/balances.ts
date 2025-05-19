@@ -1,10 +1,9 @@
 import {
   runtimeModule,
-  state,
   runtimeMethod,
   runtimeMessage,
 } from "@proto-kit/module";
-import { Deposit, State, assert } from "@proto-kit/protocol";
+import { Deposit, State, assert, state } from "@proto-kit/protocol";
 import {
   Balance,
   BalancesKey,
