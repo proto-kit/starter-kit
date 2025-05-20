@@ -22,7 +22,7 @@ export const settlementModules = {
 export const settlementModulesConfig = {
   SettlementContractModule: {
     BridgeContract: {
-      withdrawalEventName: "withdraw",
+      withdrawalEventName: "withdrawal",
       withdrawalStatePath: "Withdrawals.withdrawals",
     },
     SettlementContract: {},

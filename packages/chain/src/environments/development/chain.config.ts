@@ -3,15 +3,10 @@ import { Runtime } from "@proto-kit/module";
 import { Protocol } from "@proto-kit/protocol";
 import {
   DatabasePruneModule,
-  PendingTransaction,
   Sequencer,
-  sequencerModule,
 } from "@proto-kit/sequencer";
-import type { PrismaConnection } from "@proto-kit/persistance";
 import {
   PrismaRedisDatabase,
-  PrismaTransactionStorage,
-  TransactionMapper,
 } from "@proto-kit/persistance";
 import runtime from "../../runtime";
 import * as protocol from "../../protocol";
@@ -20,8 +15,8 @@ import {
   baseSequencerModulesConfig,
   indexerSequencerModules,
   indexerSequencerModulesConfig,
-  settlementSequencerModules,
-  settlementSequencerModulesConfig,
+  baseSettlementSequencerModules,
+  baseSettlementSequencerModulesConfig,
 } from "../../sequencer";
 import { BullQueue } from "@proto-kit/deployment";
 import { Arguments } from "../../start";
@@ -29,6 +24,7 @@ import {
   baseAppChainModules,
   baseAppChainModulesConfig,
 } from "../../app-chain";
+import { log } from "@proto-kit/common";
 
 export const appChain = AppChain.from({
   Runtime: Runtime.from({
@@ -46,13 +42,13 @@ export const appChain = AppChain.from({
     modules: {
       // ordering of the modules matters due to dependency resolution
       Database: PrismaRedisDatabase,
+      DatabasePruneModule,
       ...(process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true"
-        ? settlementSequencerModules
+        ? baseSettlementSequencerModules
         : {}),
       ...baseSequencerModules,
       ...indexerSequencerModules,
       TaskQueue: BullQueue,
-      DatabasePruneModule,
     },
   }),
   modules: baseAppChainModules,
@@ -71,7 +67,7 @@ export default async (args: Arguments) => {
       ...baseSequencerModulesConfig,
       ...indexerSequencerModulesConfig,
       ...(process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true"
-        ? settlementSequencerModulesConfig
+        ? baseSettlementSequencerModulesConfig
         : {}),
       DatabasePruneModule: {
         pruneOnStartup: args.pruneOnStartup,
@@ -81,6 +77,7 @@ export default async (args: Arguments) => {
           host: process.env.REDIS_HOST!,
           port: Number(process.env.REDIS_PORT)!,
           password: process.env.REDIS_PASSWORD!,
+          db: 1,
         },
       },
       Database: {
@@ -96,6 +93,8 @@ export default async (args: Arguments) => {
     },
     ...baseAppChainModulesConfig,
   });
+
+  log.setLevel("DEBUG")
 
   return appChain;
 };

@@ -1,23 +1,19 @@
-// const { settlement, dispatch } = settlementModule.getContracts();
-
 import {
+  BridgingModule,
   InMemoryDatabase,
-  LocalTaskQueue,
+  MinaTransactionSender,
   Sequencer,
-  SequencerModule,
   SettlementModule,
 } from "@proto-kit/sequencer";
 import {
-  settlementSequencerModules,
-  settlementSequencerModulesConfig,
+  scriptsSettlementSequencerModules,
+  scriptsSettlementSequencerModulesConfig,
 } from "../../sequencer";
 import { AppChain } from "@proto-kit/sdk";
 import { Runtime } from "@proto-kit/module";
 import runtime from "../../runtime";
 import {
   Protocol,
-  TokenBridgeAttestation,
-  TokenBridgeTree,
 } from "@proto-kit/protocol";
 import * as protocol from "../../protocol";
 import {
@@ -29,10 +25,8 @@ import {
   Provable,
   PublicKey,
   TokenId,
-  UInt32,
   UInt64,
 } from "o1js";
-import { Authorization } from "../../../node_modules/o1js/dist/node/lib/mina/account-update";
 
 export default async function () {
   const tokenId = Field(process.argv[3]);
@@ -53,10 +47,6 @@ export default async function () {
     fee,
   });
 
-  class Noop extends SequencerModule {
-    public async start() {}
-  }
-
   const appChain = AppChain.from({
     Runtime: Runtime.from({
       modules: runtime.modules,
@@ -70,9 +60,7 @@ export default async function () {
     Sequencer: Sequencer.from({
       modules: {
         Database: InMemoryDatabase,
-        TaskQueue: LocalTaskQueue,
-        ...settlementSequencerModules,
-        SequencerStartupModule: Noop,
+        ...scriptsSettlementSequencerModules,
       },
     }),
     modules: {},
@@ -86,8 +74,7 @@ export default async function () {
     },
     Sequencer: {
       Database: {},
-      TaskQueue: {},
-      ...settlementSequencerModulesConfig,
+      ...scriptsSettlementSequencerModulesConfig,
     },
   });
 
@@ -98,19 +85,20 @@ export default async function () {
     SettlementModule
   );
 
+  const bridgingModule = appChain.sequencer.resolveOrFail(
+    "BridgingModule",
+    BridgingModule
+  );
+
   const { settlement, dispatch } = settlementModule.getContracts();
 
   await fetchAccount({ publicKey: fromPrivateKey.toPublicKey() });
   await fetchAccount({ publicKey: settlement.address });
   await fetchAccount({ publicKey: dispatch.address });
+  const bridgeAddress = await bridgingModule.getBridgeAddress(TokenId.default);
+  await fetchAccount({ publicKey: bridgeAddress! });
 
-  const tree = await TokenBridgeTree.buildTreeFromEvents(dispatch);
-  const index = tree.getIndex(tokenId);
-  const witness = tree.getWitness(index);
-  const attestation = new TokenBridgeAttestation({
-    index: Field(index),
-    witness,
-  });
+  const attestation = await bridgingModule.getDepositContractAttestation(tokenId)
 
   console.log("Forging transaction...");
   const tx = await Mina.transaction(
@@ -134,26 +122,19 @@ export default async function () {
     }
   );
 
-  // TODO: remove if SIGNATURE authorization isnt used (outside of lightnet)
-  tx.transaction.accountUpdates.forEach((au) => {
-    if (
-      [
-        process.env.PROTOKIT_SETTLEMENT_CONTRACT_PUBLIC_KEY,
-        process.env.PROTOKIT_DISPATCHER_CONTRACT_PUBLIC_KEY,
-      ].includes(au.body.publicKey.toBase58())
-    ) {
-      Authorization.setLazySignature(au);
-    }
-  });
-
-  tx.sign([fromPrivateKey, settlementModule.config.keys.dispatch]);
+  settlementModule.signTransaction(
+    tx,
+    [fromPrivateKey],
+    [],
+    [dispatch.address]
+  );
 
   console.log("Sending...");
-  Provable.log("AUs", tx.toPretty());
-  const sentTx = await tx.send();
-  console.log("Waiting for inclusion...");
-  const includedTx = await sentTx.wait();
+  console.log(tx.toPretty());
 
-  console.log("Deposit transaction included in a block:");
-  console.log(includedTx.toPretty());
+  const { hash } = await appChain.sequencer
+    .resolveOrFail("TransactionSender", MinaTransactionSender)
+    .proveAndSendTransaction(tx, "included");
+
+  console.log(`Deposit transaction included in a block: ${hash}`);
 }

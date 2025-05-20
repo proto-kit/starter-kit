@@ -1,24 +1,20 @@
-// const { settlement, dispatch } = settlementModule.getContracts();
-
 import {
   BridgingModule,
   InMemoryDatabase,
-  LocalTaskQueue,
+  MinaTransactionSender,
   Sequencer,
   SequencerModule,
   SettlementModule,
 } from "@proto-kit/sequencer";
 import {
-  settlementSequencerModules,
-  settlementSequencerModulesConfig,
+  scriptsSettlementSequencerModules,
+  scriptsSettlementSequencerModulesConfig,
 } from "../../sequencer";
 import { AppChain } from "@proto-kit/sdk";
 import { Runtime } from "@proto-kit/module";
 import runtime from "../../runtime";
 import {
   Protocol,
-  TokenBridgeAttestation,
-  TokenBridgeTree,
 } from "@proto-kit/protocol";
 import * as protocol from "../../protocol";
 import {
@@ -28,12 +24,8 @@ import {
   Mina,
   PrivateKey,
   Provable,
-  PublicKey,
-  TokenId,
-  UInt32,
   UInt64,
 } from "o1js";
-import { Authorization } from "../../../node_modules/o1js/dist/node/lib/mina/account-update";
 
 export default async function () {
   const tokenId = Field(process.argv[3]);
@@ -67,10 +59,7 @@ export default async function () {
     Sequencer: Sequencer.from({
       modules: {
         Database: InMemoryDatabase,
-        TaskQueue: LocalTaskQueue,
-        ...settlementSequencerModules,
-        SequencerStartupModule: Noop,
-        OutgoingMessageQueue: Noop,
+        ...scriptsSettlementSequencerModules,
       },
     }),
     modules: {},
@@ -84,8 +73,7 @@ export default async function () {
     },
     Sequencer: {
       Database: {},
-      TaskQueue: {},
-      ...settlementSequencerModulesConfig,
+      ...scriptsSettlementSequencerModulesConfig,
     },
   });
 
@@ -119,26 +107,22 @@ export default async function () {
     }
   );
 
-  // TODO: remove if NONE authorization isnt used (outside of lightnet)
-  tx.transaction.accountUpdates.forEach((au) => {
-    if (
-      [
-        process.env.PROTOKIT_SETTLEMENT_CONTRACT_PUBLIC_KEY,
-        process.env.PROTOKIT_DISPATCHER_CONTRACT_PUBLIC_KEY,
-        process.env.PROTOKIT_MINA_BRIDGE_CONTRACT_PUBLIC_KEY,
-      ].includes(au.body.publicKey.toBase58())
-    ) {
-      Authorization.setLazyNone(au);
-    }
-  });
+  const settlementModule = appChain.sequencer.resolveOrFail(
+    "SettlementModule",
+    SettlementModule
+  );
 
-  tx.sign([toPrivateKey]);
+  settlementModule.signTransaction(
+    tx,
+    [toPrivateKey],
+  );
 
   console.log("Sending...");
-  const sentTx = await tx.send();
-  console.log("Waiting for inclusion...", sentTx.toPretty());
-  const includedTx = await sentTx.wait();
 
-  console.log("Redeem transaction included in a block:");
-  console.log(includedTx.toPretty());
+  const { hash } = await appChain.sequencer
+    .resolveOrFail("TransactionSender", MinaTransactionSender)
+    .proveAndSendTransaction(tx, "included");
+
+  console.log(`Redeem transaction included in a block: ${hash}`);
+  console.log(tx.toPretty());
 }

@@ -7,6 +7,7 @@ import * as protocol from "../../protocol";
 import { Arguments } from "../../start";
 
 import { workerModules, workerModulesConfig } from "../../sequencer/worker";
+import { log } from "@proto-kit/common";
 
 export const appChain = AppChain.from({
   Runtime: Runtime.from({
@@ -41,6 +42,8 @@ export default async (args: Arguments) => {
       ...workerModulesConfig,
     },
   });
+
+  log.setLevel("DEBUG")
 
   return appChain;
 };

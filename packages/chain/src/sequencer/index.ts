@@ -13,10 +13,13 @@ import {
   ConstantFeeStrategy,
   BatchProducerModule,
   SequencerStartupModule,
+  LocalTaskQueue,
+  LocalTaskWorkerModule,
+  VanillaTaskWorkerModules, SettlementProvingTask,
 } from "@proto-kit/sequencer";
 import { ModulesConfig } from "@proto-kit/common";
 import { IndexerNotifier } from "@proto-kit/indexer";
-import { PrivateKey, PublicKey } from "o1js";
+import { PrivateKey } from "o1js";
 
 export const apiSequencerModules = {
   GraphqlServer,
@@ -39,6 +42,7 @@ export const baseSequencerModules = {
   Mempool: PrivateMempool,
   BlockProducerModule: BlockProducerModule,
   BlockTrigger: TimedBlockTrigger,
+  SequencerStartupModule
 } satisfies SequencerModulesRecord;
 
 export const baseSequencerModulesConfig = {
@@ -50,13 +54,14 @@ export const baseSequencerModulesConfig = {
     produceEmptyBlocks: true,
     settlementInterval: Number(process.env.PROTOKIT_SETTLEMENT_INTERVAL!),
     settlementTokenConfig: {
-      "0": {
+      "1": {
         bridgingContractPrivateKey: PrivateKey.fromBase58(
           process.env.PROTOKIT_MINA_BRIDGE_CONTRACT_PRIVATE_KEY!
         ),
       },
     },
   },
+  SequencerStartupModule: {}
 } satisfies ModulesConfig<typeof baseSequencerModules>;
 
 export const indexerSequencerModules = {
@@ -67,15 +72,29 @@ export const indexerSequencerModulesConfig = {
   IndexerNotifier: {},
 } satisfies ModulesConfig<typeof indexerSequencerModules>;
 
-export const settlementSequencerModules = {
+const taskWorkerModule = LocalTaskWorkerModule.from({
+  ...VanillaTaskWorkerModules.withoutSettlement(),
+  SettlementProvingTask,
+});
+
+export const baseSettlementSequencerModules = {
   BaseLayer: MinaBaseLayer,
-  SettlementModule: SettlementModule,
   FeeStrategy: ConstantFeeStrategy,
+  BlockProducerModule,
   BatchProducerModule,
+  SettlementModule: SettlementModule,
+}
+
+export const scriptsSettlementSequencerModules = {
+  ...baseSettlementSequencerModules,
+  Mempool: PrivateMempool,
+  TaskQueue: LocalTaskQueue,
+
+  LocalTaskWorkerModule: taskWorkerModule,
   SequencerStartupModule,
 } satisfies SequencerModulesRecord;
 
-export const settlementSequencerModulesConfig = {
+export const baseSettlementSequencerModulesConfig = {
   BaseLayer: {
     network: {
       type: "lightnet",
@@ -88,14 +107,6 @@ export const settlementSequencerModulesConfig = {
     feepayer: PrivateKey.fromBase58(
       process.env.PROTOKIT_SEQUENCER_PRIVATE_KEY!
     ),
-    addresses: {
-      settlement: PublicKey.fromBase58(
-        process.env.PROTOKIT_SETTLEMENT_CONTRACT_PUBLIC_KEY!
-      ),
-      dispatch: PublicKey.fromBase58(
-        process.env.PROTOKIT_DISPATCHER_CONTRACT_PUBLIC_KEY!
-      ),
-    },
     keys: {
       settlement: PrivateKey.fromBase58(
         process.env.PROTOKIT_SETTLEMENT_CONTRACT_PRIVATE_KEY!
@@ -109,6 +120,17 @@ export const settlementSequencerModulesConfig = {
     },
   },
   FeeStrategy: {},
+  BlockProducerModule: {},
   BatchProducerModule: {},
+} satisfies ModulesConfig<typeof baseSettlementSequencerModules>;
+
+export const scriptsSettlementSequencerModulesConfig = {
+  ...baseSettlementSequencerModulesConfig,
   SequencerStartupModule: {},
-} satisfies ModulesConfig<typeof settlementSequencerModules>;
+  TaskQueue: {
+    simulatedDuration: 0,
+  },
+  Mempool: {},
+  LocalTaskWorkerModule: VanillaTaskWorkerModules.defaultConfig(),
+} satisfies ModulesConfig<typeof scriptsSettlementSequencerModules>;
+
