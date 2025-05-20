@@ -40,4 +40,6 @@ export default async function () {
   await tx.send();
 
   console.log("withdrawal tx sent");
+
+  await appChain.close();
 }

@@ -60,7 +60,8 @@ export default async function () {
 
   const chainContainer = container.createChildContainer();
   console.log("start");
-  await appChain.start(false, chainContainer);
+  const proofsEnabled = process.env.PROTOKIT_PROOFS_ENABLED === "true"
+  await appChain.start(proofsEnabled, chainContainer);
   console.log("after start");
 
   const settlementModule = appChain.sequencer.resolveOrFail(
@@ -79,7 +80,7 @@ export default async function () {
     ),
     PrivateKey.fromBase58(
       process.env.PROTOKIT_MINA_BRIDGE_CONTRACT_PRIVATE_KEY!
-    )
+    ),
   );
 
   Provable.log("Deployed and initialized settlement contracts", {
@@ -91,5 +92,5 @@ export default async function () {
     ).toPublicKey(),
   });
 
-  process.exit(0);
+  await appChain.close();
 }

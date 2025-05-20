@@ -1,14 +1,10 @@
 import { ModulesConfig } from "@proto-kit/common";
 import { BullQueue } from "@proto-kit/deployment";
 import {
-  ConstantFeeStrategy,
   LocalTaskWorkerModule,
   TaskWorkerModulesRecord,
   VanillaTaskWorkerModules,
 } from "@proto-kit/sequencer";
-import {
-  baseSettlementSequencerModulesConfig,
-} from "..";
 
 export const taskModules = {
   ...VanillaTaskWorkerModules.allTasks(),
@@ -19,13 +15,11 @@ export const taskModulesConfig = {
 } satisfies ModulesConfig<typeof taskModules>;
 
 export const workerModules = {
-  FeeStrategy: ConstantFeeStrategy,
   TaskQueue: BullQueue,
   LocalTaskWorkerModule: LocalTaskWorkerModule.from(taskModules),
 };
 
 export const workerModulesConfig = {
-  FeeStrategy: baseSettlementSequencerModulesConfig.FeeStrategy,
   TaskQueue: {
     redis: {
       host: process.env.REDIS_HOST!,

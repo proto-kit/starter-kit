@@ -8,9 +8,12 @@ export interface Arguments {
   component: string;
   pruneOnStartup: boolean;
   logLevel: LogLevelDesc;
+  proofsEnabled: boolean;
 }
 
-export type StartableFactory = (args: Arguments) => Promise<Startable>;
+export type StartableFactory = (args: Arguments) => Promise<{
+  start(proofsEnabled: boolean): Promise<void>
+}>;
 
 yargs(hideBin(process.argv))
   .command<Arguments>(
@@ -30,6 +33,10 @@ yargs(hideBin(process.argv))
         .option("logLevel", {
           type: "string",
           default: "info",
+        })
+        .option("proofsEnabled", {
+          type: "boolean",
+          default: false,
         });
     },
     async (args) => {
@@ -41,7 +48,7 @@ yargs(hideBin(process.argv))
       const startableFactory: StartableFactory = (await import(path)).default;
       const startable = await startableFactory(args);
 
-      await startable.start();
+      await startable.start(args.proofsEnabled);
     }
   )
   .parse();
