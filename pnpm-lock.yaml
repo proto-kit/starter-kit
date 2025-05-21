@@ -226,6 +226,9 @@ importers:
       graphql-scalars:
         specifier: ^1.22.4
         version: 1.23.0(graphql@16.9.0)
+      mina-fungible-token:
+        specifier: 1.0.0
+        version: 1.0.0(o1js@framework+node_modules+o1js)
       mina-lightweight-explorer:
         specifier: github:o1-labs/mina-lightweight-explorer
         version: https://codeload.github.com/o1-labs/mina-lightweight-explorer/tar.gz/b921393d5091035a913d446e38dfdeb29c06cc52
@@ -3409,6 +3412,11 @@ packages:
   min-indent@1.0.1:
     resolution: {integrity: sha512-I9jwMn07Sy/IwOj3zVkVik2JTvgpaykDZEigL6Rx6N9LbMywwUSMtxET+7lVoDLLd3O3IXwJwvuuns8UB/HeAg==}
     engines: {node: '>=4'}
+
+  mina-fungible-token@1.0.0:
+    resolution: {integrity: sha512-2LfoBIuwQO5qk3H1JjRLKsCdZsSu+B/lannjMBdujdoHnoj6aWEcLQOY4jAz4BnhVCgAmJ/uUrTqVZ86J63iTg==}
+    peerDependencies:
+      o1js: ^1.6.0
 
   mina-lightweight-explorer@https://codeload.github.com/o1-labs/mina-lightweight-explorer/tar.gz/b921393d5091035a913d446e38dfdeb29c06cc52:
     resolution: {tarball: https://codeload.github.com/o1-labs/mina-lightweight-explorer/tar.gz/b921393d5091035a913d446e38dfdeb29c06cc52}
@@ -7536,7 +7544,7 @@ snapshots:
       eslint: 8.57.0
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(eslint@8.57.0))(eslint@8.57.0)
-      eslint-plugin-import: 2.30.0(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0)
+      eslint-plugin-import: 2.30.0(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0)
       eslint-plugin-jsx-a11y: 6.10.0(eslint@8.57.0)
       eslint-plugin-react: 7.35.2(eslint@8.57.0)
       eslint-plugin-react-hooks: 4.6.2(eslint@8.57.0)
@@ -7599,7 +7607,7 @@ snapshots:
       is-bun-module: 1.1.0
       is-glob: 4.0.3
     optionalDependencies:
-      eslint-plugin-import: 2.30.0(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0)
+      eslint-plugin-import: 2.30.0(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0)
     transitivePeerDependencies:
       - '@typescript-eslint/parser'
       - eslint-import-resolver-node
@@ -7662,7 +7670,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-plugin-import@2.30.0(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0):
+  eslint-plugin-import@2.30.0(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.8
@@ -8956,6 +8964,10 @@ snapshots:
   mimic-fn@2.1.0: {}
 
   min-indent@1.0.1: {}
+
+  mina-fungible-token@1.0.0(o1js@framework+node_modules+o1js):
+    dependencies:
+      o1js: link:../framework/node_modules/o1js
 
   mina-lightweight-explorer@https://codeload.github.com/o1-labs/mina-lightweight-explorer/tar.gz/b921393d5091035a913d446e38dfdeb29c06cc52: {}
 

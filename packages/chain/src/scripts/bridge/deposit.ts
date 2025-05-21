@@ -13,7 +13,7 @@ import { AppChain } from "@proto-kit/sdk";
 import { Runtime } from "@proto-kit/module";
 import runtime from "../../runtime";
 import {
-  Protocol,
+  Protocol, TokenBridgeAttestation,
 } from "@proto-kit/protocol";
 import * as protocol from "../../protocol";
 import {
@@ -27,6 +27,7 @@ import {
   TokenId,
   UInt64,
 } from "o1js";
+import { FungibleToken } from "mina-fungible-token";
 
 export default async function () {
   const tokenId = Field(process.argv[3]);
@@ -38,6 +39,10 @@ export default async function () {
   );
   const amount = Number(process.argv[6]) * 1e9;
   const fee = 0.1 * 1e9;
+
+  const isCustomToken = tokenId.toBigInt() !== 1n;
+  const tokenOwnerPrivateKey = isCustomToken ? PrivateKey.fromBase58(process.env["PROTOKIT_CUSTOM_TOKEN_PRIVATE_KEY"]!) : PrivateKey.random();
+  const bridgeContractKey = isCustomToken ? PrivateKey.fromBase58(process.env.PROTOKIT_CUSTOM_TOKEN_BRIDGE_PRIVATE_KEY!) : PrivateKey.fromBase58(process.env.PROTOKIT_MINA_BRIDGE_CONTRACT_PRIVATE_KEY!)
 
   Provable.log("Preparing to deposit", {
     tokenId,
@@ -96,37 +101,42 @@ export default async function () {
   await fetchAccount({ publicKey: fromPrivateKey.toPublicKey() });
   await fetchAccount({ publicKey: settlement.address });
   await fetchAccount({ publicKey: dispatch.address });
-  const bridgeAddress = await bridgingModule.getBridgeAddress(TokenId.default);
-  await fetchAccount({ publicKey: bridgeAddress! });
+  const bridgeAddress = await bridgingModule.getBridgeAddress(tokenId);
+  await fetchAccount({ publicKey: bridgeAddress!, tokenId: tokenId });
+  await fetchAccount({ publicKey: bridgeAddress!, tokenId: tokenId });
 
   const attestation = await bridgingModule.getDepositContractAttestation(tokenId)
 
   console.log("Forging transaction...");
   const tx = await Mina.transaction(
     {
+      memo: "User deposit",
       sender: fromPrivateKey.toPublicKey(),
       fee,
     },
     async () => {
-      const au = AccountUpdate.createSigned(fromPrivateKey.toPublicKey());
+      const au = AccountUpdate.createSigned(fromPrivateKey.toPublicKey(), tokenId);
       au.balance.subInPlace(UInt64.from(amount));
 
       await dispatch.deposit(
         UInt64.from(amount),
         tokenId,
-        PublicKey.fromBase58(
-          process.env.PROTOKIT_MINA_BRIDGE_CONTRACT_PUBLIC_KEY!
-        ),
+        bridgeContractKey.toPublicKey(),
         attestation,
         toPublicKey
       );
+
+      if (isCustomToken) {
+        await new FungibleToken(tokenOwnerPrivateKey.toPublicKey())!.approveAccountUpdates([au, dispatch.self]);
+      }
     }
   );
+  console.log(tx.toPretty());
 
   settlementModule.signTransaction(
     tx,
     [fromPrivateKey],
-    [],
+    [tokenOwnerPrivateKey],
     [dispatch.address]
   );
 

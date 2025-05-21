@@ -20,7 +20,8 @@ import {
 } from "@proto-kit/sequencer";
 import { ModulesConfig } from "@proto-kit/common";
 import { IndexerNotifier } from "@proto-kit/indexer";
-import { PrivateKey } from "o1js";
+import { PrivateKey, TokenId } from "o1js";
+import { FungibleToken } from "mina-fungible-token";
 
 export const apiSequencerModules = {
   GraphqlServer,
@@ -51,6 +52,14 @@ console.log("settlement interval", {
   SETTLEMENT_INTERVAL: process.env.PROTOKIT_SETTLEMENT_INTERVAL,
 });
 
+const customTokenConfig = process.env.PROTOKIT_CUSTOM_TOKEN_PRIVATE_KEY ? {
+  [TokenId.derive(PrivateKey.fromBase58(process.env.PROTOKIT_CUSTOM_TOKEN_PRIVATE_KEY).toPublicKey()).toString()]: {
+    bridgingContractPrivateKey: PrivateKey.fromBase58(process.env.PROTOKIT_CUSTOM_TOKEN_BRIDGE_PRIVATE_KEY!),
+    tokenOwner: FungibleToken,
+    tokenOwnerPrivateKey: process.env.PROTOKIT_CUSTOM_TOKEN_PRIVATE_KEY
+  }
+} : {};
+
 export const baseSequencerModulesConfig = {
   ...apiSequencerModulesConfig,
   Mempool: {},
@@ -65,6 +74,7 @@ export const baseSequencerModulesConfig = {
           process.env.PROTOKIT_MINA_BRIDGE_CONTRACT_PRIVATE_KEY!
         ),
       },
+      ...customTokenConfig
     },
   },
   SequencerStartupModule: {},

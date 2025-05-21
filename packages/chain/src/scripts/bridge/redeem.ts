@@ -26,6 +26,7 @@ import {
   Provable,
   UInt64,
 } from "o1js";
+import { FungibleToken } from "mina-fungible-token";
 
 export default async function () {
   const tokenId = Field(process.argv[3]);
@@ -34,6 +35,9 @@ export default async function () {
   );
   const amount = Number(process.argv[5]) * 1e9;
   const fee = 0.1 * 1e9;
+
+  const isCustomToken = tokenId.toBigInt() !== 1n;
+  const tokenOwnerPrivateKey = isCustomToken ? PrivateKey.fromBase58(process.env["PROTOKIT_CUSTOM_TOKEN_PRIVATE_KEY"]!) : PrivateKey.random();
 
   Provable.log("Preparing to redeem", {
     tokenId,
@@ -97,10 +101,14 @@ export default async function () {
       fee,
     },
     async () => {
-      const au = AccountUpdate.createSigned(toPrivateKey.toPublicKey());
+      const au = AccountUpdate.createSigned(toPrivateKey.toPublicKey(), tokenId);
       au.balance.addInPlace(UInt64.from(amount));
 
       await bridgeContract.redeem(au);
+
+      if (isCustomToken) {
+        await new FungibleToken(tokenOwnerPrivateKey.toPublicKey())!.approveAccountUpdate(bridgeContract.self);
+      }
     }
   );
 
@@ -112,6 +120,7 @@ export default async function () {
   settlementModule.signTransaction(
     tx,
     [toPrivateKey],
+    [tokenOwnerPrivateKey]
   );
 
   console.log("Sending...");

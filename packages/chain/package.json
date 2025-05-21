@@ -45,6 +45,7 @@
     "lightnet:faucet": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./src/scripts/run lightnet/faucet.ts $1",
     "lightnet:wait-for-network": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./src/scripts/run lightnet/wait-for-network.ts $1",
     "settlement:deploy": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./src/scripts/run settlement/deploy.ts $1",
+    "settlement:token:deploy": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./src/scripts/run settlement/deploy-token.ts $1",
     "mina-explorer:start": "node ./node_modules/mina-lightweight-explorer/server.js",
     "bridge:deposit": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./src/scripts/run bridge/deposit.ts $1",
     "bridge:withdraw": "node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node ./src/scripts/run bridge/withdraw.ts $1",
@@ -102,7 +103,8 @@
     "graphql-scalars": "^1.22.4",
     "mina-lightweight-explorer": "github:o1-labs/mina-lightweight-explorer",
     "reflect-metadata": "^0.1.13",
-    "type-graphql": "2.0.0-rc.2"
+    "type-graphql": "2.0.0-rc.2",
+    "mina-fungible-token": "1.0.0"
   },
   "nodemonConfig": {
     "delay": 1000
