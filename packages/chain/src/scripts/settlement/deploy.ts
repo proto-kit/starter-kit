@@ -2,6 +2,7 @@ import { Runtime } from "@proto-kit/module";
 import { Protocol } from "@proto-kit/protocol";
 import { AppChain } from "@proto-kit/sdk";
 import {
+  InMemoryDatabase,
   Sequencer,
   SequencerModule,
   SettlementModule,
@@ -30,7 +31,7 @@ export default async function () {
     }),
     Sequencer: Sequencer.from({
       modules: {
-        Database: PrismaRedisDatabase,
+        Database: InMemoryDatabase,
         ...scriptsSettlementSequencerModules,
       },
     }),
@@ -45,16 +46,7 @@ export default async function () {
     },
     Sequencer: {
       ...scriptsSettlementSequencerModulesConfig,
-      Database: {
-        redis: {
-          host: process.env.REDIS_HOST!,
-          port: Number(process.env.REDIS_PORT)!,
-          password: process.env.REDIS_PASSWORD!,
-        },
-        prisma: {
-          connection: process.env.DATABASE_URL!,
-        },
-      },
+      Database: {},
     },
   });
 

@@ -4,47 +4,66 @@ import { Protocol } from "@proto-kit/protocol";
 import { DatabasePruneModule, Sequencer } from "@proto-kit/sequencer";
 import { PrismaRedisDatabase } from "@proto-kit/persistance";
 import runtime from "../../runtime";
-import protocol from "../../protocol";
+import * as protocol from "../../protocol";
 import {
   baseSequencerModules,
   baseSequencerModulesConfig,
   indexerSequencerModules,
   indexerSequencerModulesConfig,
+  baseSettlementSequencerModules,
+  baseSettlementSequencerModulesConfig,
 } from "../../sequencer";
-import { BullQueue, Startable } from "@proto-kit/deployment";
+import { BullQueue } from "@proto-kit/deployment";
 import { Arguments } from "../../start";
 import {
   baseAppChainModules,
   baseAppChainModulesConfig,
 } from "../../app-chain";
+import { log } from "@proto-kit/common";
 
 export const appChain = AppChain.from({
   Runtime: Runtime.from({
     modules: runtime.modules,
   }),
   Protocol: Protocol.from({
-    modules: protocol.modules,
+    modules: {
+      ...protocol.modules,
+      ...(process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true"
+        ? protocol.settlementModules
+        : {}),
+    },
   }),
   Sequencer: Sequencer.from({
     modules: {
       // ordering of the modules matters due to dependency resolution
       Database: PrismaRedisDatabase,
+      DatabasePruneModule,
+      ...(process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true"
+        ? baseSettlementSequencerModules
+        : {}),
       ...baseSequencerModules,
       ...indexerSequencerModules,
       TaskQueue: BullQueue,
-      DatabasePruneModule,
     },
   }),
   modules: baseAppChainModules,
 });
 
-export default async (args: Arguments): Promise<Startable> => {
+export default async (args: Arguments) => {
   appChain.configurePartial({
     Runtime: runtime.config,
-    Protocol: protocol.config,
+    Protocol: {
+      ...protocol.config,
+      ...(process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true"
+        ? protocol.settlementModulesConfig
+        : {}),
+    },
     Sequencer: {
       ...baseSequencerModulesConfig,
       ...indexerSequencerModulesConfig,
+      ...(process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true"
+        ? baseSettlementSequencerModulesConfig
+        : {}),
       DatabasePruneModule: {
         pruneOnStartup: args.pruneOnStartup,
       },
@@ -53,6 +72,7 @@ export default async (args: Arguments): Promise<Startable> => {
           host: process.env.REDIS_HOST!,
           port: Number(process.env.REDIS_PORT)!,
           password: process.env.REDIS_PASSWORD!,
+          db: 1,
         },
       },
       Database: {
@@ -68,6 +88,8 @@ export default async (args: Arguments): Promise<Startable> => {
     },
     ...baseAppChainModulesConfig,
   });
+
+  log.setLevel("DEBUG");
 
   return appChain;
 };

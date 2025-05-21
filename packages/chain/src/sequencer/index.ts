@@ -15,7 +15,8 @@ import {
   SequencerStartupModule,
   LocalTaskQueue,
   LocalTaskWorkerModule,
-  VanillaTaskWorkerModules, SettlementProvingTask,
+  VanillaTaskWorkerModules,
+  SettlementProvingTask,
 } from "@proto-kit/sequencer";
 import { ModulesConfig } from "@proto-kit/common";
 import { IndexerNotifier } from "@proto-kit/indexer";
@@ -42,8 +43,13 @@ export const baseSequencerModules = {
   Mempool: PrivateMempool,
   BlockProducerModule: BlockProducerModule,
   BlockTrigger: TimedBlockTrigger,
-  SequencerStartupModule
+  SequencerStartupModule,
 } satisfies SequencerModulesRecord;
+
+console.log("settlement interval", {
+  SETTLEMENT_ENABLED: process.env.PROTOKIT_SETTLEMENT_ENABLED,
+  SETTLEMENT_INTERVAL: process.env.PROTOKIT_SETTLEMENT_INTERVAL,
+});
 
 export const baseSequencerModulesConfig = {
   ...apiSequencerModulesConfig,
@@ -61,7 +67,7 @@ export const baseSequencerModulesConfig = {
       },
     },
   },
-  SequencerStartupModule: {}
+  SequencerStartupModule: {},
 } satisfies ModulesConfig<typeof baseSequencerModules>;
 
 export const indexerSequencerModules = {
@@ -83,7 +89,7 @@ export const baseSettlementSequencerModules = {
   BlockProducerModule,
   BatchProducerModule,
   SettlementModule: SettlementModule,
-}
+};
 
 export const scriptsSettlementSequencerModules = {
   ...baseSettlementSequencerModules,
@@ -133,4 +139,3 @@ export const scriptsSettlementSequencerModulesConfig = {
   Mempool: {},
   LocalTaskWorkerModule: VanillaTaskWorkerModules.defaultConfig(),
 } satisfies ModulesConfig<typeof scriptsSettlementSequencerModules>;
-
