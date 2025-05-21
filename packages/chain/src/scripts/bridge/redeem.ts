@@ -42,10 +42,6 @@ export default async function () {
     fee,
   });
 
-  class Noop extends SequencerModule {
-    public async start() {}
-  }
-
   const appChain = AppChain.from({
     Runtime: Runtime.from({
       modules: runtime.modules,
@@ -77,7 +73,8 @@ export default async function () {
     },
   });
 
-  await appChain.start();
+  const proofsEnabled = process.env.PROTOKIT_PROOFS_ENABLED === "true"
+  await appChain.start(proofsEnabled);
 
   const bridgingModule = appChain.sequencer.resolveOrFail(
     "BridgingModule",
@@ -125,4 +122,6 @@ export default async function () {
 
   console.log(`Redeem transaction included in a block: ${hash}`);
   console.log(tx.toPretty());
+
+  await appChain.close();
 }

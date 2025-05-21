@@ -78,7 +78,8 @@ export default async function () {
     },
   });
 
-  await appChain.start();
+  const proofsEnabled = process.env.PROTOKIT_PROOFS_ENABLED === "true"
+  await appChain.start(proofsEnabled);
 
   const settlementModule = appChain.sequencer.resolveOrFail(
     "SettlementModule",
@@ -137,4 +138,6 @@ export default async function () {
     .proveAndSendTransaction(tx, "included");
 
   console.log(`Deposit transaction included in a block: ${hash}`);
+
+  await appChain.close();
 }
