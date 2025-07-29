@@ -30,6 +30,9 @@ services:
       - 8082:8080
     working_dir: /app
     command: ["./packages/chain/dist/start.js start ./environments/${PROTOKIT_ENV_FOLDER}/processor.config.js",]
+    labels:
+      logging: "promtail"
+      logging_jobname: "processor"
 
 networks:
   processor-net:

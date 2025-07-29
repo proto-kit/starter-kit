@@ -21,7 +21,7 @@ COPY package.json pnpm-workspace.yaml pnpm-lock.yaml turbo.json ./
 COPY ./packages/chain/package.json ./packages/chain/package.json
 COPY ./apps/web/package.json ./apps/web/package.json
 
-RUN corepack enable pnpm
+RUN npm i -g pnpm@9.8.0
 
 COPY ./tsconfig.json .
 COPY ./packages/chain/tsconfig.json ./packages/chain/tsconfig.json

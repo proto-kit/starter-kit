@@ -4,6 +4,7 @@ import {
   resolvers as generatedResolvers,
   ResolversEnhanceMap,
 } from "./generated/type-graphql";
+import {NonEmptyArray} from "type-graphql";
 
 // enhance the generated resolvers with custom middlewares/validations
 const resolversEnchanceMap: ResolversEnhanceMap = {
@@ -22,4 +23,4 @@ const resolversEnchanceMap: ResolversEnhanceMap = {
 applyResolversEnhanceMap(resolversEnchanceMap);
 
 // remove non read only generated resolvers and their methods
-export const resolvers = cleanResolvers(generatedResolvers);
+export const resolvers: NonEmptyArray<Function> = cleanResolvers(generatedResolvers);

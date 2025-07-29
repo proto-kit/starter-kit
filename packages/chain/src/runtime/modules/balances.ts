@@ -1,5 +1,5 @@
-import { runtimeModule, state, runtimeMethod } from "@proto-kit/module";
-import { State, assert } from "@proto-kit/protocol";
+import { runtimeModule, runtimeMethod } from "@proto-kit/module";
+import { State, assert, state } from "@proto-kit/protocol";
 import { Balance, Balances as BaseBalances, TokenId } from "@proto-kit/library";
 import { PublicKey } from "o1js";
 
