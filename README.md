@@ -1,7 +1,7 @@
 # Protokit starter-kit
 
 This repository is a monorepo aimed at kickstarting application chain development using the Protokit framework.
-You can learn more about the Protokit framework at the [official documentation](protokit.dev), or at the official [Mina discord](https://discord.gg/minaprotocol).
+You can learn more about the Protokit framework at the [official documentation](https://protokit.dev), or at the official [Mina discord](https://discord.gg/minaprotocol).
 
 ## Quick start
 
