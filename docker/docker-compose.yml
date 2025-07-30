@@ -9,3 +9,4 @@ include:
   - ./processor/docker-compose.yml
   - ./worker/docker-compose.yml
   - ./lightnet/docker-compose.yml
+  - ./monitoring/docker-compose.yml

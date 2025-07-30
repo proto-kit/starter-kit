@@ -1,7 +1,10 @@
 import { AppChain } from "@proto-kit/sdk";
 import { Runtime } from "@proto-kit/module";
 import { Protocol } from "@proto-kit/protocol";
-import { DatabasePruneModule, Sequencer } from "@proto-kit/sequencer";
+import {
+  DatabasePruneModule,
+  Sequencer,
+} from "@proto-kit/sequencer";
 import { PrismaRedisDatabase } from "@proto-kit/persistance";
 import runtime from "../../runtime";
 import * as protocol from "../../protocol";
@@ -12,6 +15,8 @@ import {
   indexerSequencerModulesConfig,
   baseSettlementSequencerModules,
   baseSettlementSequencerModulesConfig,
+  metricsSequencerModules,
+  metricsSequencerModulesConfig,
 } from "../../sequencer";
 import { BullQueue } from "@proto-kit/deployment";
 import { Arguments } from "../../start";
@@ -43,6 +48,7 @@ export const appChain = AppChain.from({
         : {}),
       ...baseSequencerModules,
       ...indexerSequencerModules,
+      ...metricsSequencerModules,
       TaskQueue: BullQueue,
     },
   }),
@@ -64,6 +70,7 @@ export default async (args: Arguments) => {
       ...(process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true"
         ? baseSettlementSequencerModulesConfig
         : {}),
+      ...metricsSequencerModulesConfig,
       DatabasePruneModule: {
         pruneOnStartup: args.pruneOnStartup,
       },

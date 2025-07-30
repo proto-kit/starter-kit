@@ -17,7 +17,7 @@ COPY ./packages/chain/package.json ./packages/chain/package.json
 COPY ./packages/eslint-config-custom/package.json ./packages/eslint-config-custom/package.json
 COPY ./apps/web/package.json ./apps/web/package.json
 
-RUN corepack enable
+RUN npm i -g pnpm@9.8.0
 
 COPY ./tsconfig.json .
 COPY ./packages/chain/tsconfig.json ./packages/chain/tsconfig.json

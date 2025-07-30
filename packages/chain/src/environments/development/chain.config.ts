@@ -1,7 +1,7 @@
 import { AppChain } from "@proto-kit/sdk";
 import { Runtime } from "@proto-kit/module";
 import { Protocol } from "@proto-kit/protocol";
-import { DatabasePruneModule, Sequencer } from "@proto-kit/sequencer";
+import { DatabasePruneModule, LocalTaskWorkerModule, Sequencer, VanillaTaskWorkerModules } from "@proto-kit/sequencer";
 import { PrismaRedisDatabase } from "@proto-kit/persistance";
 import runtime from "../../runtime";
 import * as protocol from "../../protocol";
@@ -12,6 +12,8 @@ import {
   indexerSequencerModulesConfig,
   baseSettlementSequencerModules,
   baseSettlementSequencerModulesConfig,
+  metricsSequencerModules,
+  metricsSequencerModulesConfig,
 } from "../../sequencer";
 import { BullQueue } from "@proto-kit/deployment";
 import { Arguments } from "../../start";
@@ -38,6 +40,7 @@ export const appChain = AppChain.from({
       // ordering of the modules matters due to dependency resolution
       Database: PrismaRedisDatabase,
       DatabasePruneModule,
+      ...metricsSequencerModules,
       ...(process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true"
         ? baseSettlementSequencerModules
         : {}),
@@ -61,6 +64,7 @@ export default async (args: Arguments) => {
     Sequencer: {
       ...baseSequencerModulesConfig,
       ...indexerSequencerModulesConfig,
+      ...metricsSequencerModulesConfig,
       ...(process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true"
         ? baseSettlementSequencerModulesConfig
         : {}),
@@ -85,6 +89,8 @@ export default async (args: Arguments) => {
           connection: process.env.DATABASE_URL!,
         },
       },
+      LocalTaskWorkerModule: VanillaTaskWorkerModules.defaultConfig()
+
     },
     ...baseAppChainModulesConfig,
   });

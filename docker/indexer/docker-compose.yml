@@ -43,6 +43,9 @@ services:
       [
         "./packages/chain/dist/start.js start ./environments/${PROTOKIT_ENV_FOLDER}/indexer.config.js",
       ]
+    labels:
+      logging: "promtail"
+      logging_jobname: "indexer"
 
 networks:
   indexer-net:
