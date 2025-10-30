@@ -1,6 +1,13 @@
 import { Runtime } from "@proto-kit/module";
 import { Protocol } from "@proto-kit/protocol";
-import { AppChain, InMemoryDatabase, Sequencer } from "@proto-kit/sequencer";
+import {
+    AppChain,
+    InMemoryDatabase,
+    LocalTaskQueue,
+    LocalTaskWorkerModule,
+    Sequencer,
+    VanillaTaskWorkerModules,
+} from "@proto-kit/sequencer";
 import runtime from "../../runtime";
 import protocol from "../../protocol";
 import { baseSequencerModules, baseSequencerModulesConfig } from "../../sequencer";
@@ -11,6 +18,10 @@ export const appChain = AppChain.from({
     Protocol: Protocol.from(protocol.modules),
     Sequencer: Sequencer.from({
         Database: InMemoryDatabase,
+        TaskQueue: LocalTaskQueue,
+        LocalTaskWorkerModule: LocalTaskWorkerModule.from(
+            VanillaTaskWorkerModules.withoutSettlement()
+        ),
         ...baseSequencerModules,
     }),
     ...baseAppChainModules,
@@ -23,6 +34,10 @@ export default async () => {
         Sequencer: {
             ...baseSequencerModulesConfig,
             Database: {},
+            TaskQueue: {
+                simulatedDuration: 0,
+            },
+            LocalTaskWorkerModule: VanillaTaskWorkerModules.defaultConfig(),
         },
         ...baseSequencerModulesConfig,
     });
