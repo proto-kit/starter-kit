@@ -31,4 +31,7 @@ module.exports = {
     },
   },
   ignorePatterns: ["node_modules/", "dist/"],
+  rules: {
+    "@typescript-eslint/no-floating-promises": "error",
+  },
 };
