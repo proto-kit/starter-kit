@@ -1,19 +1,17 @@
-import { Processor, DatabasePruneModule } from "@proto-kit/processor";
-import { Startable } from "@proto-kit/deployment";
+import { Processor } from "@proto-kit/processor";
 import { config, databaseModule, modules } from "../../processor";
 import { Arguments } from "../../start";
+import { Startable } from "@proto-kit/common";
 
 export const processor = Processor.from({
-  modules: {
     Database: databaseModule,
     ...modules,
-  },
 });
 
 export default async (args: Arguments): Promise<Startable> => {
-  processor.configurePartial({
-    ...config,
-    Database: {},
-  });
-  return processor;
+    processor.configurePartial({
+        ...config,
+        Database: {},
+    });
+    return processor;
 };

@@ -41,19 +41,19 @@
     "processor:prisma:generate": "prisma generate --schema ./src/processor/prisma/schema.prisma"
   },
   "peerDependencies": {
-    "@proto-kit/api": "0.1.1-develop.1088",
-    "@proto-kit/common": "0.1.1-develop.1088",
-    "@proto-kit/deployment": "0.1.1-develop.1088",
-    "@proto-kit/library": "0.1.1-develop.1088",
-    "@proto-kit/module": "0.1.1-develop.1088",
-    "@proto-kit/persistance": "0.1.1-develop.1088",
-    "@proto-kit/protocol": "0.1.1-develop.1088",
-    "@proto-kit/sdk": "0.1.1-develop.1088",
-    "@proto-kit/sequencer": "0.1.1-develop.1088",
-    "@proto-kit/indexer": "0.1.1-develop.1088",
-    "@proto-kit/processor": "0.1.1-develop.1088",
+    "@proto-kit/api": "0.1.1-develop.1665",
+    "@proto-kit/common": "0.1.1-develop.1665",
+    "@proto-kit/deployment": "0.1.1-develop.1665",
+    "@proto-kit/library": "0.1.1-develop.1665",
+    "@proto-kit/module": "0.1.1-develop.1665",
+    "@proto-kit/persistance": "0.1.1-develop.1665",
+    "@proto-kit/protocol": "0.1.1-develop.1665",
+    "@proto-kit/sdk": "0.1.1-develop.1665",
+    "@proto-kit/sequencer": "0.1.1-develop.1665",
+    "@proto-kit/indexer": "0.1.1-develop.1665",
+    "@proto-kit/processor": "0.1.1-develop.1665",
     "o1js": "1.6.0",
-    "tsyringe": "^4.7.0"
+    "tsyringe": "^4.10.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.6.1",
