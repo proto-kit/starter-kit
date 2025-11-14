@@ -1,7 +1,12 @@
-import { AppChain } from "@proto-kit/sdk";
 import { Runtime } from "@proto-kit/module";
 import { Protocol } from "@proto-kit/protocol";
-import { DatabasePruneModule, LocalTaskWorkerModule, Sequencer, VanillaTaskWorkerModules } from "@proto-kit/sequencer";
+import {
+    AppChain,
+    DatabasePruneModule,
+    LocalTaskWorkerModule,
+    Sequencer,
+    VanillaTaskWorkerModules,
+} from "@proto-kit/sequencer";
 import { PrismaRedisDatabase } from "@proto-kit/persistance";
 import runtime from "../../runtime";
 import * as protocol from "../../protocol";
@@ -17,83 +22,60 @@ import {
 } from "../../sequencer";
 import { BullQueue } from "@proto-kit/deployment";
 import { Arguments } from "../../start";
-import {
-  baseAppChainModules,
-  baseAppChainModulesConfig,
-} from "../../app-chain";
-import { log } from "@proto-kit/common";
+import { baseAppChainModules, baseAppChainModulesConfig } from "../../app-chain";
+import { Startable } from "@proto-kit/common";
 
 export const appChain = AppChain.from({
-  Runtime: Runtime.from({
-    modules: runtime.modules,
-  }),
-  Protocol: Protocol.from({
-    modules: {
-      ...protocol.modules,
-      ...(process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true"
-        ? protocol.settlementModules
-        : {}),
-    },
-  }),
-  Sequencer: Sequencer.from({
-    modules: {
-      // ordering of the modules matters due to dependency resolution
-      Database: PrismaRedisDatabase,
-      DatabasePruneModule,
-      ...metricsSequencerModules,
-      ...(process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true"
-        ? baseSettlementSequencerModules
-        : {}),
-      ...baseSequencerModules,
-      ...indexerSequencerModules,
-      TaskQueue: BullQueue,
-    },
-  }),
-  modules: baseAppChainModules,
+    Runtime: Runtime.from(runtime.modules),
+    Protocol: Protocol.from(protocol.modules),
+    Sequencer: Sequencer.from({
+        // ordering of the modules matters due to dependency resolution
+        Database: PrismaRedisDatabase,
+        DatabasePruneModule,
+        ...metricsSequencerModules,
+        TaskQueue: BullQueue,
+        LocalTaskWorkerModule: LocalTaskWorkerModule.from(
+            VanillaTaskWorkerModules.withoutSettlement()
+        ),
+        ...baseSequencerModules,
+        ...indexerSequencerModules,
+    }),
+    ...baseAppChainModules,
 });
 
-export default async (args: Arguments) => {
-  appChain.configurePartial({
-    Runtime: runtime.config,
-    Protocol: {
-      ...protocol.config,
-      ...(process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true"
-        ? protocol.settlementModulesConfig
-        : {}),
-    },
-    Sequencer: {
-      ...baseSequencerModulesConfig,
-      ...indexerSequencerModulesConfig,
-      ...metricsSequencerModulesConfig,
-      ...(process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true"
-        ? baseSettlementSequencerModulesConfig
-        : {}),
-      DatabasePruneModule: {
-        pruneOnStartup: args.pruneOnStartup,
-      },
-      TaskQueue: {
-        redis: {
-          host: process.env.REDIS_HOST!,
-          port: Number(process.env.REDIS_PORT)!,
-          password: process.env.REDIS_PASSWORD!,
-          db: 1,
+export default async (args: Arguments): Promise<Startable> => {
+    appChain.configurePartial({
+        Runtime: runtime.config,
+        Protocol: protocol.config,
+        Sequencer: {
+            ...baseSequencerModulesConfig,
+            ...indexerSequencerModulesConfig,
+            ...metricsSequencerModulesConfig,
+            DatabasePruneModule: {
+                pruneOnStartup: args.pruneOnStartup,
+            },
+            TaskQueue: {
+                redis: {
+                    host: process.env.REDIS_HOST!,
+                    port: Number(process.env.REDIS_PORT)!,
+                    password: process.env.REDIS_PASSWORD!,
+                    db: 1,
+                },
+            },
+            Database: {
+                redis: {
+                    host: process.env.REDIS_HOST!,
+                    port: Number(process.env.REDIS_PORT)!,
+                    password: process.env.REDIS_PASSWORD!,
+                },
+                prisma: {
+                    connection: process.env.DATABASE_URL!,
+                },
+            },
+            LocalTaskWorkerModule: VanillaTaskWorkerModules.defaultConfig(),
         },
-      },
-      Database: {
-        redis: {
-          host: process.env.REDIS_HOST!,
-          port: Number(process.env.REDIS_PORT)!,
-          password: process.env.REDIS_PASSWORD!,
-        },
-        prisma: {
-          connection: process.env.DATABASE_URL!,
-        },
-      },
-      LocalTaskWorkerModule: VanillaTaskWorkerModules.defaultConfig()
+        ...baseAppChainModulesConfig,
+    });
 
-    },
-    ...baseAppChainModulesConfig,
-  });
-
-  return appChain;
+    return appChain;
 };

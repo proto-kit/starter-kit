@@ -1,7 +1,7 @@
 # Protokit starter-kit
 
 This repository is a monorepo aimed at kickstarting application chain development using the Protokit framework.
-You can learn more about the Protokit framework at the [official documentation](protokit.dev), or at the official [Mina discord](https://discord.gg/minaprotocol).
+You can learn more about the Protokit framework at the [official documentation](https://protokit.dev), or at the official [Mina discord](https://discord.gg/minaprotocol).
 
 ## Quick start
 
@@ -24,6 +24,8 @@ cd my-chain
 nvm use
 # install dependencies
 pnpm install
+# generate prisma clients (indexer, ...)
+pnpm env:development prisma:generate
 # starts both the UI and the sequencer (file watcher / live reload enabled)
 pnpm env:inmemory dev
 ```

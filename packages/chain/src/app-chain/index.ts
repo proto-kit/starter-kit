@@ -1,10 +1,10 @@
 import { ModulesConfig } from "@proto-kit/common";
 import {
-  AppChainModulesRecord,
   BlockStorageNetworkStateModule,
   InMemoryTransactionSender,
   StateServiceQueryModule,
 } from "@proto-kit/sdk";
+import { AppChainModulesRecord } from "@proto-kit/sequencer";
 
 export const baseAppChainModules = {
   TransactionSender: InMemoryTransactionSender,
