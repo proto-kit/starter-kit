@@ -1,11 +1,11 @@
 import { Runtime } from "@proto-kit/module";
 import { Protocol } from "@proto-kit/protocol";
-import { AppChain } from "@proto-kit/sdk";
 import {
   InMemoryDatabase,
   Sequencer,
   SequencerModule,
   SettlementModule,
+  AppChain,
 } from "@proto-kit/sequencer";
 import { PrivateKey, Provable } from "o1js";
 import "reflect-metadata";
@@ -20,22 +20,15 @@ import { PrismaRedisDatabase } from "@proto-kit/persistance";
 
 export default async function () {
   const appChain = AppChain.from({
-    Runtime: Runtime.from({
-      modules: runtime.modules,
-    }),
+    Runtime: Runtime.from(runtime.modules),
     Protocol: Protocol.from({
-      modules: {
-        ...protocol.modules,
-        ...protocol.settlementModules,
-      },
+      ...protocol.modules,
+      ...protocol.settlementModules,
     }),
     Sequencer: Sequencer.from({
-      modules: {
-        Database: InMemoryDatabase,
-        ...scriptsSettlementSequencerModules,
-      },
+      Database: InMemoryDatabase,
+      ...scriptsSettlementSequencerModules,
     }),
-    modules: {},
   });
 
   appChain.configure({
@@ -47,14 +40,12 @@ export default async function () {
     Sequencer: {
       ...scriptsSettlementSequencerModulesConfig,
       Database: {},
-    },
+    } as any,
   });
 
   const chainContainer = container.createChildContainer();
-  console.log("start");
-  const proofsEnabled = process.env.PROTOKIT_PROOFS_ENABLED === "true"
+  const proofsEnabled = process.env.PROTOKIT_PROOFS_ENABLED === "true";
   await appChain.start(proofsEnabled, chainContainer);
-  console.log("after start");
 
   const settlementModule = appChain.sequencer.resolveOrFail(
     "SettlementModule",
@@ -72,7 +63,7 @@ export default async function () {
     ),
     PrivateKey.fromBase58(
       process.env.PROTOKIT_MINA_BRIDGE_CONTRACT_PRIVATE_KEY!
-    ),
+    )
   );
 
   Provable.log("Deployed and initialized settlement contracts", {

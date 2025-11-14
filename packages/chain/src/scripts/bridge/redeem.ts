@@ -5,17 +5,15 @@ import {
   Sequencer,
   SequencerModule,
   SettlementModule,
+  AppChain,
 } from "@proto-kit/sequencer";
 import {
   scriptsSettlementSequencerModules,
   scriptsSettlementSequencerModulesConfig,
 } from "../../sequencer";
-import { AppChain } from "@proto-kit/sdk";
 import { Runtime } from "@proto-kit/module";
 import runtime from "../../runtime";
-import {
-  Protocol,
-} from "@proto-kit/protocol";
+import { Protocol } from "@proto-kit/protocol";
 import * as protocol from "../../protocol";
 import {
   AccountUpdate,
@@ -37,7 +35,9 @@ export default async function () {
   const fee = 0.1 * 1e9;
 
   const isCustomToken = tokenId.toBigInt() !== 1n;
-  const tokenOwnerPrivateKey = isCustomToken ? PrivateKey.fromBase58(process.env["PROTOKIT_CUSTOM_TOKEN_PRIVATE_KEY"]!) : PrivateKey.random();
+  const tokenOwnerPrivateKey = isCustomToken
+    ? PrivateKey.fromBase58(process.env["PROTOKIT_CUSTOM_TOKEN_PRIVATE_KEY"]!)
+    : PrivateKey.random();
 
   Provable.log("Preparing to redeem", {
     tokenId,
@@ -47,22 +47,15 @@ export default async function () {
   });
 
   const appChain = AppChain.from({
-    Runtime: Runtime.from({
-      modules: runtime.modules,
-    }),
+    Runtime: Runtime.from(runtime.modules),
     Protocol: Protocol.from({
-      modules: {
-        ...protocol.modules,
-        ...protocol.settlementModules,
-      },
+      ...protocol.modules,
+      ...protocol.settlementModules,
     }),
     Sequencer: Sequencer.from({
-      modules: {
-        Database: InMemoryDatabase,
-        ...scriptsSettlementSequencerModules,
-      },
+      Database: InMemoryDatabase,
+      ...scriptsSettlementSequencerModules,
     }),
-    modules: {},
   });
 
   appChain.configure({
@@ -77,7 +70,7 @@ export default async function () {
     },
   });
 
-  const proofsEnabled = process.env.PROTOKIT_PROOFS_ENABLED === "true"
+  const proofsEnabled = process.env.PROTOKIT_PROOFS_ENABLED === "true";
   await appChain.start(proofsEnabled);
 
   const bridgingModule = appChain.sequencer.resolveOrFail(
@@ -101,13 +94,18 @@ export default async function () {
       fee,
     },
     async () => {
-      const au = AccountUpdate.createSigned(toPrivateKey.toPublicKey(), tokenId);
+      const au = AccountUpdate.createSigned(
+        toPrivateKey.toPublicKey(),
+        tokenId
+      );
       au.balance.addInPlace(UInt64.from(amount));
 
       await bridgeContract.redeem(au);
 
       if (isCustomToken) {
-        await new FungibleToken(tokenOwnerPrivateKey.toPublicKey())!.approveAccountUpdate(bridgeContract.self);
+        await new FungibleToken(
+          tokenOwnerPrivateKey.toPublicKey()
+        )!.approveAccountUpdate(bridgeContract.self);
       }
     }
   );
@@ -117,11 +115,7 @@ export default async function () {
     SettlementModule
   );
 
-  settlementModule.signTransaction(
-    tx,
-    [toPrivateKey],
-    [tokenOwnerPrivateKey]
-  );
+  settlementModule.signTransaction(tx, [toPrivateKey], [tokenOwnerPrivateKey]);
 
   console.log("Sending...");
 

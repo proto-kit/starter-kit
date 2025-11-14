@@ -4,17 +4,15 @@ import {
   MinaTransactionSender,
   Sequencer,
   SettlementModule,
+  AppChain,
 } from "@proto-kit/sequencer";
 import {
   scriptsSettlementSequencerModules,
   scriptsSettlementSequencerModulesConfig,
 } from "../../sequencer";
-import { AppChain } from "@proto-kit/sdk";
 import { Runtime } from "@proto-kit/module";
 import runtime from "../../runtime";
-import {
-  Protocol, TokenBridgeAttestation,
-} from "@proto-kit/protocol";
+import { Protocol, TokenBridgeAttestation } from "@proto-kit/protocol";
 import * as protocol from "../../protocol";
 import {
   AccountUpdate,
@@ -41,8 +39,16 @@ export default async function () {
   const fee = 0.1 * 1e9;
 
   const isCustomToken = tokenId.toBigInt() !== 1n;
-  const tokenOwnerPrivateKey = isCustomToken ? PrivateKey.fromBase58(process.env["PROTOKIT_CUSTOM_TOKEN_PRIVATE_KEY"]!) : PrivateKey.random();
-  const bridgeContractKey = isCustomToken ? PrivateKey.fromBase58(process.env.PROTOKIT_CUSTOM_TOKEN_BRIDGE_PRIVATE_KEY!) : PrivateKey.fromBase58(process.env.PROTOKIT_MINA_BRIDGE_CONTRACT_PRIVATE_KEY!)
+  const tokenOwnerPrivateKey = isCustomToken
+    ? PrivateKey.fromBase58(process.env["PROTOKIT_CUSTOM_TOKEN_PRIVATE_KEY"]!)
+    : PrivateKey.random();
+  const bridgeContractKey = isCustomToken
+    ? PrivateKey.fromBase58(
+        process.env.PROTOKIT_CUSTOM_TOKEN_BRIDGE_PRIVATE_KEY!
+      )
+    : PrivateKey.fromBase58(
+        process.env.PROTOKIT_MINA_BRIDGE_CONTRACT_PRIVATE_KEY!
+      );
 
   Provable.log("Preparing to deposit", {
     tokenId,
@@ -53,22 +59,15 @@ export default async function () {
   });
 
   const appChain = AppChain.from({
-    Runtime: Runtime.from({
-      modules: runtime.modules,
-    }),
+    Runtime: Runtime.from(runtime.modules),
     Protocol: Protocol.from({
-      modules: {
-        ...protocol.modules,
-        ...protocol.settlementModules,
-      },
+      ...protocol.modules,
+      ...protocol.settlementModules,
     }),
     Sequencer: Sequencer.from({
-      modules: {
-        Database: InMemoryDatabase,
-        ...scriptsSettlementSequencerModules,
-      },
+      Database: InMemoryDatabase,
+      ...scriptsSettlementSequencerModules,
     }),
-    modules: {},
   });
 
   appChain.configure({
@@ -83,7 +82,7 @@ export default async function () {
     },
   });
 
-  const proofsEnabled = process.env.PROTOKIT_PROOFS_ENABLED === "true"
+  const proofsEnabled = process.env.PROTOKIT_PROOFS_ENABLED === "true";
   await appChain.start(proofsEnabled);
 
   const settlementModule = appChain.sequencer.resolveOrFail(
@@ -105,7 +104,8 @@ export default async function () {
   await fetchAccount({ publicKey: bridgeAddress!, tokenId: tokenId });
   await fetchAccount({ publicKey: bridgeAddress!, tokenId: tokenId });
 
-  const attestation = await bridgingModule.getDepositContractAttestation(tokenId)
+  const attestation =
+    await bridgingModule.getDepositContractAttestation(tokenId);
 
   console.log("Forging transaction...");
   const tx = await Mina.transaction(
@@ -115,7 +115,10 @@ export default async function () {
       fee,
     },
     async () => {
-      const au = AccountUpdate.createSigned(fromPrivateKey.toPublicKey(), tokenId);
+      const au = AccountUpdate.createSigned(
+        fromPrivateKey.toPublicKey(),
+        tokenId
+      );
       au.balance.subInPlace(UInt64.from(amount));
 
       await dispatch.deposit(
@@ -127,7 +130,9 @@ export default async function () {
       );
 
       if (isCustomToken) {
-        await new FungibleToken(tokenOwnerPrivateKey.toPublicKey())!.approveAccountUpdates([au, dispatch.self]);
+        await new FungibleToken(
+          tokenOwnerPrivateKey.toPublicKey()
+        )!.approveAccountUpdates([au, dispatch.self]);
       }
     }
   );

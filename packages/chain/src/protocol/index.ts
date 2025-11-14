@@ -13,7 +13,7 @@ export const config: ModulesConfig<typeof modules> = {
     ...VanillaProtocolModules.defaultConfig().TransactionFee,
     feeRecipient: process.env.PROTOKIT_TRANSACTION_FEE_RECIPIENT_PUBLIC_KEY!,
   },
-};
+} satisfies ModulesConfig<typeof modules>;
 
 export const settlementModules = {
   SettlementContractModule: SettlementContractModule.fromDefaults(),
@@ -21,10 +21,7 @@ export const settlementModules = {
 
 export const settlementModulesConfig = {
   SettlementContractModule: {
-    BridgeContract: {
-      withdrawalEventName: "withdrawal",
-      withdrawalStatePath: "Withdrawals.withdrawals",
-    },
+    BridgeContract: {},
     SettlementContract: {},
     DispatchContract: {
       incomingMessagesMethods: {
@@ -34,4 +31,4 @@ export const settlementModulesConfig = {
   },
 } satisfies ModulesConfig<typeof settlementModules>;
 
-export default { modules, config };
+export default { modules, config, settlementModules, settlementModulesConfig };

@@ -1,14 +1,26 @@
 import { Runtime } from "@proto-kit/module";
 import { Protocol, TokenBridgeTree } from "@proto-kit/protocol";
-import { AppChain } from "@proto-kit/sdk";
 import {
   ArchiveNode,
   MinaTransactionSender,
   ProvenSettlementPermissions,
   Sequencer,
-  SettlementModule, SignedSettlementPermissions,
+  SettlementModule,
+  SignedSettlementPermissions,
+  AppChain,
 } from "@proto-kit/sequencer";
-import { AccountUpdate, Bool, fetchAccount, Field, Mina, PrivateKey, Provable, PublicKey, UInt64, UInt8 } from "o1js";
+import {
+  AccountUpdate,
+  Bool,
+  fetchAccount,
+  Field,
+  Mina,
+  PrivateKey,
+  Provable,
+  PublicKey,
+  UInt64,
+  UInt8,
+} from "o1js";
 import "reflect-metadata";
 import { container } from "tsyringe";
 import runtime from "../../runtime";
@@ -18,26 +30,23 @@ import {
   scriptsSettlementSequencerModulesConfig,
 } from "../../sequencer";
 import { PrismaRedisDatabase } from "@proto-kit/persistance";
-import { FungibleToken, FungibleTokenAdmin } from "mina-fungible-token";
+import {
+  FungibleToken,
+  FungibleTokenAdmin,
+  SetAdminEvent,
+} from "mina-fungible-token";
 
 export default async function () {
   const appChain = AppChain.from({
-    Runtime: Runtime.from({
-      modules: runtime.modules,
-    }),
+    Runtime: Runtime.from(runtime.modules),
     Protocol: Protocol.from({
-      modules: {
-        ...protocol.modules,
-        ...protocol.settlementModules,
-      },
+      ...protocol.modules,
+      ...protocol.settlementModules,
     }),
     Sequencer: Sequencer.from({
-      modules: {
-        Database: PrismaRedisDatabase,
-        ...scriptsSettlementSequencerModules,
-      },
+      Database: PrismaRedisDatabase,
+      ...scriptsSettlementSequencerModules,
     }),
-    modules: {},
   });
 
   appChain.configure({
@@ -58,14 +67,12 @@ export default async function () {
           connection: process.env.DATABASE_URL!,
         },
       },
-    },
+    } as any,
   });
 
   const chainContainer = container.createChildContainer();
-  console.log("start");
-  const proofsEnabled = process.env.PROTOKIT_PROOFS_ENABLED === "true"
+  const proofsEnabled = process.env.PROTOKIT_PROOFS_ENABLED === "true";
   await appChain.start(proofsEnabled, chainContainer);
-  console.log("after start");
 
   const tokenSymbol = process.argv[3];
   const feepayerPrivateKey = PrivateKey.fromBase58(
@@ -74,7 +81,8 @@ export default async function () {
   const receiverPublicKey = PublicKey.fromBase58(
     process.env[process.argv[5]] || process.argv[5]!
   );
-  const mintAmount = process.argv.length > 6 ? Number(process.argv[6]) * 1e9 : 0;
+  const mintAmount =
+    process.argv.length > 6 ? Number(process.argv[6]) * 1e9 : 0;
   const fee = 0.1 * 1e9;
 
   const settlementModule = appChain.sequencer.resolveOrFail(
@@ -84,43 +92,46 @@ export default async function () {
 
   const isSignedSettlement = settlementModule.utils.isSignedSettlement();
 
-  const tokenOwnerKey = PrivateKey.fromBase58(process.env["PROTOKIT_CUSTOM_TOKEN_PRIVATE_KEY"] ?? PrivateKey.random().toBase58());
-  const tokenAdminKey = PrivateKey.fromBase58(process.env["PROTOKIT_CUSTOM_TOKEN_ADMIN_PRIVATE_KEY"] ?? PrivateKey.random().toBase58());
-  const tokenBridgeKey = PrivateKey.fromBase58(process.env["PROTOKIT_CUSTOM_TOKEN_BRIDGE_PRIVATE_KEY"] ?? PrivateKey.random().toBase58());
+  const tokenOwnerKey = PrivateKey.fromBase58(
+    process.env["PROTOKIT_CUSTOM_TOKEN_PRIVATE_KEY"] ??
+      PrivateKey.random().toBase58()
+  );
+  const tokenAdminKey = PrivateKey.fromBase58(
+    process.env["PROTOKIT_CUSTOM_TOKEN_ADMIN_PRIVATE_KEY"] ??
+      PrivateKey.random().toBase58()
+  );
+  const tokenBridgeKey = PrivateKey.fromBase58(
+    process.env["PROTOKIT_CUSTOM_TOKEN_BRIDGE_PRIVATE_KEY"] ??
+      PrivateKey.random().toBase58()
+  );
 
-  await ArchiveNode.waitOnSync(appChain.sequencer.resolve("BaseLayer").config)
+  await ArchiveNode.waitOnSync(appChain.sequencer.resolve("BaseLayer").config);
 
-  async function deployTokenContracts(){
-    const permissions =
-      isSignedSettlement
-        ? new SignedSettlementPermissions()
-        : new ProvenSettlementPermissions();
+  async function deployTokenContracts() {
+    const permissions = isSignedSettlement
+      ? new SignedSettlementPermissions()
+      : new ProvenSettlementPermissions();
 
     const tx = await Mina.transaction(
       {
         sender: feepayerPrivateKey.toPublicKey(),
         memo: "Deploy custom token",
-        fee
+        fee,
       },
       async () => {
         AccountUpdate.fundNewAccount(feepayerPrivateKey.toPublicKey(), 3);
 
-        const admin = new FungibleTokenAdmin(
-          tokenAdminKey.toPublicKey()
-        );
+        const admin = new FungibleTokenAdmin(tokenAdminKey.toPublicKey());
         await admin.deploy({
-          verificationKey: undefined,
           adminPublicKey: feepayerPrivateKey.toPublicKey(),
         });
-        admin.self.account.permissions.set(
-          permissions.bridgeContractToken()
-        );
+        admin.self.account.permissions.set(permissions.bridgeContractToken());
 
-        const fungibleToken = new FungibleToken(tokenOwnerKey.toPublicKey())
+        const fungibleToken = new FungibleToken(tokenOwnerKey.toPublicKey());
         await fungibleToken.deploy({
-          verificationKey: undefined,
           src: "",
           symbol: tokenSymbol,
+          allowUpdates: false,
         });
         fungibleToken!.self.account.permissions.set(
           permissions.bridgeContractToken()
@@ -133,7 +144,7 @@ export default async function () {
         );
       }
     );
-    console.log("Sending deploy transaction...")
+    console.log("Sending deploy transaction...");
     console.log(tx.toPretty());
 
     settlementModule.signTransaction(
@@ -146,11 +157,11 @@ export default async function () {
       .resolveOrFail("TransactionSender", MinaTransactionSender)
       .proveAndSendTransaction(tx, "included");
 
-    console.log("Deploy transaction included")
+    console.log("Deploy transaction included");
   }
 
   async function mint() {
-    const tokenOwner = new FungibleToken(tokenOwnerKey.toPublicKey())
+    const tokenOwner = new FungibleToken(tokenOwnerKey.toPublicKey());
     await settlementModule.utils.fetchContractAccounts(
       {
         address: tokenOwner!.address,
@@ -171,10 +182,7 @@ export default async function () {
       async () => {
         AccountUpdate.fundNewAccount(feepayerPrivateKey.toPublicKey(), 1);
 
-        await tokenOwner!.mint(
-          receiverPublicKey,
-          UInt64.from(mintAmount)
-        );
+        await tokenOwner!.mint(receiverPublicKey, UInt64.from(mintAmount));
       }
     );
     settlementModule.utils.signTransaction(
@@ -190,11 +198,14 @@ export default async function () {
 
   async function deployBridge() {
     const { settlement, dispatch } = settlementModule.getAddresses();
-    await fetchAccount({ publicKey: settlementModule.config.feepayer.toPublicKey() })
-    await fetchAccount({ publicKey: settlement })
-    await fetchAccount({ publicKey: dispatch })
+    await fetchAccount({
+      publicKey: settlementModule.config.feepayer.toPublicKey(),
+    });
+    await fetchAccount({ publicKey: settlement });
+    await fetchAccount({ publicKey: dispatch });
 
-    const tokenOwner = new FungibleToken(tokenOwnerKey.toPublicKey())
+    const tokenOwner = new FungibleToken(tokenOwnerKey.toPublicKey());
+    // SetAdminEvent.
     await settlementModule.deployTokenBridge(
       tokenOwner!,
       tokenOwnerKey,
@@ -210,7 +221,9 @@ export default async function () {
   await mint();
   await deployBridge();
 
-  console.log(`Deployed custom token with id ${new FungibleToken(tokenOwnerKey.toPublicKey())!.deriveTokenId()}`)
+  console.log(
+    `Deployed custom token with id ${new FungibleToken(tokenOwnerKey.toPublicKey())!.deriveTokenId()}`
+  );
 
   Provable.log("Deployed and initialized settlement contracts", {
     settlement: PrivateKey.fromBase58(

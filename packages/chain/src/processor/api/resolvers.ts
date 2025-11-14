@@ -5,7 +5,6 @@ import {
   resolvers as generatedResolvers,
   ResolversEnhanceMap,
 } from "./generated/type-graphql";
-import {NonEmptyArray} from "type-graphql";
 
 // enhance the generated resolvers with custom middlewares/validations
 const resolversEnchanceMap: ResolversEnhanceMap = {
