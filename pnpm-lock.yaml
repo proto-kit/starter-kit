@@ -220,6 +220,9 @@ importers:
       '@proto-kit/sequencer':
         specifier: ../../../framework/packages/sequencer
         version: link:../../../framework/packages/sequencer
+      '@proto-kit/stack':
+        specifier: ../../../framework/packages/stack
+        version: link:../../../framework/packages/stack
       graphql-fields:
         specifier: ^2.0.3
         version: 2.0.3
