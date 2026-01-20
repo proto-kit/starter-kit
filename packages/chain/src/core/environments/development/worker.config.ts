@@ -5,8 +5,8 @@ import runtime from "../../../runtime";
 import * as protocol from "../../../protocol";
 import { Arguments } from "../../../start";
 
-import { workerModules, workerModulesConfig } from "../../sequencer/worker";
 import { log } from "@proto-kit/common";
+import { DefaultConfigs, DefaultModules } from "@proto-kit/stack";
 
 export const appChain = AppChain.from({
   Runtime: Runtime.from(runtime.modules),
@@ -17,7 +17,7 @@ export const appChain = AppChain.from({
       : {}),
   }),
   Sequencer: Sequencer.from({
-    ...workerModules,
+    ...DefaultModules.worker(),
   }),
 });
 
@@ -31,7 +31,10 @@ export default async (args: Arguments) => {
         : {}),
     },
     Sequencer: {
-      ...workerModulesConfig,
+      ...DefaultConfigs.worker({
+        preset: "development",
+        overrides: {},
+      }),
     },
   });
 

@@ -86,7 +86,7 @@ pnpm env:<environment> <command>
 
 Each environment comes with a set of environment variables specified in `.env`. This allows for configuration for the Protokit app-chain stack.
 
-To learn more about what configuration options are available, check out any of the available env files at `packages/chain/src/environments/<environment>/.env`
+To learn more about what configuration options are available, check out any of the available env files at `packages/chain/src/core/environments/<environment>/.env`
 
 ## Development workflow
 

@@ -6,13 +6,9 @@ import {
   SettlementModule,
   AppChain,
 } from "@proto-kit/sequencer";
-import {
-  scriptsSettlementSequencerModules,
-  scriptsSettlementSequencerModulesConfig,
-} from "../../sequencer";
 import { Runtime } from "@proto-kit/module";
 import runtime from "../../../runtime";
-import { Protocol, TokenBridgeAttestation } from "@proto-kit/protocol";
+import { Protocol } from "@proto-kit/protocol";
 import * as protocol from "../../../protocol";
 import {
   AccountUpdate,
@@ -26,6 +22,7 @@ import {
   UInt64,
 } from "o1js";
 import { FungibleToken } from "mina-fungible-token";
+import { DefaultConfigs, DefaultModules } from "@proto-kit/stack";
 
 export default async function () {
   const tokenId = Field(process.argv[3]);
@@ -65,8 +62,9 @@ export default async function () {
       ...protocol.settlementModules,
     }),
     Sequencer: Sequencer.from({
-      Database: InMemoryDatabase,
-      ...scriptsSettlementSequencerModules,
+      ...DefaultModules.settlementScript({
+        overrides: DefaultModules.database({ preset: "inmemory" }),
+      }),
     }),
   });
 
@@ -77,8 +75,9 @@ export default async function () {
       ...protocol.settlementModulesConfig,
     },
     Sequencer: {
-      Database: {},
-      ...scriptsSettlementSequencerModulesConfig,
+      ...DefaultConfigs.settlementScript({
+        overrides: DefaultConfigs.database({ preset: "inmemory" }),
+      }),
     },
   });
 

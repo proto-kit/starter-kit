@@ -25,16 +25,8 @@ import "reflect-metadata";
 import { container } from "tsyringe";
 import runtime from "../../../runtime";
 import * as protocol from "../../../protocol";
-import {
-  scriptsSettlementSequencerModules,
-  scriptsSettlementSequencerModulesConfig,
-} from "../../sequencer";
-import { PrismaRedisDatabase } from "@proto-kit/persistance";
-import {
-  FungibleToken,
-  FungibleTokenAdmin,
-  SetAdminEvent,
-} from "mina-fungible-token";
+import { FungibleToken, FungibleTokenAdmin } from "mina-fungible-token";
+import { DefaultConfigs, DefaultModules } from "@proto-kit/stack";
 
 export default async function () {
   const appChain = AppChain.from({
@@ -44,8 +36,9 @@ export default async function () {
       ...protocol.settlementModules,
     }),
     Sequencer: Sequencer.from({
-      Database: PrismaRedisDatabase,
-      ...scriptsSettlementSequencerModules,
+      ...DefaultModules.settlementScript({
+        overrides: DefaultModules.database({ preset: "development" }),
+      }),
     }),
   });
 
@@ -56,18 +49,10 @@ export default async function () {
       ...protocol.settlementModulesConfig,
     },
     Sequencer: {
-      ...scriptsSettlementSequencerModulesConfig,
-      Database: {
-        redis: {
-          host: process.env.REDIS_HOST!,
-          port: Number(process.env.REDIS_PORT)!,
-          password: process.env.REDIS_PASSWORD!,
-        },
-        prisma: {
-          connection: process.env.DATABASE_URL!,
-        },
-      },
-    } as any,
+      ...DefaultConfigs.settlementScript({
+        overrides: DefaultConfigs.database({ preset: "development" }),
+      }),
+    },
   });
 
   const chainContainer = container.createChildContainer();
@@ -105,7 +90,9 @@ export default async function () {
       PrivateKey.random().toBase58()
   );
 
-  await ArchiveNode.waitOnSync(appChain.sequencer.resolve("BaseLayer").config);
+  await ArchiveNode.waitOnSync(
+    (appChain as any).sequencer.resolve("BaseLayer").config
+  );
 
   async function deployTokenContracts() {
     const permissions = isSignedSettlement
@@ -207,7 +194,7 @@ export default async function () {
     const tokenOwner = new FungibleToken(tokenOwnerKey.toPublicKey());
     // SetAdminEvent.
     await settlementModule.deployTokenBridge(
-      tokenOwner!,
+      tokenOwner! as any,
       tokenOwnerKey,
       tokenBridgeKey,
       {}

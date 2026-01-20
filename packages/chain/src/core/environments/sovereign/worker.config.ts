@@ -5,8 +5,8 @@ import runtime from "../../../runtime";
 import * as protocol from "../../../protocol";
 import { Arguments } from "../../../start";
 
-import { workerModules, workerModulesConfig } from "../../sequencer/worker";
 import { log } from "@proto-kit/common";
+import { DefaultConfigs, DefaultModules } from "@proto-kit/stack";
 
 export const appChain = AppChain.from({
   Runtime: Runtime.from(runtime.modules),
@@ -16,9 +16,7 @@ export const appChain = AppChain.from({
       ? protocol.settlementModules
       : {}),
   }),
-  Sequencer: Sequencer.from({
-    ...workerModules,
-  }),
+  Sequencer: Sequencer.from(DefaultModules.worker()),
 });
 
 export default async (args: Arguments) => {
@@ -30,9 +28,7 @@ export default async (args: Arguments) => {
         ? protocol.settlementModulesConfig
         : {}),
     },
-    Sequencer: {
-      ...workerModulesConfig,
-    },
+    Sequencer: DefaultConfigs.worker({ preset: "sovereign" }),
   });
 
   log.setLevel("DEBUG");

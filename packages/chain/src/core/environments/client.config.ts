@@ -34,7 +34,7 @@ appChain.configure({
   Sequencer: {},
   QueryTransportModule: {},
   NetworkStateTransportModule: {},
-  TransactionSender: {}
+  TransactionSender: {},
 });
 
 export const client = appChain;

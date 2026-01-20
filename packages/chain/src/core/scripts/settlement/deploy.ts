@@ -12,11 +12,7 @@ import "reflect-metadata";
 import { container } from "tsyringe";
 import runtime from "../../../runtime";
 import * as protocol from "../../../protocol";
-import {
-  scriptsSettlementSequencerModules,
-  scriptsSettlementSequencerModulesConfig,
-} from "../../sequencer";
-import { PrismaRedisDatabase } from "@proto-kit/persistance";
+import { DefaultConfigs, DefaultModules } from "@proto-kit/stack";
 
 export default async function () {
   const appChain = AppChain.from({
@@ -27,7 +23,9 @@ export default async function () {
     }),
     Sequencer: Sequencer.from({
       Database: InMemoryDatabase,
-      ...scriptsSettlementSequencerModules,
+      ...DefaultModules.settlementScript({
+        overrides: DefaultModules.database({ preset: "inmemory" }),
+      }),
     }),
   });
 
@@ -38,8 +36,9 @@ export default async function () {
       ...protocol.settlementModulesConfig,
     },
     Sequencer: {
-      ...scriptsSettlementSequencerModulesConfig,
-      Database: {},
+      ...DefaultConfigs.settlementScript({
+        overrides: DefaultConfigs.database({ preset: "inmemory" }),
+      }),
     } as any,
   });
 
