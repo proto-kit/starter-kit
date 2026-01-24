@@ -6,7 +6,7 @@ import { databaseModule } from "../../processor";
 import { handlers } from "../../processor/handlers";
 import { resolvers } from "../../processor/api/resolvers";
 
-export const processor = Processor.from({
+const processor = Processor.from({
   Database: databaseModule,
   ...DefaultModules.processor(resolvers, handlers),
 });

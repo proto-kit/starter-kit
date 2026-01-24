@@ -5,10 +5,10 @@ import runtime from "../../../runtime";
 import * as protocol from "../../../protocol";
 import { Arguments } from "../../../start";
 
-import { log } from "@proto-kit/common";
+import { log, Startable } from "@proto-kit/common";
 import { DefaultConfigs, DefaultModules } from "@proto-kit/stack";
 
-export const appChain = AppChain.from({
+const appChain = AppChain.from({
   Runtime: Runtime.from(runtime.modules),
   Protocol: Protocol.from({
     ...protocol.modules,
@@ -21,7 +21,7 @@ export const appChain = AppChain.from({
   }),
 });
 
-export default async (args: Arguments) => {
+export default async (args: Arguments): Promise<Startable> => {
   appChain.configurePartial({
     Runtime: runtime.config,
     Protocol: {
@@ -31,8 +31,8 @@ export default async (args: Arguments) => {
         : {}),
     },
     Sequencer: DefaultConfigs.worker({
-        preset: "development",
-      })
+      preset: "development",
+    }),
   });
 
   log.setLevel("DEBUG");

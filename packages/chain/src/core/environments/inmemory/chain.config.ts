@@ -1,6 +1,7 @@
 import { Runtime } from "@proto-kit/module";
 import { Protocol } from "@proto-kit/protocol";
 import { Sequencer, AppChain } from "@proto-kit/sequencer";
+import { Startable } from "@proto-kit/common";
 
 import { DefaultConfigs, DefaultModules } from "@proto-kit/stack";
 import protocol from "../../../protocol";
@@ -8,7 +9,7 @@ import runtime from "../../../runtime";
 
 const settlementEnabled = process.env.PROTOKIT_SETTLEMENT_ENABLED === "true";
 
-export const appChain = AppChain.from({
+const appChain = AppChain.from({
   Runtime: Runtime.from(runtime.modules),
   Protocol: Protocol.from(protocol.modules),
   Sequencer: Sequencer.from({
@@ -20,7 +21,7 @@ export const appChain = AppChain.from({
   }),
   ...DefaultModules.appChainBase(),
 });
-export default async () => {
+export default async (): Promise<Startable> => {
   appChain.configurePartial({
     Runtime: runtime.config,
     Protocol: protocol.config,

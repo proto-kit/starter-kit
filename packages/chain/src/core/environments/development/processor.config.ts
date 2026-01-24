@@ -6,7 +6,7 @@ import { DefaultConfigs, DefaultModules } from "@proto-kit/stack";
 import { resolvers } from "../../processor/api/resolvers";
 import { handlers } from "../../processor/handlers";
 
-export const processor = Processor.from({
+const processor = Processor.from({
   Database: databaseModule,
   DatabasePruneModule: DatabasePruneModule,
   ...DefaultModules.processor(resolvers, handlers),

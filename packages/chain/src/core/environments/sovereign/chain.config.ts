@@ -1,9 +1,6 @@
 import { Runtime } from "@proto-kit/module";
 import { Protocol } from "@proto-kit/protocol";
-import {
-  AppChain,
-  Sequencer,
-} from "@proto-kit/sequencer";
+import { AppChain, Sequencer } from "@proto-kit/sequencer";
 import runtime from "../../../runtime";
 import * as protocol from "../../../protocol";
 
@@ -13,7 +10,7 @@ import { DefaultConfigs, DefaultModules } from "@proto-kit/stack";
 
 const settlementEnabled = process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true";
 
-export const appChain  = AppChain.from({
+const appChain = AppChain.from({
   Runtime: Runtime.from(runtime.modules),
   Protocol: Protocol.from({
     ...protocol.modules,

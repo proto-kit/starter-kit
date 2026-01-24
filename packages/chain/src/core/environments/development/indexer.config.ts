@@ -3,7 +3,7 @@ import { Arguments } from "../../../start";
 import { Startable } from "@proto-kit/common";
 import { DefaultConfigs, DefaultModules } from "@proto-kit/stack";
 
-export const indexer = Indexer.from({
+const indexer = Indexer.from({
   ...DefaultModules.indexer(),
 });
 
