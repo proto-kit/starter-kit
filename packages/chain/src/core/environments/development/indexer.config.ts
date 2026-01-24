@@ -1,15 +1,10 @@
 import { Indexer } from "@proto-kit/indexer";
 import { Arguments } from "../../../start";
-import { DatabasePruneModule } from "@proto-kit/sequencer";
 import { Startable } from "@proto-kit/common";
 import { DefaultConfigs, DefaultModules } from "@proto-kit/stack";
 
 export const indexer = Indexer.from({
-  ...DefaultModules.indexer({
-    overrides: {
-      DatabasePruneModule,
-    },
-  }),
+  ...DefaultModules.indexer(),
 });
 
 export default async (args: Arguments): Promise<Startable> => {
@@ -17,9 +12,7 @@ export default async (args: Arguments): Promise<Startable> => {
     ...DefaultConfigs.indexer({
       preset: "development",
       overrides: {
-        DatabasePruneModule: {
-          pruneOnStartup: args.pruneOnStartup,
-        },
+        pruneOnStartup: args.pruneOnStartup,
       },
     }),
   });

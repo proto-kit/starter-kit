@@ -1,19 +1,34 @@
 import { Runtime } from "@proto-kit/module";
 import { Protocol } from "@proto-kit/protocol";
+import {
+  AppChain,
+  Sequencer,
+} from "@proto-kit/sequencer";
 import runtime from "../../../runtime";
 import * as protocol from "../../../protocol";
 
 import { Arguments } from "../../../start";
 import { Startable } from "@proto-kit/common";
-import { log } from "@proto-kit/common";
-import { DefaultAppChain, DefaultAppChainConfig } from "@proto-kit/stack";
+import { DefaultConfigs, DefaultModules } from "@proto-kit/stack";
 
 const settlementEnabled = process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true";
 
-export const appChain = DefaultAppChain.sovereign(
-  runtime.modules,
-  protocol.modules
-);
+export const appChain  = AppChain.from({
+  Runtime: Runtime.from(runtime.modules),
+  Protocol: Protocol.from({
+    ...protocol.modules,
+    ...(settlementEnabled ? protocol.settlementModules : {}),
+  }),
+  Sequencer: Sequencer.from({
+    // ordering of the modules matters due to dependency resolution
+    ...DefaultModules.PrismaRedisDatabase(),
+    ...DefaultModules.metrics(),
+    ...DefaultModules.RedisTaskQueue(),
+    ...DefaultModules.core({ settlementEnabled }),
+    ...DefaultModules.sequencerIndexer(),
+  }),
+  ...DefaultModules.appChainBase(),
+});
 
 export default async (args: Arguments): Promise<Startable> => {
   appChain.configurePartial({
@@ -22,17 +37,20 @@ export default async (args: Arguments): Promise<Startable> => {
       ...protocol.config,
       ...(settlementEnabled ? protocol.settlementModulesConfig : {}),
     },
-    ...DefaultAppChainConfig.sovereign({
-      settlementEnabled,
-      overrideSequencerConfig: {
-        DatabasePruneModule: {
+    Sequencer: {
+      ...DefaultConfigs.core({ settlementEnabled, preset: "sovereign" }),
+      ...DefaultConfigs.sequencerIndexer(),
+      ...DefaultConfigs.metrics({ preset: "sovereign" }),
+      ...DefaultConfigs.redisTaskQueue({ preset: "sovereign" }),
+      ...DefaultConfigs.prismaRedisDatabase({
+        preset: "sovereign",
+        overrides: {
           pruneOnStartup: args.pruneOnStartup,
         },
-      },
-    }),
+      }),
+    },
+    ...DefaultConfigs.appChainBase(),
   });
-
-  log.setLevel("DEBUG");
 
   return appChain;
 };

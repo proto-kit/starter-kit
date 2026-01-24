@@ -1,19 +1,37 @@
 import { Runtime } from "@proto-kit/module";
 import { Protocol } from "@proto-kit/protocol";
-import runtime from "../../../runtime";
+import { Sequencer, AppChain } from "@proto-kit/sequencer";
+
+import { DefaultConfigs, DefaultModules } from "@proto-kit/stack";
 import protocol from "../../../protocol";
-import { DefaultAppChain, DefaultAppChainConfig } from "@proto-kit/stack";
+import runtime from "../../../runtime";
 
-export const appChain = DefaultAppChain.inmemory(
-  runtime.modules,
-  protocol.modules
-);
+const settlementEnabled = process.env.PROTOKIT_SETTLEMENT_ENABLED === "true";
 
+export const appChain = AppChain.from({
+  Runtime: Runtime.from(runtime.modules),
+  Protocol: Protocol.from(protocol.modules),
+  Sequencer: Sequencer.from({
+    ...DefaultModules.inMemoryDatabase(),
+    ...DefaultModules.core({
+      settlementEnabled,
+    }),
+    ...DefaultModules.localTaskQueue(),
+  }),
+  ...DefaultModules.appChainBase(),
+});
 export default async () => {
   appChain.configurePartial({
     Runtime: runtime.config,
     Protocol: protocol.config,
-    ...DefaultAppChainConfig.inmemory(),
+    Sequencer: {
+      ...DefaultConfigs.core({
+        settlementEnabled,
+      }),
+      ...DefaultConfigs.inMemoryDatabase(),
+      ...DefaultConfigs.localTaskQueue(),
+    },
+    ...DefaultConfigs.appChainBase(),
   });
 
   return appChain;

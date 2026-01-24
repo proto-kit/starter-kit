@@ -49,10 +49,8 @@ export default async function () {
       ...protocol.settlementModules,
     }),
     Sequencer: Sequencer.from({
-      Database: InMemoryDatabase,
-      ...DefaultModules.settlementScript({
-        overrides: DefaultModules.database({ preset: "inmemory" }),
-      }),
+      ...DefaultModules.inMemoryDatabase(),
+      ...DefaultModules.settlementScript(),
     }),
   });
 
@@ -63,10 +61,11 @@ export default async function () {
       ...protocol.settlementModulesConfig,
     },
     Sequencer: {
+      ...DefaultConfigs.inMemoryDatabase(),
       ...DefaultConfigs.settlementScript({
-        overrides: DefaultConfigs.database({ preset: "inmemory" }),
+        preset: "development",
       }),
-    } as any,
+    },
   });
 
   const proofsEnabled = process.env.PROTOKIT_PROOFS_ENABLED === "true";

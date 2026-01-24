@@ -6,20 +6,17 @@ import { databaseModule } from "../../processor";
 import { handlers } from "../../processor/handlers";
 import { resolvers } from "../../processor/api/resolvers";
 
-export const processor = Processor.from(
-  DefaultModules.processor(resolvers, handlers, {
-    overrides: {
-      Database: databaseModule,
-    },
-  })
-);
+export const processor = Processor.from({
+  Database: databaseModule,
+  ...DefaultModules.processor(resolvers, handlers),
+});
 
 export default async (args: Arguments): Promise<Startable> => {
-  processor.configurePartial(
-    DefaultConfigs.processor({
+  processor.configurePartial({
+    ...DefaultConfigs.processor({
       preset: "sovereign",
-      overrides: { Database: {} },
-    })
-  );
+    }),
+    Database: {},
+  });
   return processor;
 };

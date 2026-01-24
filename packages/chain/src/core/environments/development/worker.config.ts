@@ -30,12 +30,9 @@ export default async (args: Arguments) => {
         ? protocol.settlementModulesConfig
         : {}),
     },
-    Sequencer: {
-      ...DefaultConfigs.worker({
+    Sequencer: DefaultConfigs.worker({
         preset: "development",
-        overrides: {},
-      }),
-    },
+      })
   });
 
   log.setLevel("DEBUG");

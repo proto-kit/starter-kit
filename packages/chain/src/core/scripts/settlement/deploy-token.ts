@@ -1,5 +1,5 @@
 import { Runtime } from "@proto-kit/module";
-import { Protocol, TokenBridgeTree } from "@proto-kit/protocol";
+import { Protocol } from "@proto-kit/protocol";
 import {
   ArchiveNode,
   MinaTransactionSender,
@@ -36,9 +36,8 @@ export default async function () {
       ...protocol.settlementModules,
     }),
     Sequencer: Sequencer.from({
-      ...DefaultModules.settlementScript({
-        overrides: DefaultModules.database({ preset: "development" }),
-      }),
+      ...DefaultModules.PrismaRedisDatabase(),
+      ...DefaultModules.settlementScript(),
     }),
   });
 
@@ -49,8 +48,14 @@ export default async function () {
       ...protocol.settlementModulesConfig,
     },
     Sequencer: {
+      ...DefaultConfigs.prismaRedisDatabase({
+        preset: "development",
+        overrides: {
+          pruneOnStartup: false,
+        },
+      }),
       ...DefaultConfigs.settlementScript({
-        overrides: DefaultConfigs.database({ preset: "development" }),
+        preset: "development",
       }),
     },
   });

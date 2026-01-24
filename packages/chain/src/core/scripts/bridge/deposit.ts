@@ -1,6 +1,5 @@
 import {
   BridgingModule,
-  InMemoryDatabase,
   MinaTransactionSender,
   Sequencer,
   SettlementModule,
@@ -62,9 +61,8 @@ export default async function () {
       ...protocol.settlementModules,
     }),
     Sequencer: Sequencer.from({
-      ...DefaultModules.settlementScript({
-        overrides: DefaultModules.database({ preset: "inmemory" }),
-      }),
+      ...DefaultModules.inMemoryDatabase(),
+      ...DefaultModules.settlementScript(),
     }),
   });
 
@@ -75,8 +73,9 @@ export default async function () {
       ...protocol.settlementModulesConfig,
     },
     Sequencer: {
+      ...DefaultConfigs.inMemoryDatabase(),
       ...DefaultConfigs.settlementScript({
-        overrides: DefaultConfigs.database({ preset: "inmemory" }),
+        preset: "development",
       }),
     },
   });

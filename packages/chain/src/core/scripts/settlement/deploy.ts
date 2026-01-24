@@ -3,7 +3,6 @@ import { Protocol } from "@proto-kit/protocol";
 import {
   InMemoryDatabase,
   Sequencer,
-  SequencerModule,
   SettlementModule,
   AppChain,
 } from "@proto-kit/sequencer";
@@ -23,9 +22,7 @@ export default async function () {
     }),
     Sequencer: Sequencer.from({
       Database: InMemoryDatabase,
-      ...DefaultModules.settlementScript({
-        overrides: DefaultModules.database({ preset: "inmemory" }),
-      }),
+      ...DefaultModules.settlementScript(),
     }),
   });
 
@@ -36,10 +33,9 @@ export default async function () {
       ...protocol.settlementModulesConfig,
     },
     Sequencer: {
-      ...DefaultConfigs.settlementScript({
-        overrides: DefaultConfigs.database({ preset: "inmemory" }),
-      }),
-    } as any,
+      ...DefaultConfigs.inMemoryDatabase(),
+      ...DefaultConfigs.settlementScript({ preset: "development" }),
+    } ,
   });
 
   const chainContainer = container.createChildContainer();
