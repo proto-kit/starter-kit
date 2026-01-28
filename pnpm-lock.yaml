@@ -190,6 +190,9 @@ importers:
       '@proto-kit/api':
         specifier: ../../../framework/packages/api
         version: link:../../../framework/packages/api
+      '@proto-kit/cli':
+        specifier: ../../../framework/packages/cli
+        version: link:../../../framework/packages/cli
       '@proto-kit/common':
         specifier: ../../../framework/packages/common
         version: link:../../../framework/packages/common

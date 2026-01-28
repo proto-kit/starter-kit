@@ -29,18 +29,9 @@
     "env:development": "dotenv -e ./packages/chain/src/core/environments/development/.env -- pnpm",
     "env:inmemory": "dotenv -e ./packages/chain/src/core/environments/inmemory/.env -- pnpm",
     "env:sovereign": "dotenv -e ./packages/chain/src/core/environments/sovereign/.env -- pnpm",
-    "generate-keys": "turbo run generate-keys --env-mode=loose --",
     "lightnet:start": "docker compose -f docker/lightnet/docker-compose.yml up",
     "lightnet:stop": "docker compose -f docker/lightnet/docker-compose.yml down",
-    "lightnet:faucet": "turbo run lightnet:faucet --env-mode=loose --",
-    "lightnet:wait-for-network": "turbo run lightnet:wait-for-network --env-mode=loose --",
-    "lightnet:initialize": "pnpm env:development lightnet:wait-for-network && pnpm env:development lightnet:faucet PROTOKIT_SEQUENCER_PUBLIC_KEY && pnpm env:development lightnet:faucet TEST_ACCOUNT_1_PUBLIC_KEY && pnpm env:development settlement:deploy",
-    "settlement:deploy": "turbo run settlement:deploy --env-mode=loose --",
-    "settlement:token:deploy": "turbo run settlement:token:deploy --env-mode=loose --",
     "mina-explorer:start": "turbo run mina-explorer:start --env-mode=loose --",
-    "bridge:deposit": "turbo run bridge:deposit --env-mode=loose --",
-    "bridge:withdraw": "turbo run bridge:withdraw --env-mode=loose --",
-    "bridge:redeem": "turbo run bridge:redeem --env-mode=loose --",
     "docker:prune": "rm -rf ./docker/data/*"
   },
   "devDependencies": {

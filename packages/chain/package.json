@@ -64,6 +64,7 @@
     "@proto-kit/sdk": "../../../framework/packages/sdk",
     "@proto-kit/sequencer": "../../../framework/packages/sequencer",
     "@proto-kit/stack": "../../../framework/packages/stack",
+    "@proto-kit/cli": "../../../framework/packages/cli",
     "o1js": "../../../framework/node_modules/o1js",
     "tsyringe": "../../../framework/node_modules/tsyringe"
   },
