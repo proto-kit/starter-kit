@@ -16,7 +16,9 @@ export const config: ModulesConfig<typeof modules> = {
 } satisfies ModulesConfig<typeof modules>;
 
 export const settlementModules = {
-  SettlementContractModule: SettlementContractModule.fromDefaults(),
+  SettlementContractModule: SettlementContractModule.from(
+    SettlementContractModule.settlementAndBridging()
+  ),
 } satisfies ProtocolModulesRecord;
 
 export const settlementModulesConfig = {

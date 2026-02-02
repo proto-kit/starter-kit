@@ -18,9 +18,9 @@ const appChain = AppChain.from({
   }),
   Sequencer: Sequencer.from({
     // ordering of the modules matters due to dependency resolution
-    ...DefaultModules.PrismaRedisDatabase(),
+    ...DefaultModules.prismaRedisDatabase(),
     ...DefaultModules.metrics(),
-    ...DefaultModules.RedisTaskQueue(),
+    ...DefaultModules.redisTaskQueue(),
     ...DefaultModules.core({ settlementEnabled }),
     ...DefaultModules.sequencerIndexer(),
   }),

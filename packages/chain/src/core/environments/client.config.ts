@@ -1,11 +1,11 @@
 import {
   AuroSigner,
   ClientAppChain,
+  GraphqlBlockExplorerTransportModule,
   GraphqlClient,
   GraphqlNetworkStateTransportModule,
   GraphqlQueryTransportModule,
   GraphqlTransactionSender,
-  InMemoryTransactionSender,
 } from "@proto-kit/sdk";
 import runtime from "../../runtime";
 import { Runtime } from "@proto-kit/module";
@@ -21,6 +21,7 @@ const appChain = ClientAppChain.from({
   GraphqlClient,
   QueryTransportModule: GraphqlQueryTransportModule,
   NetworkStateTransportModule: GraphqlNetworkStateTransportModule,
+  BlockExplorerTransportModule: GraphqlBlockExplorerTransportModule,
   TransactionSender: GraphqlTransactionSender,
 });
 
@@ -35,6 +36,7 @@ appChain.configure({
   QueryTransportModule: {},
   NetworkStateTransportModule: {},
   TransactionSender: {},
+  BlockExplorerTransportModule: {},
 });
 
 export const client = appChain;
