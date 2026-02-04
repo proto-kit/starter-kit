@@ -48,15 +48,14 @@ The starter kit contains the following files and folders:
 └── packages
     └── chain
         ├── src // source files for various app-chain modules
-        │   ├── app-chain // app-chain modules (signers, queries, ...)
-        │   ├── environments // app-chain environments (inmemory, development, ...)
-        │   ├── indexer // indexer configuration (graphql server, storage services, ...)
-            ├── processor // processor configuration (handlers, graphql resolvers, graphql server, ...)
+        │   ├── core // core app-chain configuration
+        │   │   ├── environments // app-chain environments (inmemory, development, ...)
+        │   │   └── processor // processor configuration (handlers, graphql resolvers, graphql server, ...)
         │   ├── protocol // protocol modules (transaction fees, ...)
-        │   ├── runtime // runtime modules (your app-chain's business logic, such as balances)
-        │   │   └── modules 
-        │   │       └── balances.ts // built-in example runtime module for Balances, with a faucet
-        │   ├── sequencer // sequencer modules (graphql server, mempool, block production, ...)
+        │   └── runtime // runtime modules (your app-chain's business logic)
+        │       └── modules 
+        │           ├── balances.ts // built-in example runtime module for Balances, with a faucet
+        │           └── withdrawals.ts // withdrawal functionality module
         └── test // tests for various app-chain components
             └── runtime
                 └── modules
@@ -220,7 +219,7 @@ Follow these steps to get the sequencer to settle & bridge:
 - Initialize the lightnet process, fund the sequencer operator & deploy settlement+bridging contracts:
     ```
     pnpm env:development lightnet:start -d
-    pnpm env:development lightnet:initialize
+    pnpm protokit lightnet initialize
     ```
 
 - Run a worker, alongside with the sequencer in separate shell instances
@@ -231,19 +230,19 @@ Follow these steps to get the sequencer to settle & bridge:
 
 - Fund a testing account on lightnet (defined in the .env file)
     ```
-    pnpm env:development lightnet:faucet B62qkVfEwyfkm5yucHEqrRjxbyx98pgdWz82pHv7LYq9Qigs812iWZ8
+    pnpm lightnet faucet B62qkVfEwyfkm5yucHEqrRjxbyx98pgdWz82pHv7LYq9Qigs812iWZ8
     ```
 
 - Bridge the L1 $MINA to your app-chain, and observe your app-chain $MINA balance change after the next settlement lifecycle has been completed by the sequencer
 
     > Token ID of MINA is `1` on both the L1 and app-chain
     ```
-    pnpm env:development bridge:deposit 1 TEST_ACCOUNT_1_PRIVATE_KEY TEST_ACCOUNT_1_PUBLIC_KEY 100
+    pnpm protokit bridge deposit 1 TEST_ACCOUNT_1_PRIVATE_KEY TEST_ACCOUNT_1_PUBLIC_KEY 100
     ```
 
 - Withdraw your app-chain $MINA tokens back to the L1
     ```
-    pnpm env:development bridge:withdraw 1 TEST_ACCOUNT_1_PRIVATE_KEY 100
+    pnpm protokit bridge withdraw 1 TEST_ACCOUNT_1_PRIVATE_KEY 100
     ```
 
 ## Deployments (sovereign environment)
