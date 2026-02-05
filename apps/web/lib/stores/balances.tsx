@@ -3,7 +3,7 @@ import { Client, useClientStore } from "./client";
 import { immer } from "zustand/middleware/immer";
 import { PendingTransaction, UnsignedTransaction } from "@proto-kit/sequencer";
 import { Balance, BalancesKey, TokenId } from "@proto-kit/library";
-import { Provable, PublicKey, UInt64 } from "o1js";
+import { Provable, PublicKey, UInt64, TokenId as O1JSTokenId } from "o1js";
 import { useCallback, useEffect } from "react";
 import { useChainStore } from "./chain";
 import { useWalletStore } from "./wallet";
@@ -25,7 +25,7 @@ function isPendingTransaction(
     throw new Error("Transaction is not a PendingTransaction");
 }
 
-export const tokenId = TokenId.from(0);
+export const tokenId = TokenId.from(O1JSTokenId.default);
 
 export const useBalancesStore = create<
   BalancesState,
@@ -53,7 +53,12 @@ export const useBalancesStore = create<
       const sender = PublicKey.fromBase58(address);
 
       const tx = await client.transaction(sender, async () => {
-        await balances.addBalance(tokenId, sender, Balance.from(1000));
+        await balances.addBalance(
+          tokenId,
+          sender,
+          // @ts-ignore
+          Balance.from(1000 * 1e9),
+        );
       });
 
       await tx.sign();

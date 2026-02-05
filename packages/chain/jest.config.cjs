@@ -2,7 +2,6 @@
 /* eslint-disable import/unambiguous */
 /* eslint-disable import/no-commonjs */
 /** @type {import('ts-jest').JestConfigWithTsJest} */
-
 module.exports = {
     // because we run tests from within ./packages/<package_name>/
     rootDir: './',

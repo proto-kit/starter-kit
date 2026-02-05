@@ -64,6 +64,36 @@
     "processor:prisma:migrate": {
       "cache": false
     },
-    "start:headless": {}
+    "start:headless": {},
+    "generate-keys": {
+      "cache": false
+    },
+    "lightnet:faucet": {
+      "cache": false
+    },
+    "lightnet:wait-for-network": {
+      "cache": false
+    },
+    "settlement:deploy": {
+      "cache": false
+    },
+    "settlement:token:deploy": {
+      "cache": false
+    },
+    "mina-explorer:start": {
+      "cache": false
+    },
+    "worker:dev": {
+      "cache": false
+    },
+    "bridge:deposit": {
+      "cache": false
+    },
+    "bridge:withdraw": {
+      "cache": false
+    },
+    "bridge:redeem": {
+      "cache": false
+    }
   }
 }

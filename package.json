@@ -6,6 +6,7 @@
     "sequencer:dev": "turbo run sequencer:dev --env-mode=loose",
     "indexer:dev": "turbo run indexer:dev --env-mode=loose",
     "processor:dev": "turbo run processor:dev --env-mode=loose",
+    "worker:dev": "turbo run worker:dev --env-mode=loose",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "test": "turbo run test",
@@ -25,9 +26,13 @@
     "docker:build": "docker compose -f docker/docker-compose.yml build",
     "docker:up": "docker compose -f docker/docker-compose.yml up",
     "docker:down": "docker compose -f docker/docker-compose.yml down",
-    "env:development": "dotenv -e ./packages/chain/src/environments/development/.env -- pnpm",
-    "env:inmemory": "dotenv -e ./packages/chain/src/environments/inmemory/.env -- pnpm",
-    "env:sovereign": "dotenv -e ./packages/chain/src/environments/sovereign/.env -- pnpm"
+    "env:development": "dotenv -e ./packages/chain/src/core/environments/development/.env -- pnpm",
+    "env:inmemory": "dotenv -e ./packages/chain/src/core/environments/inmemory/.env -- pnpm",
+    "env:sovereign": "dotenv -e ./packages/chain/src/core/environments/sovereign/.env -- pnpm",
+    "lightnet:start": "docker compose -f docker/lightnet/docker-compose.yml up",
+    "lightnet:stop": "docker compose -f docker/lightnet/docker-compose.yml down",
+    "mina-explorer:start": "turbo run mina-explorer:start --env-mode=loose --",
+    "docker:prune": "rm -rf ./docker/data/*"
   },
   "devDependencies": {
     "eslint": "^8.53.0",
@@ -40,7 +45,8 @@
     "chain": "^0.4.0",
     "dotenv-cli": "^7.4.2",
     "tslib": "^2.7.0",
-    "type-graphql": "2.0.0-rc.2"
+    "type-graphql": "2.0.0-rc.2",
+    "@proto-kit/cli": "../framework/packages/cli"
   },
   "packageManager": "pnpm@9.8.0+sha256.56a9e76b51796ca7f73b85e44cf83712862091f4d498c0ce4d5b7ecdc6ba18f7",
   "name": "starter-kit"
