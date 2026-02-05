@@ -26,7 +26,6 @@ function isPendingTransaction(
 }
 
 export const tokenId = TokenId.from(O1JSTokenId.default);
-Provable.log("tokenId", tokenId);
 
 export const useBalancesStore = create<
   BalancesState,

@@ -11,7 +11,7 @@ export interface Arguments {
 }
 
 export type StartableFactory = (args: Arguments) => Promise<{
-  start(proofsEnabled: boolean): Promise<void>
+  start(proofsEnabled: boolean): Promise<void>;
 }>;
 
 yargs(hideBin(process.argv))
@@ -41,11 +41,11 @@ yargs(hideBin(process.argv))
     async (args) => {
       log.setLevel(args.logLevel);
 
-            // For windows support, we need to parse out environment variables used in the path
-            let path = replaceEnvTemplates(args.component);
+      // For windows support, we need to parse out environment variables used in the path
+      let path = replaceEnvTemplates(args.component);
 
-            const startableFactory: StartableFactory = (await import(path)).default;
-            const startable = await startableFactory(args);
+      const startableFactory: StartableFactory = (await import(path)).default;
+      const startable = await startableFactory(args);
 
       await startable.start(args.proofsEnabled);
     }
@@ -53,26 +53,28 @@ yargs(hideBin(process.argv))
   .parse();
 
 function replaceEnvTemplates(str: string) {
-    let temp = str;
+  let temp = str;
 
-    const envRegex = /\$[A-Z1-9_]*/;
+  const envRegex = /\$[A-Z1-9_]*/;
 
-    let m;
-    while ((m = envRegex.exec(temp)) !== null) {
-        // This is necessary to avoid infinite loops with zero-width matches
-        if (m.index === envRegex.lastIndex) {
-            envRegex.lastIndex++;
-        }
-
-        // The result can be accessed through the `m`-variable.
-        m.forEach((match, groupIndex) => {
-            const envVarName = match.slice(1);
-            const envVarValue = process.env[envVarName];
-            if (envVarValue === undefined) {
-                throw new Error(`Substituted environment variable ${envVarName} not found`);
-            }
-            temp = temp.replace(match, envVarValue);
-        });
+  let m;
+  while ((m = envRegex.exec(temp)) !== null) {
+    // This is necessary to avoid infinite loops with zero-width matches
+    if (m.index === envRegex.lastIndex) {
+      envRegex.lastIndex++;
     }
-    return temp;
+
+    // The result can be accessed through the `m`-variable.
+    m.forEach((match, groupIndex) => {
+      const envVarName = match.slice(1);
+      const envVarValue = process.env[envVarName];
+      if (envVarValue === undefined) {
+        throw new Error(
+          `Substituted environment variable ${envVarName} not found`
+        );
+      }
+      temp = temp.replace(match, envVarValue);
+    });
+  }
+  return temp;
 }

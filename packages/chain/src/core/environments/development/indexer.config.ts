@@ -13,6 +13,7 @@ export default async (args: Arguments): Promise<Startable> => {
       preset: "development",
       overrides: {
         pruneOnStartup: args.pruneOnStartup,
+        redisDb: 1,
       },
     }),
   });
