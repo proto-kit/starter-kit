@@ -17,7 +17,7 @@ const appChain = AppChain.from({
     ...DefaultModules.core({
       settlementEnabled,
     }),
-    ...DefaultModules.localTaskQueue(),
+    ...DefaultModules.localWorker({ settlementEnabled }),
   }),
   ...DefaultModules.appChainBase(),
 });
@@ -30,7 +30,7 @@ export default async (): Promise<Startable> => {
         settlementEnabled,
       }),
       ...DefaultConfigs.inMemoryDatabase(),
-      ...DefaultConfigs.localTaskQueue(),
+      ...DefaultConfigs.localWorker(),
     },
     ...DefaultConfigs.appChainBase(),
   });
