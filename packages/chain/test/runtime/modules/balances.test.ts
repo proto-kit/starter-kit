@@ -6,22 +6,32 @@ import { BalancesKey, TokenId, UInt64 } from "@proto-kit/library";
 
 log.setLevel("ERROR");
 
-describe("balances", () => {
-  it("should demonstrate how balances work", async () => {
-    const appChain = TestingAppChain.fromRuntime({
-      Balances,
-    });
+function createAppChain() {
+  const appChain = TestingAppChain.fromRuntime({
+    Balances,
+  });
 
-    appChain.configurePartial({
-      Runtime: {
-        Balances: {
-          totalSupply: UInt64.from(10000),
-        },
+  appChain.configurePartial({
+    Runtime: {
+      Balances: {
+        totalSupply: UInt64.from(10000),
       },
-    });
+    },
+  });
+  return appChain;
+}
 
+describe("balances", () => {
+  let appChain: ReturnType<typeof createAppChain> | undefined;
+  afterAll(async () => {
+    if (appChain) {
+      await appChain.close();
+    }
+  });
+
+  it("should demonstrate how balances work", async () => {
+    appChain = createAppChain();
     await appChain.start();
-
     const alicePrivateKey = PrivateKey.random();
     const alice = alicePrivateKey.toPublicKey();
     const tokenId = TokenId.from(0);

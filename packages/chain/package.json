@@ -16,7 +16,7 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "test": "node --experimental-vm-modules --experimental-wasm-modules --experimental-wasm-threads ./node_modules/jest/bin/jest.js",
+    "test": "node --experimental-vm-modules --experimental-wasm-modules ./node_modules/jest/bin/jest.js",
     "test:watch": "npm run test --watchAll",
     "build": "pnpm run prisma:generate && tsc -p tsconfig.json",
     "start": "pnpm run sequencer:start",
