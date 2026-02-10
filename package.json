@@ -26,7 +26,6 @@
     "docker:build": "docker compose -f docker/docker-compose.yml build",
     "docker:up": "docker compose -f docker/docker-compose.yml up",
     "docker:down": "docker compose -f docker/docker-compose.yml down",
-    "docker": "docker",
     "env:development": "dotenv -e ./packages/chain/src/core/environments/development/.env -- pnpm",
     "env:inmemory": "dotenv -e ./packages/chain/src/core/environments/inmemory/.env -- pnpm",
     "env:sovereign": "dotenv -e ./packages/chain/src/core/environments/sovereign/.env -- pnpm",
@@ -47,7 +46,8 @@
     "chain": "^0.4.0",
     "dotenv-cli": "^7.4.2",
     "tslib": "^2.7.0",
-    "type-graphql": "2.0.0-rc.2"
+    "type-graphql": "2.0.0-rc.2",
+    "ts-node": "^10.9.2"
   },
   "packageManager": "pnpm@9.8.0+sha256.56a9e76b51796ca7f73b85e44cf83712862091f4d498c0ce4d5b7ecdc6ba18f7",
   "name": "starter-kit"

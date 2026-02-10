@@ -38,11 +38,18 @@ export default async (args: Arguments): Promise<Startable> => {
       ...DefaultConfigs.core({ settlementEnabled, preset: "sovereign" }),
       ...DefaultConfigs.sequencerIndexer(),
       //...DefaultConfigs.metrics({ preset: "sovereign" }),
-      ...DefaultConfigs.redisTaskQueue({ preset: "sovereign" }),
+      ...DefaultConfigs.redisTaskQueue({
+        preset: "sovereign",
+        overrides: {
+          redisDb: 1,
+        },
+      }),
       ...DefaultConfigs.prismaRedisDatabase({
         preset: "sovereign",
         overrides: {
-          pruneOnStartup: args.pruneOnStartup,
+          pruneOnStartup:
+            args.pruneOnStartup ||
+            Boolean(process.env.PROTOKIT_PRUNE_ON_STARTUP ?? "false"),
         },
       }),
     },

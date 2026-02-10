@@ -24,6 +24,7 @@
   "exclude": ["jest.config.cjs"],
   "ts-node": {
     "experimentalResolver": true,
-    "esm": true
+    "esm": true,
+    "transpileOnly": true,
   }
 }

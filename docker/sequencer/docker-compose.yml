@@ -61,7 +61,7 @@ services:
       - lightnet-net
     ports:
       - 8080:8080
-    command: ["./packages/chain/dist/start.js start ./core/environments/${PROTOKIT_ENV_FOLDER}/chain.config.js"]
+    command: ["./dist/start.js start ./core/environments/${PROTOKIT_ENV_FOLDER}/chain.config.js"]
     labels:
       logging: "promtail"
       logging_jobname: "sequencer"

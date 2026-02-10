@@ -61,7 +61,7 @@
   },
   "devDependencies": {
     "@jest/globals": "^29.6.1",
-    "@prisma/client": "5.18",
+    "@prisma/client": "^5.18.0",
     "@types/jest": "^29.5.7",
     "@types/node": "^20.8.10",
     "@types/react-dom": "^18.2.7",
@@ -83,7 +83,6 @@
     "stream-browserify": "^3.0.0",
     "string_decoder": "^1.3.0",
     "ts-jest": "^29.1.1",
-    "ts-node": "^10.9.2",
     "tsconfig": "workspace:*",
     "typegraphql-prisma": "^0.28",
     "typescript": "5.4.5",
