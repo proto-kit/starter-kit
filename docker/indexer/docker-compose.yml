@@ -41,7 +41,7 @@ services:
       - 8081:8080
     command:
       [
-        "./packages/chain/dist/start.js start ./environments/${PROTOKIT_ENV_FOLDER}/indexer.config.js",
+        "./packages/chain/dist/start.js start ./core/environments/${PROTOKIT_ENV_FOLDER}/indexer.config.js",
       ]
     labels:
       logging: "promtail"

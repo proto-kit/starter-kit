@@ -32,5 +32,5 @@ services:
       - db-net
     volumes:
       - ./o1js-cache:/home/node/.cache/o1js
-    command: ["./packages/chain/dist/start.js start ./environments/${PROTOKIT_ENV_FOLDER}/worker.config.js"]
+    command: ["./packages/chain/dist/start.js start ./core/environments/${PROTOKIT_ENV_FOLDER}/worker.config.js"]
 
