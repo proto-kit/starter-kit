@@ -10,7 +10,6 @@ services:
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
 
-
       - PROTOKIT_TRANSACTION_FEE_RECIPIENT_PRIVATE_KEY=${PROTOKIT_TRANSACTION_FEE_RECIPIENT_PRIVATE_KEY}
       - PROTOKIT_TRANSACTION_FEE_RECIPIENT_PUBLIC_KEY=${PROTOKIT_TRANSACTION_FEE_RECIPIENT_PUBLIC_KEY}
       - PROTOKIT_LOG_LEVEL=${PROTOKIT_LOG_LEVEL}
@@ -31,5 +30,7 @@ services:
         condition: service_healthy
     networks:
       - db-net
+    volumes:
+      - ./o1js-cache:/home/node/.cache/o1js
     command: ["./packages/chain/dist/start.js start ./environments/${PROTOKIT_ENV_FOLDER}/worker.config.js"]
 
