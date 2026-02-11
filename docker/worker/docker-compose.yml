@@ -35,6 +35,6 @@ services:
       - db-net
       - lightnet-net
     volumes:
-      - ./o1js-cache:/home/node/.cache/o1js
+      - ${PWD}/.cache/o1js:/home/node/.cache/o1js
     command: ["./dist/start.js start ./core/environments/${PROTOKIT_ENV_FOLDER}/worker.config.js"]
 
