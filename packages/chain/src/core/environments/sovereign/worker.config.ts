@@ -41,7 +41,5 @@ export default async (args: Arguments): Promise<Startable> => {
     }),
   });
 
-  log.setLevel("DEBUG");
-
   return appChain;
 };
