@@ -27,4 +27,4 @@ cd packages/chain
 echo $@
 
 # We can't use start:headless here bcs that task hardcodes the .js file, we want it to be extensible
-node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node $@
+node --loader ts-node/esm --experimental-vm-modules --experimental-wasm-modules --es-module-specifier-resolution=node --no-warnings $@
