@@ -20,7 +20,7 @@
     "skipLibCheck": true
   },
   "files": ["node_modules/jest-expect-message/types/index.d.ts"],
-  "include": ["./src/**/*"],
+  "include": ["./src/**/*", "./test/**/*"],
   "exclude": ["jest.config.cjs"],
   "ts-node": {
     "experimentalResolver": true,
