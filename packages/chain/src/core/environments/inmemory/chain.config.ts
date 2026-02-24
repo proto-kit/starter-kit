@@ -13,11 +13,11 @@ const appChain = AppChain.from({
   Runtime: Runtime.from(runtime.modules),
   Protocol: Protocol.from(protocol.modules),
   Sequencer: Sequencer.from({
+    ...DefaultModules.localWorker({ settlementEnabled }),
     ...DefaultModules.inMemoryDatabase(),
     ...DefaultModules.core({
       settlementEnabled,
     }),
-    ...DefaultModules.localWorker({ settlementEnabled }),
   }),
   ...DefaultModules.appChainBase(),
 });
@@ -26,11 +26,11 @@ export default async (): Promise<Startable> => {
     Runtime: runtime.config,
     Protocol: protocol.config,
     Sequencer: {
+      ...DefaultConfigs.localWorker(),
       ...DefaultConfigs.core({
         settlementEnabled,
       }),
       ...DefaultConfigs.inMemoryDatabase(),
-      ...DefaultConfigs.localWorker(),
     },
     ...DefaultConfigs.appChainBase(),
   });
