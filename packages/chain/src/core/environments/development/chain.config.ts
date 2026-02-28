@@ -1,6 +1,6 @@
 import { Runtime } from "@proto-kit/module";
 import { Protocol } from "@proto-kit/protocol";
-import { AppChain, Sequencer } from "@proto-kit/sequencer";
+import { AppChain, BatchProducerModule, Sequencer } from "@proto-kit/sequencer";
 import runtime from "../../../runtime";
 import * as protocol from "../../../protocol";
 
@@ -23,6 +23,7 @@ const appChain = AppChain.from({
     ...DefaultModules.core({ settlementEnabled }),
     ...DefaultModules.redisTaskQueue(),
     ...DefaultModules.sequencerIndexer(),
+    BatchProducerModule,
   }),
   ...DefaultModules.appChainBase(),
 });
@@ -50,6 +51,7 @@ export default async (args: Arguments): Promise<Startable> => {
           pruneOnStartup: args.pruneOnStartup,
         },
       }),
+      BatchProducerModule: {},
     },
     ...DefaultConfigs.appChainBase(),
   });

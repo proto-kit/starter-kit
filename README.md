@@ -312,6 +312,10 @@ If you want to remove the monitoring services, remove the docker profile `monito
 
 More information about monitoring can be found [here](https://github.com/proto-kit/framework/pull/272).
 
+*Deploying contracts* 
+
+`pnpm protokit lightnet initialize --env-path ./packages/chain/src/core/environments/sovereign/scripts.env`
+
 ## Building the framework from source
 
 1. Make sure the framework is located under ../framework from the starter-kit's location
