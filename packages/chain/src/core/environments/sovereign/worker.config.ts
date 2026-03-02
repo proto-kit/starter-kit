@@ -71,7 +71,7 @@ export default async (args: Arguments): Promise<Startable> => {
         preset: "sovereign",
         overrides: { redisDb: 1 },
       }),
-      ...variantConfigs[variant],
+      LocalTaskWorkerModule: variantConfigs[variant],
     },
   });
 
