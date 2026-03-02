@@ -41,7 +41,7 @@ const variant = process.env.PROTOKIT_WORKER_VARIANT ?? "default";
 function validateVariant(
   variant: string
 ): asserts variant is keyof typeof variants {
-  if (variant! in variants) {
+  if (!(variant in variants)) {
     throw new Error(`Worker variant ${variant} not found`);
   }
 }
