@@ -7,6 +7,7 @@ import {
   VanillaTaskWorkerModules,
   SettlementProvingTask,
   SettlementCompileTask,
+  WorkerRegistrationTask,
 } from "@proto-kit/sequencer";
 import { BullQueue } from "@proto-kit/deployment";
 import runtime from "../../../runtime";
@@ -24,6 +25,7 @@ const variants = {
   l1: {
     SettlementProvingTask,
     SettlementCompileTask,
+    WorkerRegistrationTask,
   },
 };
 
@@ -33,6 +35,7 @@ const variantConfigs = {
   l1: {
     SettlementProvingTask: {},
     SettlementCompileTask: {},
+    WorkerRegistrationTask: {},
   } satisfies ModulesConfig<(typeof variants)["l1"]>,
 };
 
