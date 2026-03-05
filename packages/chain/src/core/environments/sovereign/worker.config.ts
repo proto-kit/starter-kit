@@ -6,8 +6,6 @@ import {
   LocalTaskWorkerModule,
   VanillaTaskWorkerModules,
   SettlementProvingTask,
-  SettlementCompileTask,
-  WorkerRegistrationTask,
 } from "@proto-kit/sequencer";
 import { BullQueue } from "@proto-kit/deployment";
 import runtime from "../../../runtime";
@@ -24,8 +22,6 @@ const variants = {
   l2: VanillaTaskWorkerModules.withoutSettlement(),
   l1: {
     SettlementProvingTask,
-    SettlementCompileTask,
-    WorkerRegistrationTask,
   },
 };
 
@@ -34,8 +30,6 @@ const variantConfigs = {
   l2: VanillaTaskWorkerModules.defaultConfig(),
   l1: {
     SettlementProvingTask: {},
-    SettlementCompileTask: {},
-    WorkerRegistrationTask: {},
   } satisfies ModulesConfig<(typeof variants)["l1"]>,
 };
 
