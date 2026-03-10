@@ -1,79 +1,32 @@
 services:
   worker:
-    image: starterkit-chain-base
-    build:
-      dockerfile: ./docker/base/Dockerfile
-      context: ../..
+    extends:
+      file: ./worker-template.yml
+      service: worker-base
     container_name: starterkit-worker
     environment:
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-
-      - PROTOKIT_TRANSACTION_FEE_RECIPIENT_PRIVATE_KEY=${PROTOKIT_TRANSACTION_FEE_RECIPIENT_PRIVATE_KEY}
-      - PROTOKIT_TRANSACTION_FEE_RECIPIENT_PUBLIC_KEY=${PROTOKIT_TRANSACTION_FEE_RECIPIENT_PUBLIC_KEY}
-      - PROTOKIT_LOG_LEVEL=${PROTOKIT_LOG_LEVEL}
-      - PROTOKIT_SEQUENCER_PRIVATE_KEY=${PROTOKIT_SEQUENCER_PRIVATE_KEY}
-      - PROTOKIT_SEQUENCER_PUBLIC_KEY=${PROTOKIT_SEQUENCER_PUBLIC_KEY}
-      - PROTOKIT_SETTLEMENT_CONTRACT_PRIVATE_KEY=${PROTOKIT_SETTLEMENT_CONTRACT_PRIVATE_KEY}
-      - PROTOKIT_SETTLEMENT_CONTRACT_PUBLIC_KEY=${PROTOKIT_SETTLEMENT_CONTRACT_PUBLIC_KEY}
-      - PROTOKIT_DISPATCHER_CONTRACT_PRIVATE_KEY=${PROTOKIT_DISPATCHER_CONTRACT_PRIVATE_KEY}
-      - PROTOKIT_DISPATCHER_CONTRACT_PUBLIC_KEY=${PROTOKIT_DISPATCHER_CONTRACT_PUBLIC_KEY}
-      - PROTOKIT_MINA_BRIDGE_CONTRACT_PRIVATE_KEY=${PROTOKIT_MINA_BRIDGE_CONTRACT_PRIVATE_KEY}
-      - PROTOKIT_MINA_BRIDGE_CONTRACT_PUBLIC_KEY=${PROTOKIT_MINA_BRIDGE_CONTRACT_PUBLIC_KEY}
-      - PROTOKIT_SETTLEMENT_ENABLED=${PROTOKIT_SETTLEMENT_ENABLED}
-      - PROTOKIT_PROOFS_ENABLED=${PROTOKIT_PROOFS_ENABLED}
-      - PROTOKIT_BLOCK_ARGUMENT_BATCH_SIZE=${PROTOKIT_BLOCK_ARGUMENT_BATCH_SIZE}
-      - PROTOKIT_STATE_TRANSITION_BATCH_SIZE=${PROTOKIT_STATE_TRANSITION_BATCH_SIZE}
       - PROTOKIT_WORKER_VARIANT=${PROTOKIT_WORKER_VARIANT}
-    profiles:
-      - worker
-      - worker-specialized
-    depends_on:
-      redis:
-        condition: service_healthy
-    networks:
-      - db-net
-      - lightnet-net
-    volumes:
-      - ${HOME}/.cache/o1js:/home/node/.cache/o1js
-    command: ["./dist/start.js start ./core/environments/${PROTOKIT_ENV_FOLDER}/worker.config.js"]
 
   worker-2:
-    image: starterkit-chain-base
-    build:
-      dockerfile: ./docker/base/Dockerfile
-      context: ../..
+    extends:
+      file: ./worker-template.yml
+      service: worker-base
     container_name: starterkit-worker-2
     environment:
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-
-      - PROTOKIT_TRANSACTION_FEE_RECIPIENT_PRIVATE_KEY=${PROTOKIT_TRANSACTION_FEE_RECIPIENT_PRIVATE_KEY}
-      - PROTOKIT_TRANSACTION_FEE_RECIPIENT_PUBLIC_KEY=${PROTOKIT_TRANSACTION_FEE_RECIPIENT_PUBLIC_KEY}
-      - PROTOKIT_LOG_LEVEL=${PROTOKIT_LOG_LEVEL}
-      - PROTOKIT_SEQUENCER_PRIVATE_KEY=${PROTOKIT_SEQUENCER_PRIVATE_KEY}
-      - PROTOKIT_SEQUENCER_PUBLIC_KEY=${PROTOKIT_SEQUENCER_PUBLIC_KEY}
-      - PROTOKIT_SETTLEMENT_CONTRACT_PRIVATE_KEY=${PROTOKIT_SETTLEMENT_CONTRACT_PRIVATE_KEY}
-      - PROTOKIT_SETTLEMENT_CONTRACT_PUBLIC_KEY=${PROTOKIT_SETTLEMENT_CONTRACT_PUBLIC_KEY}
-      - PROTOKIT_DISPATCHER_CONTRACT_PRIVATE_KEY=${PROTOKIT_DISPATCHER_CONTRACT_PRIVATE_KEY}
-      - PROTOKIT_DISPATCHER_CONTRACT_PUBLIC_KEY=${PROTOKIT_DISPATCHER_CONTRACT_PUBLIC_KEY}
-      - PROTOKIT_MINA_BRIDGE_CONTRACT_PRIVATE_KEY=${PROTOKIT_MINA_BRIDGE_CONTRACT_PRIVATE_KEY}
-      - PROTOKIT_MINA_BRIDGE_CONTRACT_PUBLIC_KEY=${PROTOKIT_MINA_BRIDGE_CONTRACT_PUBLIC_KEY}
-      - PROTOKIT_SETTLEMENT_ENABLED=${PROTOKIT_SETTLEMENT_ENABLED}
-      - PROTOKIT_PROOFS_ENABLED=${PROTOKIT_PROOFS_ENABLED}
-      - PROTOKIT_BLOCK_ARGUMENT_BATCH_SIZE=${PROTOKIT_BLOCK_ARGUMENT_BATCH_SIZE}
-      - PROTOKIT_STATE_TRANSITION_BATCH_SIZE=${PROTOKIT_STATE_TRANSITION_BATCH_SIZE}
       - PROTOKIT_WORKER_VARIANT=${PROTOKIT_WORKER_VARIANT_2}
-    profiles:
-      - worker-specialized
-    depends_on:
-      redis:
-        condition: service_healthy
-    networks:
-      - db-net
-      - lightnet-net
-    volumes:
-      - ${HOME}/.cache/o1js:/home/node/.cache/o1js
-    command: ["./dist/start.js start ./core/environments/${PROTOKIT_ENV_FOLDER}/worker.config.js"]
+
+  worker-3:
+    extends:
+      file: ./worker-template.yml
+      service: worker-base
+    container_name: starterkit-worker-3
+    environment:
+      - PROTOKIT_WORKER_VARIANT=${PROTOKIT_WORKER_VARIANT_3}
+
+  worker-4:
+    extends:
+      file: ./worker-template.yml
+      service: worker-base
+    container_name: starterkit-worker-4
+    environment:
+      - PROTOKIT_WORKER_VARIANT=${PROTOKIT_WORKER_VARIANT_4}

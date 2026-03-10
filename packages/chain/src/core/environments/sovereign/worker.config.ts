@@ -8,6 +8,13 @@ import {
   SettlementProvingTask,
   SettlementCompileTask,
   WorkerRegistrationTask,
+  StateTransitionReductionTask,
+  StateTransitionTask,
+  RuntimeProvingTask,
+  TransactionProvingTask,
+  TransactionReductionTask,
+  BlockReductionTask,
+  NewBlockTask,
 } from "@proto-kit/sequencer";
 import { BullQueue } from "@proto-kit/deployment";
 import runtime from "../../../runtime";
@@ -27,6 +34,22 @@ const variants = {
     SettlementCompileTask,
     WorkerRegistrationTask,
   },
+  transaction: {
+    RuntimeProvingTask,
+    TransactionProvingTask,
+    TransactionReductionTask,
+    WorkerRegistrationTask,
+  },
+  st: {
+    StateTransitionTask,
+    StateTransitionReductionTask,
+    WorkerRegistrationTask,
+  },
+  block: {
+    BlockReductionTask,
+    NewBlockTask,
+    WorkerRegistrationTask,
+  },
 };
 
 const variantConfigs = {
@@ -37,6 +60,22 @@ const variantConfigs = {
     SettlementCompileTask: {},
     WorkerRegistrationTask: {},
   } satisfies ModulesConfig<(typeof variants)["l1"]>,
+  transaction: {
+    RuntimeProvingTask: {},
+    TransactionProvingTask: {},
+    TransactionReductionTask: {},
+    WorkerRegistrationTask: {},
+  },
+  st: {
+    StateTransitionTask: {},
+    StateTransitionReductionTask: {},
+    WorkerRegistrationTask: {},
+  },
+  block: {
+    BlockReductionTask: {},
+    NewBlockTask: {},
+    WorkerRegistrationTask: {},
+  },
 };
 
 const variant = process.env.PROTOKIT_WORKER_VARIANT ?? "default";
