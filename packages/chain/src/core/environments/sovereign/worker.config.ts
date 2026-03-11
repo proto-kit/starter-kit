@@ -1,5 +1,5 @@
 import { Runtime } from "@proto-kit/module";
-import { Protocol } from "@proto-kit/protocol";
+import { Protocol, ProtocolConstants } from "@proto-kit/protocol";
 import {
   Sequencer,
   AppChain,
@@ -102,6 +102,8 @@ const appChain = AppChain.from({
 });
 
 export default async (args: Arguments): Promise<Startable> => {
+  ProtocolConstants.printAllConstants();
+
   appChain.configurePartial({
     Runtime: runtime.config,
     Protocol: {
