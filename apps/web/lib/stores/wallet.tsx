@@ -13,6 +13,7 @@ import { Bool, Field, PublicKey, Signature, UInt64 } from "o1js";
 
 export interface WalletState {
   wallet?: string;
+  walletInstalled: boolean;
   initializeWallet: () => Promise<void>;
   connectWallet: () => Promise<void>;
   observeWalletChange: () => void;
@@ -24,9 +25,13 @@ export interface WalletState {
 
 export const useWalletStore = create<WalletState, [["zustand/immer", never]]>(
   immer((set) => ({
+    walletInstalled: true,
     async initializeWallet() {
       if (typeof mina === "undefined") {
-        throw new Error("Auro wallet not installed");
+        set((state) => {
+          state.walletInstalled = false;
+        });
+        return;
       }
 
       const [wallet] = await mina.getAccounts();
@@ -37,7 +42,10 @@ export const useWalletStore = create<WalletState, [["zustand/immer", never]]>(
     },
     async connectWallet() {
       if (typeof mina === "undefined") {
-        throw new Error("Auro wallet not installed");
+        set((state) => {
+          state.walletInstalled = false;
+        });
+        return;
       }
 
       const [wallet] = await mina.requestAccounts();
@@ -48,7 +56,7 @@ export const useWalletStore = create<WalletState, [["zustand/immer", never]]>(
     },
     observeWalletChange() {
       if (typeof mina === "undefined") {
-        throw new Error("Auro wallet not installed");
+        return;
       }
 
       mina.on("accountsChanged", ([wallet]) => {

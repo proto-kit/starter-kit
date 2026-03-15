@@ -22,7 +22,7 @@ const appChain = AppChain.from({
     ...(settlementEnabled ? protocol.settlementModules : {}),
   }),
   Sequencer: Sequencer.from({
-    ...DefaultModules.worker(),
+    ...DefaultModules.remoteWorker(),
     ...(!settlementEnabled
       ? {
           LocalTaskWorkerModule: LocalTaskWorkerModule.from(
