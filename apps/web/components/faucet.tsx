@@ -8,6 +8,7 @@ import { Button } from "./ui/button";
 export interface FaucetProps {
   wallet?: string;
   loading: boolean;
+  walletInstalled: boolean;
   onConnectWallet: () => void;
   onDrip: () => void;
 }
@@ -17,6 +18,7 @@ export function Faucet({
   onConnectWallet,
   onDrip,
   loading,
+  walletInstalled,
 }: FaucetProps) {
   const form = useForm();
   return (
@@ -54,11 +56,19 @@ export function Faucet({
           className="mt-6 w-full"
           loading={loading}
           onClick={() => {
+            if (!walletInstalled) {
+              window.open("https://www.aurowallet.com", "_blank");
+              return;
+            }
             wallet ?? onConnectWallet();
             wallet && onDrip();
           }}
         >
-          {wallet ? "Drip 💦" : "Connect wallet"}
+          {!walletInstalled
+            ? "Install Auro Wallet"
+            : wallet
+              ? "Drip 💦"
+              : "Connect wallet"}
         </Button>
       </Form>
     </Card>
