@@ -3,12 +3,16 @@ import { Protocol } from "@proto-kit/protocol";
 import {
   AppChain,
   BatchProducerModule,
+  BlockProducerModule,
   BridgingModule,
   ConstantFeeStrategy,
   InMemoryMinaSigner,
   MinaBaseLayer,
+  PrivateMempool,
   Sequencer,
+  SequencerStartupModule,
   SettlementModule,
+  TimedBlockTrigger,
 } from "@proto-kit/sequencer";
 import runtime from "../../../runtime";
 import * as protocol from "../../../protocol";
@@ -17,6 +21,11 @@ import { Arguments } from "../../../start";
 import { Startable } from "@proto-kit/common";
 import { DefaultConfigs, DefaultModules } from "@proto-kit/stack";
 import { PrivateKey } from "o1js";
+import {
+  GraphqlSequencerModule,
+  GraphqlServer,
+  VanillaGraphqlModules,
+} from "@proto-kit/api";
 
 const settlementEnabled = process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true";
 
@@ -31,7 +40,12 @@ const appChain = AppChain.from({
     ...DefaultModules.prismaRedisDatabase(),
     //...DefaultModules.metrics(),
     ...DefaultModules.redisTaskQueue(),
-    ...DefaultModules.core({ settlementEnabled: false }),
+    GraphqlServer,
+    Graphql: GraphqlSequencerModule.from(VanillaGraphqlModules.with({})),
+    Mempool: PrivateMempool,
+    BlockProducerModule: BlockProducerModule,
+    BlockTrigger: TimedBlockTrigger,
+    SequencerStartupModule,
     BaseLayer: MinaBaseLayer,
     FeeStrategy: ConstantFeeStrategy,
     BatchProducerModule,
@@ -51,7 +65,21 @@ export default async (args: Arguments): Promise<Startable> => {
       ...(settlementEnabled ? protocol.settlementModulesConfig : {}),
     },
     Sequencer: {
-      ...DefaultConfigs.core({ settlementEnabled: false, preset: "sovereign" }),
+      Graphql: VanillaGraphqlModules.defaultConfig(),
+      GraphqlServer: {
+        port: Number(process.env.PROTOKIT_GRAPHQL_PORT),
+        host: process.env.PROTOKIT_GRAPHQL_HOST!,
+        graphiql: Boolean(process.env.PROTOKIT_GRAPHIQL_ENABLED),
+      },
+      Mempool: {},
+      BlockProducerModule: {},
+      BlockTrigger: {
+        blockInterval: Number(process.env.PROTOKIT_BLOCK_INTERVAL!),
+        produceEmptyBlocks: true,
+        settlementInterval: Number(process.env.PROTOKIT_SETTLEMENT_INTERVAL!),
+        settlementTokenConfig: {},
+      },
+      SequencerStartupModule: {},
       BaseLayer: {
         network: {
           type: process.env.MINA_NETWORK as any,

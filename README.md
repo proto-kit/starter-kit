@@ -321,5 +321,7 @@ More information about monitoring can be found [here](https://github.com/proto-k
 1. Make sure the framework is located under ../framework from the starter-kit's location
 2. Adapt your starter-kit's `packages/chain` and `apps/web` package.json to use the file:// references to framework, including
 references to `o1js` and `tsyringe`. Important: Make sure to update references in both chain and web, otherwise the location of the node_modules will be different and lead to errors
+
+If you want to use the sovereign environment or above:
 3. Go into the framework folder, and build a docker image containing the sources with `docker build -f ./packages/deployment/docker/development-base/Dockerfile -t protokit-base .`
 4. Replace the first line of `docker/base/Dockerfile` and `docker/web/Dockerfile` to use `FROM protokit-base:latest`
