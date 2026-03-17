@@ -55,9 +55,9 @@ export default async (args: Arguments): Promise<Startable> => {
       BaseLayer: {
         network: {
           type: process.env.MINA_NETWORK as any,
-          graphql: `${process.env.MINA_NODE_GRAPHQL_HOST!}:${process.env.MINA_NODE_GRAPHQL_PORT!}/graphql`,
-          archive: `${process.env.MINA_ARCHIVE_GRAPHQL_HOST!}:${process.env.MINA_ARCHIVE_GRAPHQL_PORT!}`,
-          accountManager: `${process.env.MINA_ACCOUNT_MANAGER_HOST!}:${process.env.MINA_ACCOUNT_MANAGER_PORT!}`,
+          graphql: process.env.MINA_NODE_GRAPHQL!,
+          archive: process.env.MINA_ARCHIVE_GRAPHQL!,
+          accountManager: process.env.MINA_ACCOUNT_MANAGER!,
         },
       },
       SettlementModule: {
