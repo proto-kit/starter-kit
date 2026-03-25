@@ -1,57 +1,117 @@
 import { Runtime } from "@proto-kit/module";
 import { Protocol } from "@proto-kit/protocol";
-import { AppChain, Sequencer } from "@proto-kit/sequencer";
+import {
+  AppChain,
+  Sequencer,
+  PrivateMempool,
+  TimedBlockTrigger,
+  SequencerCoreModule,
+} from "@proto-kit/sequencer";
+import { VanillaGraphqlModules, GraphqlSequencerModule } from "@proto-kit/api";
+import { IndexerNotifier } from "@proto-kit/indexer";
+import { PrismaRedisDatabase } from "@proto-kit/persistance";
+import { BullQueue } from "@proto-kit/deployment";
+import {
+  BlockStorageNetworkStateModule,
+  InMemoryTransactionSender,
+  StateServiceQueryModule,
+} from "@proto-kit/sdk";
 import runtime from "../../../runtime";
 import * as protocol from "../../../protocol";
 
 import { Arguments } from "../../../start";
 import { Startable } from "@proto-kit/common";
-import { DefaultConfigs, DefaultModules } from "@proto-kit/stack";
-
-const settlementEnabled = process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true";
+import {
+  buildCustomTokenConfig,
+  buildSettlementTokenConfig,
+} from "@proto-kit/stack";
+import { baseSettlementSequencerModules, baseSettlementSequencerModulesConfig } from "../../sequencer";
 
 const appChain = AppChain.from({
   Runtime: Runtime.from(runtime.modules),
   Protocol: Protocol.from({
     ...protocol.modules,
-    ...(settlementEnabled ? protocol.settlementModules : {}),
+    ...protocol.settlementModules,
   }),
   Sequencer: Sequencer.from({
     // ordering of the modules matters due to dependency resolution
-    //...DefaultModules.metrics(),
-    ...DefaultModules.prismaRedisDatabase(),
-    ...DefaultModules.core({ settlementEnabled }),
-    ...DefaultModules.redisTaskQueue(),
-    ...DefaultModules.sequencerIndexer(),
+    //OpenTelemetryServer,
+    Database: PrismaRedisDatabase,
+    Graphql: GraphqlSequencerModule.from(VanillaGraphqlModules.with({})),
+    Mempool: PrivateMempool,
+    BlockTrigger: TimedBlockTrigger,
+    SequencerCoreModule,
+    ...baseSettlementSequencerModules,
+    TaskQueue: BullQueue,
+    IndexerNotifier,
   }),
-  ...DefaultModules.appChainBase(),
+  TransactionSender: InMemoryTransactionSender,
+  QueryTransportModule: StateServiceQueryModule,
+  NetworkStateTransportModule: BlockStorageNetworkStateModule,
 });
 
 export default async (args: Arguments): Promise<Startable> => {
-  appChain.configurePartial({
+  appChain.configure({
     Runtime: runtime.config,
     Protocol: {
       ...protocol.config,
-      ...(settlementEnabled ? protocol.settlementModulesConfig : {}),
+      ...protocol.settlementModulesConfig,
     },
     Sequencer: {
-      ...DefaultConfigs.core({ settlementEnabled, preset: "development" }),
-      ...DefaultConfigs.sequencerIndexer(),
-      //...DefaultConfigs.metrics({ preset: "development" }),
-      ...DefaultConfigs.redisTaskQueue({
-        preset: "development",
-        overrides: {
-          redisDb: 1,
+      Graphql: {
+        ...VanillaGraphqlModules.defaultConfig(),
+        containerConfig: {
+          port: Number(process.env.PROTOKIT_GRAPHQL_PORT ?? 8080),
+          host: process.env.PROTOKIT_GRAPHQL_HOST ?? "0.0.0.0",
+          graphiql: process.env.PROTOKIT_GRAPHIQL_ENABLED !== "false",
         },
-      }),
-      ...DefaultConfigs.prismaRedisDatabase({
-        preset: "development",
-        overrides: {
-          pruneOnStartup: args.pruneOnStartup,
+      },
+      Mempool: {},
+      BlockTrigger: {
+        blockInterval: Number(process.env.PROTOKIT_BLOCK_INTERVAL ?? 30000),
+        produceEmptyBlocks: true,
+        settlementInterval: Number(
+          process.env.PROTOKIT_SETTLEMENT_INTERVAL ?? 60000
+        ),
+        settlementTokenConfig: buildSettlementTokenConfig(
+          process.env.PROTOKIT_MINA_BRIDGE_CONTRACT_PRIVATE_KEY!,
+          buildCustomTokenConfig(
+            process.env.PROTOKIT_CUSTOM_TOKEN_PRIVATE_KEY,
+            process.env.PROTOKIT_CUSTOM_TOKEN_BRIDGE_PRIVATE_KEY
+          )
+        ),
+      },
+      //OpenTelemetryServer: { ... },
+      IndexerNotifier: {},
+      TaskQueue: {
+        redis: {
+          host: process.env.REDIS_HOST ?? "localhost",
+          port: Number(process.env.REDIS_PORT ?? 6379),
+          password: process.env.REDIS_PASSWORD ?? "password",
+          db: 1,
         },
-      }),
+      },
+      Database: {
+        redis: {
+          host: process.env.REDIS_HOST ?? "localhost",
+          port: Number(process.env.REDIS_PORT ?? 6379),
+          password: process.env.REDIS_PASSWORD ?? "password",
+        },
+        prisma: {
+          connection: process.env.DATABASE_URL!,
+        },
+        pruneOnStartup: args.pruneOnStartup,
+      },
+      ...baseSettlementSequencerModulesConfig,
+      SequencerCoreModule: {
+        BlockProducerModule: {},
+        BatchProducerModule: {},
+        SequencerStartupModule: {},
+      },
     },
-    ...DefaultConfigs.appChainBase(),
+    QueryTransportModule: {},
+    NetworkStateTransportModule: {},
+    TransactionSender: {},
   });
 
   return appChain;

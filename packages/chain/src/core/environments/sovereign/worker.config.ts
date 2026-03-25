@@ -3,15 +3,15 @@ import { Protocol } from "@proto-kit/protocol";
 import {
   Sequencer,
   AppChain,
-  LocalTaskWorkerModule,
+  WorkerModule,
   VanillaTaskWorkerModules,
 } from "@proto-kit/sequencer";
+import { BullQueue } from "@proto-kit/deployment";
 import runtime from "../../../runtime";
 import * as protocol from "../../../protocol";
 import { Arguments } from "../../../start";
 
 import { log, Startable } from "@proto-kit/common";
-import { DefaultConfigs, DefaultModules } from "@proto-kit/stack";
 
 const settlementEnabled = process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true";
 
@@ -22,10 +22,13 @@ const appChain = AppChain.from({
     ...(settlementEnabled ? protocol.settlementModules : {}),
   }),
   Sequencer: Sequencer.from({
-    ...DefaultModules.remoteWorker(),
+    TaskQueue: BullQueue,
+    WorkerModule: WorkerModule.from(
+      VanillaTaskWorkerModules.allTasks()
+    ),
     ...(!settlementEnabled
       ? {
-          LocalTaskWorkerModule: LocalTaskWorkerModule.from(
+          WorkerModule: WorkerModule.from(
             VanillaTaskWorkerModules.withoutSettlement()
           ),
         }
@@ -40,12 +43,17 @@ export default async (args: Arguments): Promise<Startable> => {
       ...protocol.config,
       ...(settlementEnabled ? protocol.settlementModulesConfig : {}),
     },
-    Sequencer: DefaultConfigs.worker({
-      preset: "sovereign",
-      overrides: {
-        redisDb: 1,
+    Sequencer: {
+      WorkerModule: VanillaTaskWorkerModules.defaultConfig(),
+      TaskQueue: {
+        redis: {
+          host: process.env.REDIS_HOST ?? "redis",
+          port: Number(process.env.REDIS_PORT ?? 6379),
+          password: process.env.REDIS_PASSWORD ?? "password",
+          db: 1,
+        },
       },
-    }),
+    },
   });
 
   log.setLevel("DEBUG");

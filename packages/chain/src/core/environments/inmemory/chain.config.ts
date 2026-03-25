@@ -1,38 +1,76 @@
 import { Runtime } from "@proto-kit/module";
 import { Protocol } from "@proto-kit/protocol";
-import { Sequencer, AppChain } from "@proto-kit/sequencer";
+import {
+  Sequencer,
+  AppChain,
+  InMemoryDatabase,
+  PrivateMempool,
+  TimedBlockTrigger,
+  WorkerModule,
+  VanillaTaskWorkerModules,
+  LocalTaskQueue,
+  LocalSequencerCoreModule,
+} from "@proto-kit/sequencer";
+import { VanillaGraphqlModules, GraphqlSequencerModule } from "@proto-kit/api";
+import {
+  BlockStorageNetworkStateModule,
+  InMemoryTransactionSender,
+  StateServiceQueryModule,
+} from "@proto-kit/sdk";
 import { Startable } from "@proto-kit/common";
 
-import { DefaultConfigs, DefaultModules } from "@proto-kit/stack";
 import protocol from "../../../protocol";
 import runtime from "../../../runtime";
-
-const settlementEnabled = process.env.PROTOKIT_SETTLEMENT_ENABLED === "true";
 
 const appChain = AppChain.from({
   Runtime: Runtime.from(runtime.modules),
   Protocol: Protocol.from(protocol.modules),
   Sequencer: Sequencer.from({
-    ...DefaultModules.inMemoryDatabase(),
-    ...DefaultModules.core({
-      settlementEnabled,
-    }),
-    ...DefaultModules.localWorker(),
+    WorkerModule: WorkerModule.from(
+      VanillaTaskWorkerModules.withoutSettlement()
+    ),
+    TaskQueue: LocalTaskQueue,
+    Database: InMemoryDatabase,
+    Graphql: GraphqlSequencerModule.from(VanillaGraphqlModules.with({})),
+    Mempool: PrivateMempool,
+    BlockTrigger: TimedBlockTrigger,
+    LocalSequencerCoreModule,
   }),
-  ...DefaultModules.appChainBase(),
+  TransactionSender: InMemoryTransactionSender,
+  QueryTransportModule: StateServiceQueryModule,
+  NetworkStateTransportModule: BlockStorageNetworkStateModule,
 });
+
 export default async (): Promise<Startable> => {
-  appChain.configurePartial({
+  appChain.configure({
     Runtime: runtime.config,
     Protocol: protocol.config,
     Sequencer: {
-      ...DefaultConfigs.core({
-        settlementEnabled,
-      }),
-      ...DefaultConfigs.inMemoryDatabase(),
-      ...DefaultConfigs.localWorker(),
+      Graphql: {
+        ...VanillaGraphqlModules.defaultConfig(),
+        containerConfig: {
+          port: Number(process.env.PROTOKIT_GRAPHQL_PORT),
+          host: process.env.PROTOKIT_GRAPHQL_HOST ?? "localhost",
+          graphiql: process.env.PROTOKIT_GRAPHIQL_ENABLED !== "false",
+        },
+      },
+      Mempool: {},
+      LocalSequencerCoreModule: {
+        SequencerStartupModule: {},
+        BlockProducerModule: {},
+      },
+      BlockTrigger: {
+        blockInterval: Number(process.env.PROTOKIT_BLOCK_INTERVAL ?? 5000),
+        produceEmptyBlocks: true,
+        settlementTokenConfig: {},
+      },
+      WorkerModule: VanillaTaskWorkerModules.defaultConfig(),
+      Database: {},
+      TaskQueue: {},
     },
-    ...DefaultConfigs.appChainBase(),
+    QueryTransportModule: {},
+    NetworkStateTransportModule: {},
+    TransactionSender: {},
   });
 
   return appChain;
