@@ -10,6 +10,7 @@ You can learn more about the Protokit framework at the [official documentation](
 - Node.js `v18.18` (we recommend using NVM)
 - pnpm `v9.8.0`
 - nvm
+- [Auro Wallet](https://www.aurowallet.com)
 - (optional) For running with persistance / deploying on a server
     - docker `>= 24.0`
     - docker-compose `>= 2.22.0`

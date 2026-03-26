@@ -1,22 +1,41 @@
-import { DatabasePruneModule, Processor } from "@proto-kit/processor";
+import {
+  DatabasePruneModule,
+  Processor,
+  TimedProcessorTrigger,
+  BlockFetching,
+  HandlersExecutor,
+  ResolverFactoryGraphqlModule,
+} from "@proto-kit/processor";
+import { GraphqlSequencerModule } from "@proto-kit/api";
 import { databaseModule } from "../../processor";
 import { Arguments } from "../../../start";
 import { Startable } from "@proto-kit/common";
-import { DefaultConfigs, DefaultModules } from "@proto-kit/stack";
 import { resolvers } from "../../processor/api/resolvers";
 import { handlers } from "../../processor/handlers";
 
 const processor = Processor.from({
   Database: databaseModule,
   DatabasePruneModule: DatabasePruneModule,
-  ...DefaultModules.processor(resolvers, handlers),
+  GraphqlSequencerModule: GraphqlSequencerModule.from({
+    ResolverFactory: ResolverFactoryGraphqlModule.from(resolvers),
+  }),
+  HandlersExecutor: HandlersExecutor.from(handlers),
+  BlockFetching,
+  Trigger: TimedProcessorTrigger,
 });
 
 export default async (args: Arguments): Promise<Startable> => {
   processor.configurePartial({
-    ...DefaultConfigs.processor({
-      preset: "development",
-    }),
+    HandlersExecutor: {},
+    BlockFetching: {
+      url: `http://${process.env.PROTOKIT_PROCESSOR_INDEXER_GRAPHQL_HOST ?? "0.0.0.0"}:${process.env.PROTOKIT_INDEXER_GRAPHQL_PORT ?? 8081}`,
+    },
+    Trigger: {
+      interval: 6000,
+    },
+    GraphqlSequencerModule: {
+      ResolverFactory: {},
+    },
     Database: {},
     DatabasePruneModule: {
       pruneOnStartup: args.pruneOnStartup,

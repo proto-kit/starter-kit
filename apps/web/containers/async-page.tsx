@@ -13,6 +13,7 @@ export default function Home() {
         <div className="flex basis-4/12 flex-col items-center justify-center 2xl:basis-3/12">
           <Faucet
             wallet={wallet.wallet}
+            walletInstalled={wallet.walletInstalled}
             onConnectWallet={wallet.connectWallet}
             onDrip={drip}
             loading={false}

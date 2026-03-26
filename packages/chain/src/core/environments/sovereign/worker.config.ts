@@ -3,7 +3,7 @@ import { Protocol, ProtocolConstants } from "@proto-kit/protocol";
 import {
   Sequencer,
   AppChain,
-  LocalTaskWorkerModule,
+  WorkerModule,
   VanillaTaskWorkerModules,
   SettlementProvingTask,
   SettlementCompileTask,
@@ -21,10 +21,7 @@ import runtime from "../../../runtime";
 import * as protocol from "../../../protocol";
 import { Arguments } from "../../../start";
 
-import { ModulesConfig, Startable } from "@proto-kit/common";
-import { DefaultConfigs } from "@proto-kit/stack";
-
-const settlementEnabled = process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true";
+import { log, Startable } from "@proto-kit/common";
 
 const variants = {
   default: VanillaTaskWorkerModules.allTasks(),
@@ -93,29 +90,33 @@ const appChain = AppChain.from({
   Runtime: Runtime.from(runtime.modules),
   Protocol: Protocol.from({
     ...protocol.modules,
-    ...(settlementEnabled ? protocol.settlementModules : {}),
+    ...protocol.settlementModules,
   }),
   Sequencer: Sequencer.from({
     TaskQueue: BullQueue,
-    LocalTaskWorkerModule: LocalTaskWorkerModule.from(variants[variant]),
+    WorkerModule: WorkerModule.from(variants[variant]),
   }),
 });
 
 export default async (args: Arguments): Promise<Startable> => {
   ProtocolConstants.printAllConstants();
 
-  appChain.configurePartial({
+  appChain.configure({
     Runtime: runtime.config,
     Protocol: {
       ...protocol.config,
-      ...(settlementEnabled ? protocol.settlementModulesConfig : {}),
+      ...protocol.settlementModulesConfig,
     },
     Sequencer: {
-      ...DefaultConfigs.redisTaskQueue({
-        preset: "sovereign",
-        overrides: { redisDb: 1 },
-      }),
-      LocalTaskWorkerModule: variantConfigs[variant],
+      WorkerModule: VanillaTaskWorkerModules.defaultConfig(),
+      TaskQueue: {
+        redis: {
+          host: process.env.REDIS_HOST ?? "redis",
+          port: Number(process.env.REDIS_PORT ?? 6379),
+          password: process.env.REDIS_PASSWORD ?? "password",
+          db: 1,
+        },
+      },
     },
   });
 
