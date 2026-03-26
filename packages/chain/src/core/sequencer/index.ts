@@ -1,8 +1,11 @@
+import { OpenTelemetryServer } from "@proto-kit/api";
+import { ModulesConfig } from "@proto-kit/common";
 import {
   BridgingModule,
   ConstantFeeStrategy,
   InMemoryMinaSigner,
   MinaBaseLayer,
+  SequencerModulesRecord,
   SettlementModule,
 } from "@proto-kit/sequencer";
 import { PrivateKey } from "o1js";
@@ -13,7 +16,7 @@ export const baseSettlementSequencerModules = {
   SettlementModule,
   SettlementSigner: InMemoryMinaSigner,
   BridgingModule,
-};
+} satisfies SequencerModulesRecord;
 
 export const baseSettlementSequencerModulesConfig = {
   BaseLayer: {
@@ -57,4 +60,30 @@ export const baseSettlementSequencerModulesConfig = {
     ],
   },
   FeeStrategy: {},
-};
+} satisfies ModulesConfig<typeof baseSettlementSequencerModules>;
+
+export const metricsSequencerModules = {
+  OpenTelemetryServer,
+} satisfies SequencerModulesRecord;
+
+export const metricsSequencerModulesConfig = {
+  OpenTelemetryServer: {
+    metrics: {
+      enabled: Boolean(process.env.OPEN_TELEMETRY_METRICS_ENABLED ?? false),
+      prometheus: {
+        host: process.env.OPEN_TELEMETRY_METRICS_HOST ?? "localhost",
+        port: Number(process.env.OPEN_TELEMETRY_METRICS_PORT),
+        appendTimestamp: true,
+      },
+      nodeScrapeInterval: Number(
+        process.env.OPEN_TELEMETRY_METRICS_SCRAPING_FREQUENCY ?? 10
+      ),
+    },
+    tracing: {
+      enabled: Boolean(process.env.OPEN_TELEMETRY_TRACING_ENABLED ?? false),
+      otlp: {
+        url: process.env.OPEN_TELEMETRY_TRACING_URL,
+      },
+    },
+  },
+} satisfies ModulesConfig<typeof metricsSequencerModules>;

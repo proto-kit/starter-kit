@@ -25,7 +25,10 @@ import {
   buildCustomTokenConfig,
   buildSettlementTokenConfig,
 } from "@proto-kit/stack";
-import { baseSettlementSequencerModules, baseSettlementSequencerModulesConfig } from "../../sequencer";
+import {
+  baseSettlementSequencerModules,
+  baseSettlementSequencerModulesConfig,
+} from "../../sequencer";
 
 const appChain = AppChain.from({
   Runtime: Runtime.from(runtime.modules),
@@ -35,7 +38,6 @@ const appChain = AppChain.from({
   }),
   Sequencer: Sequencer.from({
     // ordering of the modules matters due to dependency resolution
-    //OpenTelemetryServer,
     Database: PrismaRedisDatabase,
     Graphql: GraphqlSequencerModule.from(VanillaGraphqlModules.with({})),
     Mempool: PrivateMempool,
@@ -81,7 +83,6 @@ export default async (args: Arguments): Promise<Startable> => {
           )
         ),
       },
-      //OpenTelemetryServer: { ... },
       IndexerNotifier: {},
       TaskQueue: {
         redis: {

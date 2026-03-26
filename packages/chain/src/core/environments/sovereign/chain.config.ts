@@ -29,6 +29,8 @@ import {
 import {
   baseSettlementSequencerModules,
   baseSettlementSequencerModulesConfig,
+  metricsSequencerModules,
+  metricsSequencerModulesConfig,
 } from "../../sequencer";
 
 const appChain = AppChain.from({
@@ -39,6 +41,7 @@ const appChain = AppChain.from({
   }),
   Sequencer: Sequencer.from({
     // ordering of the modules matters due to dependency resolution
+    ...metricsSequencerModules,
     Database: PrismaRedisDatabase,
     TaskQueue: BullQueue,
     Graphql: GraphqlSequencerModule.from(VanillaGraphqlModules.with({})),
@@ -62,6 +65,7 @@ export default async (args: Arguments): Promise<Startable> => {
       ...protocol.settlementModulesConfig,
     },
     Sequencer: {
+      ...metricsSequencerModulesConfig,
       Graphql: {
         ...VanillaGraphqlModules.defaultConfig(),
         containerConfig: {
@@ -95,6 +99,7 @@ export default async (args: Arguments): Promise<Startable> => {
           host: process.env.REDIS_HOST ?? "redis",
           port: Number(process.env.REDIS_PORT ?? 6379),
           password: process.env.REDIS_PASSWORD ?? "password",
+          db: 1,
         },
       },
       Database: {
