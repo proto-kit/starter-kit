@@ -21,7 +21,6 @@ import { Startable } from "@proto-kit/common";
 
 import protocol from "../../../protocol";
 import runtime from "../../../runtime";
-import config from "./config";
 
 const appChain = AppChain.from({
   Runtime: Runtime.from(runtime.modules),
@@ -52,7 +51,7 @@ export default async (): Promise<Startable> => {
         containerConfig: {
           port: Number(process.env.PROTOKIT_GRAPHQL_PORT),
           host: process.env.PROTOKIT_GRAPHQL_HOST ?? "localhost",
-          graphiql: config.graphiqlEnabled,
+          graphiql: true,
         },
       },
       Mempool: {},
@@ -61,7 +60,7 @@ export default async (): Promise<Startable> => {
         BlockProducerModule: {},
       },
       BlockTrigger: {
-        blockInterval: config.blockInterval,
+        blockInterval: 5000,
         produceEmptyBlocks: true,
         settlementTokenConfig: {},
       },

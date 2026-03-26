@@ -6,15 +6,12 @@ import {
   HandlersExecutor,
   ResolverFactoryGraphqlModule,
 } from "@proto-kit/processor";
-import {
-  GraphqlSequencerModule,
-} from "@proto-kit/api";
+import { GraphqlSequencerModule } from "@proto-kit/api";
 import { databaseModule } from "../../processor";
 import { Arguments } from "../../../start";
 import { Startable } from "@proto-kit/common";
 import { resolvers } from "../../processor/api/resolvers";
 import { handlers } from "../../processor/handlers";
-import config from "./config";
 
 const processor = Processor.from({
   Database: databaseModule,
@@ -34,7 +31,7 @@ export default async (args: Arguments): Promise<Startable> => {
       url: `http://${process.env.PROTOKIT_PROCESSOR_INDEXER_GRAPHQL_HOST ?? "0.0.0.0"}:${process.env.PROTOKIT_INDEXER_GRAPHQL_PORT ?? 8081}`,
     },
     Trigger: {
-      interval: config.blockInterval / 5,
+      interval: 6000,
     },
     GraphqlSequencerModule: {
       ResolverFactory: {},
