@@ -30,8 +30,9 @@ import {
   baseSettlementSequencerModules,
   baseSettlementSequencerModulesConfig,
   metricsSequencerModules,
-  metricsSequencerModulesConfig,
+  createMetricsSequencerModulesConfig,
 } from "../../sequencer";
+import config from "./config";
 
 const appChain = AppChain.from({
   Runtime: Runtime.from(runtime.modules),
@@ -65,24 +66,22 @@ export default async (args: Arguments): Promise<Startable> => {
       ...protocol.settlementModulesConfig,
     },
     Sequencer: {
-      ...metricsSequencerModulesConfig,
+      ...createMetricsSequencerModulesConfig(config),
       Graphql: {
         ...VanillaGraphqlModules.defaultConfig(),
         containerConfig: {
           port: Number(process.env.PROTOKIT_GRAPHQL_PORT ?? 8080),
           host: process.env.PROTOKIT_GRAPHQL_HOST ?? "0.0.0.0",
-          graphiql: process.env.PROTOKIT_GRAPHIQL_ENABLED !== "false",
+          graphiql: config.graphiqlEnabled,
         },
       },
       Mempool: {},
       BlockProducerModule: {},
       BlockTrigger: {
-        blockInterval: Number(process.env.PROTOKIT_BLOCK_INTERVAL ?? 10000),
+        blockInterval: config.blockInterval,
         produceEmptyBlocks: true,
 
-        settlementInterval: Number(
-          process.env.PROTOKIT_SETTLEMENT_INTERVAL ?? 60000
-        ),
+        settlementInterval: config.settlementInterval,
         settlementTokenConfig: buildSettlementTokenConfig(
           process.env.PROTOKIT_MINA_BRIDGE_CONTRACT_PRIVATE_KEY!,
           buildCustomTokenConfig(

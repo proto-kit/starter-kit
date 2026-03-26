@@ -9,6 +9,8 @@ import {
   SettlementModule,
 } from "@proto-kit/sequencer";
 import { PrivateKey } from "o1js";
+import { DevelopmentConfig } from "../environments/development/config";
+import { SovereignConfig } from "../environments/sovereign/config";
 
 export const baseSettlementSequencerModules = {
   BaseLayer: MinaBaseLayer,
@@ -65,25 +67,25 @@ export const baseSettlementSequencerModulesConfig = {
 export const metricsSequencerModules = {
   OpenTelemetryServer,
 } satisfies SequencerModulesRecord;
-
-export const metricsSequencerModulesConfig = {
-  OpenTelemetryServer: {
-    metrics: {
-      enabled: Boolean(process.env.OPEN_TELEMETRY_METRICS_ENABLED ?? false),
-      prometheus: {
-        host: process.env.OPEN_TELEMETRY_METRICS_HOST ?? "localhost",
-        port: Number(process.env.OPEN_TELEMETRY_METRICS_PORT),
-        appendTimestamp: true,
+export const createMetricsSequencerModulesConfig = (
+  config: DevelopmentConfig | SovereignConfig
+) =>
+  ({
+    OpenTelemetryServer: {
+      metrics: {
+        enabled: config.openTelemetry.metrics.enabled,
+        prometheus: {
+          host: process.env.OPEN_TELEMETRY_METRICS_HOST ?? "localhost",
+          port: Number(process.env.OPEN_TELEMETRY_METRICS_PORT),
+          appendTimestamp: true,
+        },
+        nodeScrapeInterval: config.openTelemetry.metrics.scrapingFrequency,
       },
-      nodeScrapeInterval: Number(
-        process.env.OPEN_TELEMETRY_METRICS_SCRAPING_FREQUENCY ?? 10
-      ),
-    },
-    tracing: {
-      enabled: Boolean(process.env.OPEN_TELEMETRY_TRACING_ENABLED ?? false),
-      otlp: {
-        url: process.env.OPEN_TELEMETRY_TRACING_URL,
+      tracing: {
+        enabled: config.openTelemetry.tracing.enabled,
+        otlp: {
+          url: process.env.OPEN_TELEMETRY_TRACING_URL,
+        },
       },
     },
-  },
-} satisfies ModulesConfig<typeof metricsSequencerModules>;
+  }) satisfies ModulesConfig<typeof metricsSequencerModules>;

@@ -12,6 +12,7 @@ import { PrismaRedisDatabase } from "@proto-kit/persistance";
 import { BullQueue } from "@proto-kit/deployment";
 import { Arguments } from "../../../start";
 import { Startable } from "@proto-kit/common";
+import { config } from "./config";
 
 const indexer = Indexer.from({
   Database: PrismaRedisDatabase,
@@ -59,7 +60,7 @@ export default async (args: Arguments): Promise<Startable> => {
       containerConfig: {
         port: Number(process.env.PROTOKIT_INDEXER_GRAPHQL_PORT ?? 8081),
         host: process.env.PROTOKIT_INDEXER_GRAPHQL_HOST ?? "0.0.0.0",
-        graphiql: process.env.PROTOKIT_INDEXER_GRAPHIQL_ENABLED !== "false",
+        graphiql: config.indexer.graphiqlEnabled,
       },
     },
   });
