@@ -13,35 +13,24 @@ import { Arguments } from "../../../start";
 
 import { log, Startable } from "@proto-kit/common";
 
-const settlementEnabled = process.env.PROTOKIT_SETTLEMENT_ENABLED! === "true";
-
 const appChain = AppChain.from({
   Runtime: Runtime.from(runtime.modules),
   Protocol: Protocol.from({
     ...protocol.modules,
-    ...(settlementEnabled ? protocol.settlementModules : {}),
+    ...protocol.settlementModules,
   }),
   Sequencer: Sequencer.from({
     TaskQueue: BullQueue,
-    WorkerModule: WorkerModule.from(
-      VanillaTaskWorkerModules.allTasks()
-    ),
-    ...(!settlementEnabled
-      ? {
-          WorkerModule: WorkerModule.from(
-            VanillaTaskWorkerModules.withoutSettlement()
-          ),
-        }
-      : {}),
+    WorkerModule: WorkerModule.from(VanillaTaskWorkerModules.allTasks()),
   }),
 });
 
 export default async (args: Arguments): Promise<Startable> => {
-  appChain.configurePartial({
+  appChain.configure({
     Runtime: runtime.config,
     Protocol: {
       ...protocol.config,
-      ...(settlementEnabled ? protocol.settlementModulesConfig : {}),
+      ...protocol.settlementModulesConfig,
     },
     Sequencer: {
       WorkerModule: VanillaTaskWorkerModules.defaultConfig(),
