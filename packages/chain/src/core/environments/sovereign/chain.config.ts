@@ -21,10 +21,10 @@ import * as protocol from "../../../protocol";
 
 import { Arguments } from "../../../start";
 import { Startable } from "@proto-kit/common";
-import {
-  buildCustomTokenConfig,
-  buildSettlementTokenConfig,
-} from "@proto-kit/stack";
+// import {
+//   buildCustomTokenConfig,
+//   buildSettlementTokenConfig,
+// } from "@proto-kit/stack";
 import {
   baseSettlementSequencerModules,
   baseSettlementSequencerModulesConfig,
@@ -83,13 +83,14 @@ export default async (args: Arguments): Promise<Startable> => {
         produceEmptyBlocks: true,
 
         settlementInterval: 60000,
-        settlementTokenConfig: buildSettlementTokenConfig(
-          process.env.PROTOKIT_MINA_BRIDGE_CONTRACT_PRIVATE_KEY!,
-          buildCustomTokenConfig(
-            process.env.PROTOKIT_CUSTOM_TOKEN_PRIVATE_KEY,
-            process.env.PROTOKIT_CUSTOM_TOKEN_BRIDGE_PRIVATE_KEY
-          )
-        ),
+        settlementTokenConfig: {},
+        // settlementTokenConfig: buildSettlementTokenConfig(
+        //   process.env.PROTOKIT_MINA_BRIDGE_CONTRACT_PRIVATE_KEY!,
+        //   buildCustomTokenConfig(
+        //     process.env.PROTOKIT_CUSTOM_TOKEN_PRIVATE_KEY,
+        //     process.env.PROTOKIT_CUSTOM_TOKEN_BRIDGE_PRIVATE_KEY
+        //   )
+        // ),
       },
       ...baseSettlementSequencerModulesConfig,
       IndexerNotifier: {},

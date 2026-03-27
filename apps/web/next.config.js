@@ -29,6 +29,7 @@ const nextConfig = {
       worker_threads: false,
       dns: false,
       child_process: false,
+      "@o1js": false,
     };
 
     config.plugins.push(
@@ -40,7 +41,7 @@ const nextConfig = {
     return config;
   },
   compress: false,
-  output: "standalone"
+  output: "standalone",
 };
 
 module.exports = nextConfig;
