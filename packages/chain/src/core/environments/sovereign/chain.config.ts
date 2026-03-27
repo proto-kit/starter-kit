@@ -5,8 +5,7 @@ import {
   Sequencer,
   PrivateMempool,
   TimedBlockTrigger,
-  BlockProducerModule,
-  SequencerStartupModule,
+  SequencerCoreModule,
 } from "@proto-kit/sequencer";
 import { VanillaGraphqlModules, GraphqlSequencerModule } from "@proto-kit/api";
 import { IndexerNotifier } from "@proto-kit/indexer";
@@ -46,9 +45,8 @@ const appChain = AppChain.from({
     TaskQueue: BullQueue,
     Graphql: GraphqlSequencerModule.from(VanillaGraphqlModules.with({})),
     Mempool: PrivateMempool,
-    BlockProducerModule,
     BlockTrigger: TimedBlockTrigger,
-    SequencerStartupModule,
+    SequencerCoreModule,
     ...baseSettlementSequencerModules,
     IndexerNotifier,
   }),
@@ -75,7 +73,11 @@ export default async (args: Arguments): Promise<Startable> => {
         },
       },
       Mempool: {},
-      BlockProducerModule: {},
+      SequencerCoreModule: {
+        BatchProducerModule: {},
+        SequencerStartupModule: {},
+        BlockProducerModule: {},
+      },
       BlockTrigger: {
         blockInterval: 10000,
         produceEmptyBlocks: true,
@@ -89,7 +91,6 @@ export default async (args: Arguments): Promise<Startable> => {
           )
         ),
       },
-      SequencerStartupModule: {},
       ...baseSettlementSequencerModulesConfig,
       IndexerNotifier: {},
       TaskQueue: {

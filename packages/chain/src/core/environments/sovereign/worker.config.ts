@@ -21,7 +21,7 @@ import runtime from "../../../runtime";
 import * as protocol from "../../../protocol";
 import { Arguments } from "../../../start";
 
-import { log, Startable } from "@proto-kit/common";
+import { ModulesConfig, Startable } from "@proto-kit/common";
 
 const variants = {
   default: VanillaTaskWorkerModules.allTasks(),
