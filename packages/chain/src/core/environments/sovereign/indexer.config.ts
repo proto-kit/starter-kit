@@ -7,9 +7,7 @@ import {
   GeneratedResolverFactoryGraphqlModule,
 } from "@proto-kit/indexer";
 import { GraphqlSequencerModule } from "@proto-kit/api";
-import {
-  WorkerModule,
-} from "@proto-kit/sequencer";
+import { WorkerModule } from "@proto-kit/sequencer";
 import { PrismaRedisDatabase } from "@proto-kit/persistance";
 import { BullQueue } from "@proto-kit/deployment";
 import { Arguments } from "../../../start";
@@ -57,6 +55,11 @@ export default async (args: Arguments): Promise<Startable> => {
     },
     Graphql: {
       GeneratedResolverFactory: {},
+      containerConfig: {
+        port: Number(process.env.PROTOKIT_INDEXER_GRAPHQL_PORT ?? 8081),
+        host: process.env.PROTOKIT_INDEXER_GRAPHQL_HOST ?? "0.0.0.0",
+        graphiql: true,
+      },
     },
   });
   return indexer;

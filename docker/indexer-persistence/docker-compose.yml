@@ -3,6 +3,7 @@ services:
     image: postgres:14-alpine
     container_name: starterkit-indexer-postgres
     profiles:
+      - indexer
       - indexer-db
     ports:
       - 5433:5432

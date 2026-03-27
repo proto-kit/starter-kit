@@ -17,7 +17,7 @@ services:
       - PROTOKIT_INDEXER_GRAPHQL_HOST=${PROTOKIT_INDEXER_GRAPHQL_HOST}
       - PROTOKIT_INDEXER_GRAPHQL_PORT=${PROTOKIT_INDEXER_GRAPHQL_PORT}
     profiles:
-      - monolithic-indexer
+      - indexer
     depends_on:
       indexer-postgres:
         condition: service_healthy
