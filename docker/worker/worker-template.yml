@@ -23,9 +23,6 @@ services:
       - PROTOKIT_PROOFS_ENABLED=${PROTOKIT_PROOFS_ENABLED}
       - PROTOKIT_BLOCK_ARGUMENT_BATCH_SIZE=${PROTOKIT_BLOCK_ARGUMENT_BATCH_SIZE}
       - PROTOKIT_STATE_TRANSITION_BATCH_SIZE=${PROTOKIT_STATE_TRANSITION_BATCH_SIZE}
-    profiles:
-      - worker
-      - worker-specialized
     depends_on:
       redis:
         condition: service_healthy
@@ -35,3 +32,10 @@ services:
     volumes:
       - ${HOME}/.cache/o1js:/home/node/.cache/o1js
     command: ["./dist/start.js start ./core/environments/${PROTOKIT_ENV_FOLDER}/worker.config.js"]
+
+  worker-specialized-base:
+    extends:
+      service: worker-base
+    profiles:
+      - worker
+      - worker-specialized

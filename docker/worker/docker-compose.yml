@@ -9,19 +9,18 @@ services:
     environment:
       - PROTOKIT_WORKER_VARIANT=default
 
-
   worker-1:
     extends:
       file: ./worker-template.yml
-      service: worker-base
-    container_name: starterkit-worker
+      service: worker-specialized-base
+    container_name: starterkit-worker-1
     environment:
       - PROTOKIT_WORKER_VARIANT=l1
 
   worker-2:
     extends:
       file: ./worker-template.yml
-      service: worker-base
+      service: worker-specialized-base
     container_name: starterkit-worker-2
     environment:
       - PROTOKIT_WORKER_VARIANT=st
@@ -29,7 +28,7 @@ services:
   worker-3:
     extends:
       file: ./worker-template.yml
-      service: worker-base
+      service: worker-specialized-base
     container_name: starterkit-worker-3
     environment:
       - PROTOKIT_WORKER_VARIANT=transaction
@@ -37,7 +36,7 @@ services:
   worker-4:
     extends:
       file: ./worker-template.yml
-      service: worker-base
+      service: worker-specialized-base
     container_name: starterkit-worker-4
     environment:
       - PROTOKIT_WORKER_VARIANT=block
