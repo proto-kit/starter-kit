@@ -16,7 +16,7 @@ fi
 
 if [[ ${PROTOKIT_SHOULD_ATTEMPT_PROCESSOR_DB_MIGRATION} ]]; then
   echo "Migrating on ${PROCESSOR_DATABASE_URL}"
-  cd packages/chain/src/processor
+  cd packages/chain/src/core/processor
   pnpx prisma@5.18.0 migrate deploy
   cd ../../../../..
 fi
