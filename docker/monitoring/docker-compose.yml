@@ -15,7 +15,7 @@ services:
       - "9090:9090"
     restart: unless-stopped
     volumes:
-      - ./prometheus/${PROTOKIT_ENV_FOLDER}:/etc/prometheus
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yml
       - ../data/prometheus:/prometheus
 
   loki:
@@ -37,7 +37,7 @@ services:
     networks:
       - monitoring
     volumes:
-      - ./promtail/promtail.yaml:/etc/promtail/docker-config.yaml
+      - ./promtail.yaml:/etc/promtail/docker-config.yaml
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock
     command: -config.file=/etc/promtail/docker-config.yaml
@@ -54,7 +54,7 @@ services:
       - chain-net
     command: [ "--config=/etc/otel-collector.yaml" ]
     volumes:
-      - ./otel-collector/otel-collector.yaml:/etc/otel-collector.yaml
+      - ./otel-collector.yaml:/etc/otel-collector.yaml
     ports:
       - "4318:4317"
 
@@ -67,7 +67,7 @@ services:
       - monitoring
     command: [ "-config.file=/etc/tempo.yaml" ]
     volumes:
-      - ./tempo/tempo.yaml:/etc/tempo.yaml
+      - ./tempo.yaml:/etc/tempo.yaml
       - ../data/tempo:/var/tempo
     ports:
       - "3200:3200" # tempo
@@ -88,7 +88,7 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
       - GF_SECURITY_ALLOW_EMBEDDING=true
     volumes:
-      - ./grafana:/etc/grafana/provisioning/datasources
+      - ./grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
       - ../data/grafana:/var/lib/grafana
     depends_on:
       - loki
