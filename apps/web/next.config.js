@@ -30,6 +30,7 @@ const nextConfig = {
       dns: false,
       child_process: false,
       "@o1js": false,
+      "@o1js/native": false,
     };
 
     config.plugins.push(

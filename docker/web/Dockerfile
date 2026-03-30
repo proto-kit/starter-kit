@@ -6,6 +6,9 @@
 # Make sure you build the base-image first
 FROM protokit-base:latest AS base
 
+# Remove native dependency
+RUN rm -r /framework/node_modules/@o1js
+
 # Install dependencies only when needed
 FROM base AS builder
 WORKDIR /app

@@ -81,6 +81,7 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+      - routing-net
     ports:
       - "3001:3000"
     environment:
