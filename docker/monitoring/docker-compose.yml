@@ -11,6 +11,7 @@ services:
     networks:
       - monitoring
       - chain-net
+      - indexer-db-net
     ports:
       - "9090:9090"
     restart: unless-stopped
@@ -59,7 +60,7 @@ services:
       - "4318:4317"
 
   tempo:
-    image: grafana/tempo:latest
+    image: grafana/tempo:2.7.0
     container_name: tempo
     networks:
       - monitoring
