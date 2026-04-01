@@ -59,7 +59,7 @@ export default async (args: Arguments): Promise<Startable> => {
       containerConfig: {
         port: Number(process.env.PROTOKIT_INDEXER_GRAPHQL_PORT ?? 8081),
         host: process.env.PROTOKIT_INDEXER_GRAPHQL_HOST ?? "0.0.0.0",
-        graphiql: process.env.PROTOKIT_INDEXER_GRAPHIQL_ENABLED !== "false",
+        graphiql: true,
       },
     },
   });

@@ -29,7 +29,7 @@ export default async (args: Arguments): Promise<Startable> => {
       url: `http://${process.env.PROTOKIT_PROCESSOR_INDEXER_GRAPHQL_HOST ?? "0.0.0.0"}:${process.env.PROTOKIT_INDEXER_GRAPHQL_PORT ?? 8081}`,
     },
     Trigger: {
-      interval: Number(process.env.PROTOKIT_BLOCK_INTERVAL ?? 30000) / 5,
+      interval: 2000,
     },
     GraphqlSequencerModule: {
       ResolverFactory: {},

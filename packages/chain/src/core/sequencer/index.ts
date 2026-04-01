@@ -69,18 +69,16 @@ export const metricsSequencerModules = {
 export const metricsSequencerModulesConfig = {
   OpenTelemetryServer: {
     metrics: {
-      enabled: Boolean(process.env.OPEN_TELEMETRY_METRICS_ENABLED ?? false),
+      enabled: true,
       prometheus: {
         host: process.env.OPEN_TELEMETRY_METRICS_HOST ?? "localhost",
         port: Number(process.env.OPEN_TELEMETRY_METRICS_PORT),
         appendTimestamp: true,
       },
-      nodeScrapeInterval: Number(
-        process.env.OPEN_TELEMETRY_METRICS_SCRAPING_FREQUENCY ?? 10
-      ),
+      nodeScrapeInterval: 10,
     },
     tracing: {
-      enabled: Boolean(process.env.OPEN_TELEMETRY_TRACING_ENABLED ?? false),
+      enabled: true,
       otlp: {
         url: process.env.OPEN_TELEMETRY_TRACING_URL,
       },

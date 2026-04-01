@@ -51,7 +51,7 @@ export default async (): Promise<Startable> => {
         containerConfig: {
           port: Number(process.env.PROTOKIT_GRAPHQL_PORT),
           host: process.env.PROTOKIT_GRAPHQL_HOST ?? "localhost",
-          graphiql: process.env.PROTOKIT_GRAPHIQL_ENABLED !== "false",
+          graphiql: true,
         },
       },
       Mempool: {},
@@ -60,7 +60,7 @@ export default async (): Promise<Startable> => {
         BlockProducerModule: {},
       },
       BlockTrigger: {
-        blockInterval: Number(process.env.PROTOKIT_BLOCK_INTERVAL ?? 5000),
+        blockInterval: 5000,
         produceEmptyBlocks: true,
         settlementTokenConfig: {},
       },
