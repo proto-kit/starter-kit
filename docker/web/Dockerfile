@@ -7,7 +7,7 @@
 FROM protokit-base:latest AS base
 
 # Remove native dependency
-RUN rm -r /framework/node_modules/@o1js
+# RUN rm -r /framework/node_modules/@o1js
 
 # Install dependencies only when needed
 FROM base AS builder

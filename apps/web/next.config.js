@@ -29,8 +29,6 @@ const nextConfig = {
       worker_threads: false,
       dns: false,
       child_process: false,
-      "@o1js": false,
-      "@o1js/native": false,
     };
 
     config.plugins.push(
@@ -39,6 +37,10 @@ const nextConfig = {
       }),
     );
 
+    config.module.rules.push({
+      test: /\.(node|md|d\.ts)$/,
+      loader: "null-loader",
+    });
     return config;
   },
   compress: false,

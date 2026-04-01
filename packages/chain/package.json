@@ -59,6 +59,9 @@
     "o1js": "../../../framework/node_modules/o1js",
     "tsyringe": "../../../framework/node_modules/tsyringe"
   },
+  "optionalDependencies": {
+    "@o1js/native": "2.14.0-dev.e1080"
+  },
   "devDependencies": {
     "@jest/globals": "^29.6.1",
     "@prisma/client": "^5.18.0",
