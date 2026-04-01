@@ -14,6 +14,7 @@ services:
       - indexer-db-net
     ports:
       - "9090:9090"
+    user: ${USER_ID}
     restart: unless-stopped
     volumes:
       - ./prometheus/${PROTOKIT_ENV_FOLDER}:/etc/prometheus
@@ -67,6 +68,7 @@ services:
     profiles:
       - monitoring
     command: [ "-config.file=/etc/tempo.yaml" ]
+    user: ${USER_ID}
     volumes:
       - ./tempo/tempo.yaml:/etc/tempo.yaml
       - ../data/tempo:/var/tempo
@@ -85,6 +87,7 @@ services:
       - routing-net
     ports:
       - "3001:3000"
+    user: ${USER_ID}
     environment:
       - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
