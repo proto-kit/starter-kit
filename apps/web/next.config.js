@@ -14,7 +14,7 @@ const nextConfig = {
       },
     ];
   },
-  webpack(config) {
+  webpack(config, { isServer }) {
     config.experiments = { ...config.experiments, topLevelAwait: true };
     config.resolve.fallback = {
       fs: false,
@@ -36,6 +36,10 @@ const nextConfig = {
         resource.request = resource.request.replace(/^node:/, "");
       }),
     );
+
+    if (isServer) {
+      config.externals.push('o1js');
+    }
 
     return config;
   },
