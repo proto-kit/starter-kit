@@ -1,6 +1,6 @@
 services:
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:v3.9.1
     container_name: prometheus
     profiles:
       - monitoring
@@ -21,7 +21,7 @@ services:
       - ../data/prometheus:/prometheus
 
   loki:
-    image: grafana/loki:latest
+    image: grafana/loki:3.6.5
     container_name: loki
     profiles:
       - monitoring
@@ -32,7 +32,7 @@ services:
     command: -config.file=/etc/loki/local-config.yaml
 
   promtail:
-    image: grafana/promtail:latest
+    image: grafana/promtail:3.6.5
     container_name: promtail
     profiles:
       - monitoring
