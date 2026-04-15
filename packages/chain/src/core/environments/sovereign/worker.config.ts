@@ -1,17 +1,90 @@
 import { Runtime } from "@proto-kit/module";
-import { Protocol } from "@proto-kit/protocol";
+import { Protocol, ProtocolConstants } from "@proto-kit/protocol";
 import {
   Sequencer,
   AppChain,
   WorkerModule,
   VanillaTaskWorkerModules,
+  SettlementProvingTask,
+  SettlementCompileTask,
+  WorkerRegistrationTask,
+  StateTransitionReductionTask,
+  StateTransitionTask,
+  RuntimeProvingTask,
+  TransactionProvingTask,
+  TransactionReductionTask,
+  BlockReductionTask,
+  NewBlockTask,
 } from "@proto-kit/sequencer";
 import { BullQueue } from "@proto-kit/deployment";
 import runtime from "../../../runtime";
 import * as protocol from "../../../protocol";
 import { Arguments } from "../../../start";
 
-import { log, Startable } from "@proto-kit/common";
+import { ModulesConfig, Startable } from "@proto-kit/common";
+
+const variants = {
+  default: VanillaTaskWorkerModules.allTasks(),
+  l2: VanillaTaskWorkerModules.withoutSettlement(),
+  l1: {
+    SettlementProvingTask,
+    SettlementCompileTask,
+    WorkerRegistrationTask,
+  },
+  transaction: {
+    RuntimeProvingTask,
+    TransactionProvingTask,
+    TransactionReductionTask,
+    WorkerRegistrationTask,
+  },
+  st: {
+    StateTransitionTask,
+    StateTransitionReductionTask,
+    WorkerRegistrationTask,
+  },
+  block: {
+    BlockReductionTask,
+    NewBlockTask,
+    WorkerRegistrationTask,
+  },
+};
+
+const variantConfigs = {
+  default: VanillaTaskWorkerModules.defaultConfig(),
+  l2: VanillaTaskWorkerModules.defaultConfig(),
+  l1: {
+    SettlementProvingTask: {},
+    SettlementCompileTask: {},
+    WorkerRegistrationTask: {},
+  } satisfies ModulesConfig<(typeof variants)["l1"]>,
+  transaction: {
+    RuntimeProvingTask: {},
+    TransactionProvingTask: {},
+    TransactionReductionTask: {},
+    WorkerRegistrationTask: {},
+  },
+  st: {
+    StateTransitionTask: {},
+    StateTransitionReductionTask: {},
+    WorkerRegistrationTask: {},
+  },
+  block: {
+    BlockReductionTask: {},
+    NewBlockTask: {},
+    WorkerRegistrationTask: {},
+  },
+};
+
+const variant = process.env.PROTOKIT_WORKER_VARIANT ?? "default";
+
+function validateVariant(
+  variant: string
+): asserts variant is keyof typeof variants {
+  if (!(variant in variants)) {
+    throw new Error(`Worker variant ${variant} not found`);
+  }
+}
+validateVariant(variant);
 
 const appChain = AppChain.from({
   Runtime: Runtime.from(runtime.modules),
@@ -21,11 +94,13 @@ const appChain = AppChain.from({
   }),
   Sequencer: Sequencer.from({
     TaskQueue: BullQueue,
-    WorkerModule: WorkerModule.from(VanillaTaskWorkerModules.allTasks()),
+    WorkerModule: WorkerModule.from(variants[variant]),
   }),
 });
 
 export default async (args: Arguments): Promise<Startable> => {
+  ProtocolConstants.printAllConstants();
+
   appChain.configure({
     Runtime: runtime.config,
     Protocol: {
@@ -44,8 +119,6 @@ export default async (args: Arguments): Promise<Startable> => {
       },
     },
   });
-
-  log.setLevel("DEBUG");
 
   return appChain;
 };

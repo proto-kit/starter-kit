@@ -3,6 +3,7 @@ services:
     image: postgres:14-alpine
     container_name: starterkit-processor-postgres
     profiles:
+      - processor
       - processor-db
     ports:
       - 5434:5432

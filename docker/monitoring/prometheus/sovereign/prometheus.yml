@@ -28,3 +28,12 @@ scrape_configs:
     static_configs:
       - targets:
           - starterkit-sequencer:4320
+  - job_name: indexer
+    honor_timestamps: true
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    metrics_path: /metrics
+    scheme: http
+    static_configs:
+      - targets:
+          - starterkit-indexer:4320

@@ -14,7 +14,7 @@ services:
       - PROTOKIT_PROCESSOR_INDEXER_GRAPHQL_HOST=${PROTOKIT_PROCESSOR_INDEXER_GRAPHQL_HOST}
       - PROTOKIT_INDEXER_GRAPHQL_PORT=${PROTOKIT_INDEXER_GRAPHQL_PORT}
     profiles:
-      - monolithic-processor
+      - processor
     depends_on:
       processor-postgres:
         condition: service_healthy
@@ -25,9 +25,9 @@ services:
       - indexer-net
       - routing-net
     ports:
-      - 8082:8080
+      - 8082:${PROTOKIT_PROCESSOR_GRAPHQL_PORT}
     working_dir: /app
-    command: ["./packages/chain/dist/start.js start ./environments/${PROTOKIT_ENV_FOLDER}/processor.config.js",]
+    command: ["./dist/start.js start ./core/environments/${PROTOKIT_ENV_FOLDER}/processor.config.js",]
     labels:
       logging: "promtail"
       logging_jobname: "processor"

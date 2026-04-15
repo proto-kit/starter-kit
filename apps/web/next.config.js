@@ -37,10 +37,14 @@ const nextConfig = {
       }),
     );
 
+    config.module.rules.push({
+      test: /\.(node|md|d\.ts)$/,
+      loader: "null-loader",
+    });
     return config;
   },
   compress: false,
-  output: "standalone"
+  output: "standalone",
 };
 
 module.exports = nextConfig;

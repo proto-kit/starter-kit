@@ -2,6 +2,8 @@ services:
   lightnet:
     image: o1labs/mina-local-network:compatible-latest-lightnet
     container_name: lightnet
+    profiles:
+      - lightnet
 
     environment:
       - RUN_ARCHIVE_NODE=true

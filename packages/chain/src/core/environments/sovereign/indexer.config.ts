@@ -6,10 +6,8 @@ import {
   IndexSettlementTask,
   GeneratedResolverFactoryGraphqlModule,
 } from "@proto-kit/indexer";
-import { GraphqlSequencerModule } from "@proto-kit/api";
-import {
-  WorkerModule,
-} from "@proto-kit/sequencer";
+import { GraphqlSequencerModule, OpenTelemetryServer } from "@proto-kit/api";
+import { WorkerModule } from "@proto-kit/sequencer";
 import { PrismaRedisDatabase } from "@proto-kit/persistance";
 import { BullQueue } from "@proto-kit/deployment";
 import { Arguments } from "../../../start";
@@ -27,6 +25,7 @@ const indexer = Indexer.from({
   Graphql: GraphqlSequencerModule.from({
     GeneratedResolverFactory: GeneratedResolverFactoryGraphqlModule,
   }),
+  OpenTelemetryServer,
 });
 
 export default async (args: Arguments): Promise<Startable> => {
@@ -57,6 +56,25 @@ export default async (args: Arguments): Promise<Startable> => {
     },
     Graphql: {
       GeneratedResolverFactory: {},
+      containerConfig: {
+        port: Number(process.env.PROTOKIT_INDEXER_GRAPHQL_PORT ?? 8081),
+        host: process.env.PROTOKIT_INDEXER_GRAPHQL_HOST ?? "0.0.0.0",
+        graphiql: true,
+      },
+    },
+    OpenTelemetryServer: {
+      tracing: {
+        enabled: false,
+      },
+      metrics: {
+        enabled: true,
+        prometheus: {
+          host: process.env.INDEXER_OPEN_TELEMETRY_METRICS_HOST ?? "localhost",
+          port: Number(process.env.INDEXER_OPEN_TELEMETRY_METRICS_PORT),
+          appendTimestamp: true,
+        },
+        nodeScrapeInterval: 10,
+      },
     },
   });
   return indexer;

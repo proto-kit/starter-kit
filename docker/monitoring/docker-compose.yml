@@ -11,8 +11,10 @@ services:
     networks:
       - monitoring
       - chain-net
+      - indexer-db-net
     ports:
       - "9090:9090"
+    user: ${USER_ID}
     restart: unless-stopped
     volumes:
       - ./prometheus/${PROTOKIT_ENV_FOLDER}:/etc/prometheus
@@ -59,13 +61,14 @@ services:
       - "4318:4317"
 
   tempo:
-    image: grafana/tempo:latest
+    image: grafana/tempo:2.7.0
     container_name: tempo
     networks:
       - monitoring
     profiles:
       - monitoring
     command: [ "-config.file=/etc/tempo.yaml" ]
+    user: ${USER_ID}
     volumes:
       - ./tempo/tempo.yaml:/etc/tempo.yaml
       - ../data/tempo:/var/tempo
@@ -81,14 +84,17 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+      - routing-net
     ports:
       - "3001:3000"
+    user: ${USER_ID}
     environment:
       - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
       - GF_SECURITY_ALLOW_EMBEDDING=true
     volumes:
-      - ./grafana:/etc/grafana/provisioning/datasources
+      - ./grafana/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/grafana-datasources.yaml
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
       - ../data/grafana:/var/lib/grafana
     depends_on:
       - loki

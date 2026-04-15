@@ -23,10 +23,17 @@ distributor:
 
 ingester:
   max_block_duration: 5m               # cut the headblock when this much time passes. this is being set for demo purposes and should probably be left alone normally
+  trace_idle_period: 10s
+  max_block_bytes: 1_000_000
+  lifecycler:
+    ring:
+      replication_factor: 1
 
 compactor:
   compaction:
-    block_retention: 1h                # overall Tempo trace retention. set for demo purposes
+    compaction_window: 1h
+    max_block_bytes: 100_000_000
+    block_retention: 1h
 
 metrics_generator:
   registry:

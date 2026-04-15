@@ -5,8 +5,7 @@ import {
   Sequencer,
   PrivateMempool,
   TimedBlockTrigger,
-  BlockProducerModule,
-  SequencerStartupModule,
+  SequencerCoreModule,
 } from "@proto-kit/sequencer";
 import { VanillaGraphqlModules, GraphqlSequencerModule } from "@proto-kit/api";
 import { IndexerNotifier } from "@proto-kit/indexer";
@@ -22,10 +21,10 @@ import * as protocol from "../../../protocol";
 
 import { Arguments } from "../../../start";
 import { Startable } from "@proto-kit/common";
-import {
-  buildCustomTokenConfig,
-  buildSettlementTokenConfig,
-} from "@proto-kit/stack";
+// import {
+//   buildCustomTokenConfig,
+//   buildSettlementTokenConfig,
+// } from "@proto-kit/stack";
 import {
   baseSettlementSequencerModules,
   baseSettlementSequencerModulesConfig,
@@ -46,9 +45,8 @@ const appChain = AppChain.from({
     TaskQueue: BullQueue,
     Graphql: GraphqlSequencerModule.from(VanillaGraphqlModules.with({})),
     Mempool: PrivateMempool,
-    BlockProducerModule,
     BlockTrigger: TimedBlockTrigger,
-    SequencerStartupModule,
+    SequencerCoreModule,
     ...baseSettlementSequencerModules,
     IndexerNotifier,
   }),
@@ -75,21 +73,25 @@ export default async (args: Arguments): Promise<Startable> => {
         },
       },
       Mempool: {},
-      BlockProducerModule: {},
+      SequencerCoreModule: {
+        BatchProducerModule: {},
+        SequencerStartupModule: {},
+        BlockProducerModule: {},
+      },
       BlockTrigger: {
         blockInterval: 10000,
         produceEmptyBlocks: true,
 
         settlementInterval: 60000,
-        settlementTokenConfig: buildSettlementTokenConfig(
-          process.env.PROTOKIT_MINA_BRIDGE_CONTRACT_PRIVATE_KEY!,
-          buildCustomTokenConfig(
-            process.env.PROTOKIT_CUSTOM_TOKEN_PRIVATE_KEY,
-            process.env.PROTOKIT_CUSTOM_TOKEN_BRIDGE_PRIVATE_KEY
-          )
-        ),
+        settlementTokenConfig: {},
+        // settlementTokenConfig: buildSettlementTokenConfig(
+        //   process.env.PROTOKIT_MINA_BRIDGE_CONTRACT_PRIVATE_KEY!,
+        //   buildCustomTokenConfig(
+        //     process.env.PROTOKIT_CUSTOM_TOKEN_PRIVATE_KEY,
+        //     process.env.PROTOKIT_CUSTOM_TOKEN_BRIDGE_PRIVATE_KEY
+        //   )
+        // ),
       },
-      SequencerStartupModule: {},
       ...baseSettlementSequencerModulesConfig,
       IndexerNotifier: {},
       TaskQueue: {
