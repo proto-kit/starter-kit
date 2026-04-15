@@ -1,4 +1,27 @@
 services:
+  processor-postgres:
+    image: postgres:14-alpine
+    container_name: starterkit-processor-postgres
+    profiles:
+      - processor
+      - processor-db
+    ports:
+      - 5434:5432
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $PROCESSOR_POSTGRES_USER -d $PROCESSOR_POSTGRES_DB" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ../data/processor/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=${PROCESSOR_POSTGRES_PASSWORD}
+      - POSTGRES_USER=${PROCESSOR_POSTGRES_USER}
+      - POSTGRES_DB=${PROCESSOR_POSTGRES_DB}
+    networks:
+      - processor-net
+    restart: unless-stopped
+
   processor:
     image: starterkit-chain-base
     build:
@@ -21,7 +44,7 @@ services:
       indexer:
         condition: service_healthy
     networks:
-      - processor-db-net
+      - processor-net
       - indexer-net
       - routing-net
     ports:
