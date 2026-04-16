@@ -33,6 +33,11 @@ export default async (args: Arguments): Promise<Startable> => {
     },
     GraphqlSequencerModule: {
       ResolverFactory: {},
+      containerConfig: {
+        port: Number(process.env.PROTOKIT_PROCESSOR_GRAPHQL_PORT ?? 8082),
+        host: process.env.PROTOKIT_PROCESSOR_GRAPHQL_HOST ?? "0.0.0.0",
+        graphiql: true,
+      },
     },
     Database: {},
   });

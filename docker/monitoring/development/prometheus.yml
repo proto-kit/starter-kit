@@ -27,4 +27,4 @@ scrape_configs:
     scheme: http
     static_configs:
       - targets:
-          - starterkit-sequencer:4320
+          - host.docker.internal:4320

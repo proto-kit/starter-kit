@@ -1,0 +1,18 @@
+services:
+  explorer:
+    image: ghcr.io/proto-kit/explorer:latest
+    container_name: explorer
+    profiles:
+      - explorer
+    ports:
+      - 3002:3000
+    networks:
+      - indexer-net
+      - routing-net
+    environment:
+      - NEXT_PUBLIC_INDEXER_URL=${NEXT_PUBLIC_PROTOKIT_INDEXER_GRAPHQL_URL}
+      - NEXT_PUBLIC_DASHBOARD_TITLE=${NEXT_PUBLIC_DASHBOARD_TITLE}
+      - NEXT_PUBLIC_DASHBOARD_SLOGAN=${NEXT_PUBLIC_DASHBOARD_SLOGAN}
+      - HOSTNAME=0.0.0.0
+      - NODE_ENV=production
+      - PORT=3000

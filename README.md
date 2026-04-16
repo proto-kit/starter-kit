@@ -12,11 +12,10 @@ You can learn more about the Protokit framework at the [official documentation](
 - nvm
 - [Auro Wallet](https://www.aurowallet.com)
 - (optional) For running with persistance / deploying on a server
-  - docker `>= 24.0`
-  - docker-compose `>= 2.22.0`
+    - docker `>= 24.0`
+    - docker-compose `>= 2.22.0`
 
 **Run the following commands to get started:**
-
 ```zsh
 # clone the repository
 git clone https://github.com/proto-kit/starter-kit my-chain
@@ -31,13 +30,11 @@ pnpm env:development prisma:generate
 # starts both the UI and the sequencer (file watcher / live reload enabled)
 pnpm env:inmemory dev
 ```
-
 Visit http://localhost:3000 to view the example UI, or http://localhost:8080/graphql to explore the sequencer's GraphQL APIs.
 
 ### Structural overview
 
 The starter kit contains the following files and folders:
-
 ```
 ├── apps
 │   └── web // example UI that connects to the app-chain's sequencer
@@ -45,7 +42,7 @@ The starter kit contains the following files and folders:
 │       ├── containers // smart components ("containers")
 │       └── lib
 │           └── stores // data stores for interacting with the app-chain's sequencer
-│
+│           
 ├── docker
 │   └── data // mounted as a volume for the docker containers
 │
@@ -57,7 +54,7 @@ The starter kit contains the following files and folders:
         │   │   └── processor // processor configuration (handlers, graphql resolvers, graphql server, ...)
         │   ├── protocol // protocol modules (transaction fees, ...)
         │   └── runtime // runtime modules (your app-chain's business logic)
-        │       └── modules
+        │       └── modules 
         │           ├── balances.ts // built-in example runtime module for Balances, with a faucet
         │           └── withdrawals.ts // withdrawal functionality module
         └── test // tests for various app-chain components
@@ -73,9 +70,8 @@ The starter-kit offers different environments to run you appchain.
 You can use those environments to configure the mode of operation for your appchain depending on which stage of development you are in.
 
 The starter kit comes with a set of pre-configured environments:
-
 - `inmemory`: Runs everything in-memory without persisting the data. Useful for early stages of runtime development.
-- `development`: Runs the sequencer locally and persists all state in databases running in docker.
+- `development`: Runs the sequencer locally and persists all state in databases running in docker. 
 - `sovereign`: Runs your appchain fully in docker (including the UI) for testnet deployments without settlement or bridging.
 
 Every command you execute should follow this pattern:
@@ -118,7 +114,7 @@ pnpm env:development prisma:migrate
 
 #### Pruning data
 
-Persisted data is stored under `docker/data`, you can delete this folder in case you're experiencing issues with persistence and need to reset your environment setup entirely.
+Persisted data is stored under `docker/data`, you can delete this folder in case you're experiencing issues with persistence and need to reset your environment setup entirely. 
 
 However to prune data during development, you should use the `--pruneOnStartup` CLI option [documented here](#cli-options)
 
@@ -128,7 +124,7 @@ Ensure you've successfully started the dockerized dependencies, generated and mi
 
 #### With live reload
 
-> ⚠️ Be aware, the dev command will automatically restart your application when your sources change.
+> ⚠️ Be aware, the dev command will automatically restart your application when your sources change. 
 > Please keep in mind that running the components below in `dev` mode (with live reload / watchersr) is advisable only when you're working on that specific component. In case you're experiencing issues with watches cross-triggering reload of different components, you can use the `start` command instead.
 
 ```zsh
@@ -146,7 +142,6 @@ pnpm env:development sequencer:start --filter=chain
 
 Protokit has the ability to report metrics, logs and traces to a Grafana instance for visualisation.
 These can be configured by the following environment variables
-
 ```zsh
 OPEN_TELEMETRY_TRACING_URL=
 OPEN_TELEMETRY_TRACING_ENABLED=
@@ -154,8 +149,7 @@ OPEN_TELEMETRY_TRACING_ENABLED=
 OPEN_TELEMETRY_METRICS_URL=
 OPEN_TELEMETRY_METRICS_ENABLED=
 OPEN_TELEMETRY_METRICS_SCRAPING_FREQUENCY=
-```
-
+````
 Note that the functionality is not configured for the `in-memory` mode.
 
 ### Running the UI
@@ -165,6 +159,7 @@ pnpm env:development dev --filter=web
 ```
 
 > You can also build/start the UI as well, instead of using `dev` command with live-reload.
+
 
 ### Running the indexer
 
@@ -222,46 +217,38 @@ You can define which resolvers are available in `chain/src/processor/api/resolve
 At this point in time, the starter-kit offers settlement & bridging integration with lightnet (local mina network). You can enable these features by setting the `PROTOKIT_SETTLEMENT_ENABLED` environment variable to `true` in development .env file.
 
 Follow these steps to get the sequencer to settle & bridge:
-
 - Initialize the lightnet process, fund the sequencer operator & deploy settlement+bridging contracts:
-
-  ```
-  pnpm env:development lightnet:start -d
-  pnpm protokit lightnet initialize --env development
-  ```
+    ```
+    pnpm env:development lightnet:start -d
+    pnpm protokit lightnet initialize
+    ```
 
 - Run a worker, alongside with the sequencer in separate shell instances
-
-  ```
-  pnpm env:development worker:dev
-  pnpm env:development sequencer:dev
-  ```
+    ```
+    pnpm env:development worker:dev
+    pnpm env:development sequencer:dev
+    ```
 
 - Fund a testing account on lightnet (defined in the .env file)
-
-  ```
-  pnpm protokit lightnet faucet B62qkVfEwyfkm5yucHEqrRjxbyx98pgdWz82pHv7LYq9Qigs812iWZ8 --env development
-  ```
+    ```
+    pnpm lightnet faucet B62qkVfEwyfkm5yucHEqrRjxbyx98pgdWz82pHv7LYq9Qigs812iWZ8
+    ```
 
 - Bridge the L1 $MINA to your app-chain, and observe your app-chain $MINA balance change after the next settlement lifecycle has been completed by the sequencer
 
-  > Token ID of MINA is `1` on both the L1 and app-chain
-
-  ```
-  pnpm protokit bridge deposit 1 TEST_ACCOUNT_1_PRIVATE_KEY TEST_ACCOUNT_1_PUBLIC_KEY 100 --env development
-  ```
+    > Token ID of MINA is `1` on both the L1 and app-chain
+    ```
+    pnpm protokit bridge deposit 1 TEST_ACCOUNT_1_PRIVATE_KEY TEST_ACCOUNT_1_PUBLIC_KEY 100
+    ```
 
 - Withdraw your app-chain $MINA tokens back to the L1
-
-  ```
-  pnpm protokit bridge withdraw 1 TEST_ACCOUNT_1_PRIVATE_KEY 100 --env development
-  ```
-
-For more detailed information about the protokit CLI commands used in this section, refer to the [Protokit CLI documentation](http://github.com/proto-kit/framework/tree/develop/packages/cli#proto-kit-cli).
+    ```
+    pnpm protokit bridge withdraw 1 TEST_ACCOUNT_1_PRIVATE_KEY 100
+    ```
 
 ## Deployments (sovereign environment)
 
-When deploying to a server, you should push your code along with your forked starter-kit to some repository,
+When deploying to a server, you should push your code along with your forked starter-kit to some repository, 
 then clone it on your remote server and execute it.
 
 > Don't forget to run `pnpm env:sovereign docker:build` to build the required images.
@@ -276,7 +263,6 @@ UI will be accessible at `https://localhost` and GQL inspector will be available
 ### Configuration
 
 Go to `docker/proxy/Caddyfile` and replace the `*` matcher with your domain.
-
 ```
 yourdomain.com {
     ...
@@ -296,8 +282,7 @@ The caddy reverse-proxy automatically uses https for all connections, use this g
 
 ### Monitoring
 
-Protokit offers monitoring via three different kinds of data and a collection of preconfigured services:
-
+Protokit offers monitoring via three different kinds of data and a collection of preconfigured services: 
 - Logs via Promtail and Loki
 - Metrics via OpenTelemetry and Prometheus
 - Traces via OpenTelemetry, OTel Collector and Tempo
@@ -308,11 +293,10 @@ Protokit offers monitoring via three different kinds of data and a collection of
 In Development mode, monitoring is disabled by default.
 
 To enabled, edit the `development/.env` file in the following way:
-
 1. Add the monitoring profile to `COMPOSE_PROFILES`
-2. Uncomment `...DefaultModules.metrics()` in the sequencer's module definition.
-   Important: This has to be in front of all other modules (i.e. has to be first in the modules record)
-3. Uncomment `...DefaultConfigs.metrics()` in the configuration call.
+2. Uncomment `...metricsSequencerModules` in the sequencer's module definition. 
+Important: This has to be in front of all other modules (i.e. has to be first in the modules record)
+3. Uncomment `...metricsSequencerModulesConfig` in the configuration call.
 
 Then, run `pnpm env:development docker:up` like usual. This should start all the services needed for monitoring.
 Grafana is available at `localhost:3000`.
@@ -329,10 +313,16 @@ If you want to remove the monitoring services, remove the docker profile `monito
 
 More information about monitoring can be found [here](https://github.com/proto-kit/framework/pull/272).
 
+*Deploying contracts* 
+
+`pnpm protokit lightnet initialize --env-path ./packages/chain/src/core/environments/sovereign/scripts.env`
+
 ## Building the framework from source
 
 1. Make sure the framework is located under ../framework from the starter-kit's location
 2. Adapt your starter-kit's `packages/chain` and `apps/web` package.json to use the file:// references to framework, including
-   references to `o1js` and `tsyringe`. Important: Make sure to update references in both chain and web, otherwise the location of the node_modules will be different and lead to errors
+references to `o1js` and `tsyringe`. Important: Make sure to update references in both chain and web, otherwise the location of the node_modules will be different and lead to errors
+
+If you want to use the sovereign environment or above:
 3. Go into the framework folder, and build a docker image containing the sources with `docker build -f ./packages/deployment/docker/development-base/Dockerfile -t protokit-base .`
 4. Replace the first line of `docker/base/Dockerfile` and `docker/web/Dockerfile` to use `FROM protokit-base:latest`

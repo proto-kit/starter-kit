@@ -8,3 +8,4 @@ include:
   - ./worker/docker-compose.yml
   - ./lightnet/docker-compose.yml
   - ./monitoring/docker-compose.yml
+  - ./explorer/docker-compose.yml

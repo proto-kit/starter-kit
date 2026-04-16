@@ -3,6 +3,7 @@ services:
     image: postgres:14-alpine
     container_name: starterkit-indexer-postgres
     profiles:
+      - indexer
       - indexer-db
     ports:
       - "127.0.0.1:5433:5432"
@@ -18,7 +19,7 @@ services:
       - POSTGRES_USER=${INDEXER_POSTGRES_USER}
       - POSTGRES_DB=${INDEXER_POSTGRES_DB}
     networks:
-      - indexer-db-net
+      - indexer-net
     restart: unless-stopped
 
   indexer:
@@ -38,8 +39,10 @@ services:
       - PROTOKIT_LOG_LEVEL=${PROTOKIT_LOG_LEVEL}
       - PROTOKIT_INDEXER_GRAPHQL_HOST=${PROTOKIT_INDEXER_GRAPHQL_HOST}
       - PROTOKIT_INDEXER_GRAPHQL_PORT=${PROTOKIT_INDEXER_GRAPHQL_PORT}
+      - INDEXER_OPEN_TELEMETRY_METRICS_HOST=${INDEXER_OPEN_TELEMETRY_METRICS_HOST}
+      - INDEXER_OPEN_TELEMETRY_METRICS_PORT=${INDEXER_OPEN_TELEMETRY_METRICS_PORT}
     profiles:
-      - monolithic-indexer
+      - indexer
     depends_on:
       indexer-postgres:
         condition: service_healthy
@@ -55,19 +58,18 @@ services:
       timeout: 5s
       retries: 30
     networks:
-      - indexer-db-net
+      - indexer-net
       - routing-net
       - queue-net
     ports:
-      - 8081:8080
+      - 8081:${PROTOKIT_INDEXER_GRAPHQL_PORT}
     command:
       [
-        "./packages/chain/dist/start.js start ./environments/${PROTOKIT_ENV_FOLDER}/indexer.config.js",
+        "./dist/start.js start ./core/environments/${PROTOKIT_ENV_FOLDER}/indexer.config.js",
       ]
     labels:
       logging: "promtail"
       logging_jobname: "indexer"
 
 networks:
-  indexer-db-net:
   indexer-net:

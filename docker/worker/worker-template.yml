@@ -1,31 +1,17 @@
 services:
-  sequencer:
+  worker-base:
     image: starterkit-chain-base
     build:
       dockerfile: ./docker/base/Dockerfile
       context: ../..
-    container_name: starterkit-sequencer
     environment:
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - DATABASE_URL=${DATABASE_URL}
-
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
 
-      - MINA_NETWORK=${MINA_NETWORK}
-      - MINA_NODE_GRAPHQL=${MINA_NODE_GRAPHQL}
-      - MINA_ARCHIVE_GRAPHQL=${MINA_ARCHIVE_GRAPHQL}
       - PROTOKIT_TRANSACTION_FEE_RECIPIENT_PRIVATE_KEY=${PROTOKIT_TRANSACTION_FEE_RECIPIENT_PRIVATE_KEY}
       - PROTOKIT_TRANSACTION_FEE_RECIPIENT_PUBLIC_KEY=${PROTOKIT_TRANSACTION_FEE_RECIPIENT_PUBLIC_KEY}
-      - PROTOKIT_SHOULD_ATTEMPT_DB_MIGRATION=${PROTOKIT_SHOULD_ATTEMPT_DB_MIGRATION}
       - PROTOKIT_LOG_LEVEL=${PROTOKIT_LOG_LEVEL}
-      - PROTOKIT_GRAPHQL_HOST=${PROTOKIT_GRAPHQL_HOST}
-      - PROTOKIT_GRAPHQL_PORT=${PROTOKIT_GRAPHQL_PORT}
       - PROTOKIT_SEQUENCER_PRIVATE_KEY=${PROTOKIT_SEQUENCER_PRIVATE_KEY}
       - PROTOKIT_SEQUENCER_PUBLIC_KEY=${PROTOKIT_SEQUENCER_PUBLIC_KEY}
       - PROTOKIT_SETTLEMENT_CONTRACT_PRIVATE_KEY=${PROTOKIT_SETTLEMENT_CONTRACT_PRIVATE_KEY}
@@ -37,29 +23,22 @@ services:
       - PROTOKIT_PROOFS_ENABLED=${PROTOKIT_PROOFS_ENABLED}
       - PROTOKIT_BLOCK_ARGUMENT_BATCH_SIZE=${PROTOKIT_BLOCK_ARGUMENT_BATCH_SIZE}
       - PROTOKIT_STATE_TRANSITION_BATCH_SIZE=${PROTOKIT_STATE_TRANSITION_BATCH_SIZE}
-
-      - OPEN_TELEMETRY_TRACING_URL=${OPEN_TELEMETRY_TRACING_URL}
-
-      - OPEN_TELEMETRY_METRICS_PORT=${OPEN_TELEMETRY_METRICS_PORT}
-      - OPEN_TELEMETRY_METRICS_HOST=${OPEN_TELEMETRY_METRICS_HOST}
-    profiles:
-      - monolithic-sequencer
     depends_on:
-      postgres:
-        condition: service_healthy
       redis:
         condition: service_healthy
     networks:
       - db-net
-      - routing-net
-      - chain-net
       - lightnet-net
-    ports:
-      - 8080:8080
-    command: ["./dist/start.js start ./core/environments/${PROTOKIT_ENV_FOLDER}/chain.config.js"]
+    volumes:
+      - ${HOME}/.cache/o1js:/home/node/.cache/o1js
+    command: ["./dist/start.js start ./core/environments/${PROTOKIT_ENV_FOLDER}/worker.config.js"]
     labels:
       logging: "promtail"
-      logging_jobname: "sequencer"
+      logging_jobname: "worker"
 
-networks:
-  chain-net:
+  worker-specialized-base:
+    extends:
+      service: worker-base
+    profiles:
+      - worker
+      - worker-specialized

@@ -24,9 +24,11 @@ export const baseSettlementSequencerModulesConfig = {
       type:
         (process.env.MINA_NETWORK as "local" | "lightnet" | "remote") ??
         "lightnet",
-      graphql: `${process.env.MINA_NODE_GRAPHQL_HOST ?? "http://localhost"}:${process.env.MINA_NODE_GRAPHQL_PORT ?? 8083}/graphql`,
-      archive: `${process.env.MINA_ARCHIVE_GRAPHQL_HOST ?? "http://localhost"}:${process.env.MINA_ARCHIVE_GRAPHQL_PORT ?? 8085}`,
-      accountManager: `${process.env.MINA_ACCOUNT_MANAGER_HOST ?? "http://localhost"}:${process.env.MINA_ACCOUNT_MANAGER_PORT ?? 8084}`,
+      graphql: process.env.MINA_NODE_GRAPHQL ?? "http://localhost:8083/graphql",
+      archive:
+        process.env.MINA_ARCHIVE_GRAPHQL ?? "http://localhost:8085/graphql",
+      accountManager:
+        process.env.MINA_ACCOUNT_MANAGER_URL ?? "http://localhost:8084",
     },
   },
   SettlementModule: {
