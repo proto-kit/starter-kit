@@ -6,7 +6,7 @@ services:
       - processor
       - processor-db
     ports:
-      - 5434:5432
+      - "127.0.0.1:5434:5432"
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U $PROCESSOR_POSTGRES_USER -d $PROCESSOR_POSTGRES_DB" ]
       interval: 5s
