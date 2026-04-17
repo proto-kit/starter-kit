@@ -26,7 +26,7 @@ export const baseSettlementSequencerModulesConfig = {
         "lightnet",
       graphql: process.env.MINA_NODE_GRAPHQL ?? "http://localhost:8083/graphql",
       archive:
-        process.env.MINA_ARCHIVE_GRAPHQL ?? "http://localhost:8085/graphql",
+        process.env.MINA_ARCHIVE_GRAPHQL ?? "http://localhost:8085",
       accountManager:
         process.env.MINA_ACCOUNT_MANAGER_URL ?? "http://localhost:8084",
     },
