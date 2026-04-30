@@ -41,7 +41,7 @@
     "turbo": "^2.1.2"
   },
   "dependencies": {
-    "@proto-kit/cli": "../framework/packages/cli",
+    "@proto-kit/cli": "0.2.0",
     "@types/graphql-fields": "^1.3.9",
     "chain": "^0.4.0",
     "dotenv-cli": "^7.4.2",
